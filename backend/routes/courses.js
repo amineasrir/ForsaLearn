@@ -42,7 +42,7 @@ router.get('/', async (req, res) => {
       if (req.query.minPrice) filter.price.$gte = parseFloat(req.query.minPrice);
       if (req.query.maxPrice) filter.price.$lte = parseFloat(req.query.maxPrice);
     }
-    
+     
     // Build sort options
     let sort = {};
     if (req.query.sort === 'popular') {

@@ -1,4 +1,3 @@
-// server.js
 const express = require('express');
 const dotenv = require('dotenv');
 const cors = require('cors');
@@ -57,7 +56,7 @@ if (process.env.NODE_ENV === 'development') {
 // Test route
 app.get('/', (req, res) => {
   res.json({
-    message: '🚀 Welcome to ForsaLearn API',
+    message: ' Welcome to ForsaLearn API',
     version: '1.0.0',
     status: 'Running'
   });
@@ -78,22 +77,28 @@ const authRoutes = require('./routes/auth');
 app.use('/api/auth', authRoutes);
 
 // Course Routes
-// const courseRoutes = require('./routes/courses');
-// app.use('/api/courses', courseRoutes);
+const courseRoutes = require('./routes/courses');
+app.use('/api/courses', courseRoutes);
 
-// User Routes
+// Admin Routes
+const adminRoutes = require('./routes/admin');
+app.use('/api/admin', adminRoutes);
+
+// User Routes (we'll create this later)
 // const userRoutes = require('./routes/users');
 // app.use('/api/users', userRoutes);
 
-// Admin Routes
+// Admin Routes (we'll create this later)
 // const adminRoutes = require('./routes/admin');
 // app.use('/api/admin', adminRoutes);
 
-// Payment Routes
+// Payment Routes (we'll create this later)
 // const paymentRoutes = require('./routes/payments');
 // app.use('/api/payments', paymentRoutes);
 
+// ============================================
 // ERROR HANDLING MIDDLEWARE
+// ============================================
 
 // Handle 404 - Route not found
 app.use((req, res, next) => {
@@ -121,15 +126,15 @@ const PORT = process.env.PORT || 5000;
 
 const server = app.listen(PORT, () => {
   console.log('='.repeat(50));
-  console.log(`🚀 Server running in ${process.env.NODE_ENV} mode`);
-  console.log(`📡 Server URL: http://localhost:${PORT}`);
-  console.log(`🌐 API Base: http://localhost:${PORT}/api`);
+  console.log(` Server running in ${process.env.NODE_ENV} mode`);
+  console.log(`Server URL: http://localhost:${PORT}`);
+  console.log(`API Base: http://localhost:${PORT}/api`);
   console.log('='.repeat(50));
 });
 
 // Handle unhandled promise rejections
 process.on('unhandledRejection', (err, promise) => {
-  console.error('❌ Unhandled Rejection:', err.message);
+  console.error(' Unhandled Rejection:', err.message);
   // Close server & exit process
   server.close(() => process.exit(1));
 });
