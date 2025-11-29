@@ -36,6 +36,10 @@ const userSchema = new mongoose.Schema({
     minlength: [6, 'Password must be at least 6 characters'],
     select: false // Don't return password by default in queries
   },
+  profilePicture: {
+    type: String,
+    default: 'default-avatar.jpg'
+  },
   role: {
     type: String,
     enum: ['admin', 'formateur', 'visiteur'],

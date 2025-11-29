@@ -1,3 +1,4 @@
+// server.js
 const express = require('express');
 const dotenv = require('dotenv');
 const cors = require('cors');
@@ -25,6 +26,9 @@ const app = express();
 // Body Parser - to parse JSON requests
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
+// Serve static files (uploads)
+app.use('/uploads', express.static('uploads'));
 
 // CORS - Allow frontend to communicate with backend
 app.use(cors({
@@ -56,7 +60,7 @@ if (process.env.NODE_ENV === 'development') {
 // Test route
 app.get('/', (req, res) => {
   res.json({
-    message: ' Welcome to ForsaLearn API',
+    message: '🚀 Welcome to ForsaLearn API',
     version: '1.0.0',
     status: 'Running'
   });
@@ -76,13 +80,21 @@ app.get('/api/health', (req, res) => {
 const authRoutes = require('./routes/auth');
 app.use('/api/auth', authRoutes);
 
-// Course Routes
+// Course Routes (Public & Students)
 const courseRoutes = require('./routes/courses');
 app.use('/api/courses', courseRoutes);
 
 // Admin Routes
 const adminRoutes = require('./routes/admin');
 app.use('/api/admin', adminRoutes);
+
+// Formateur Routes
+const formateurRoutes = require('./routes/formateur');
+app.use('/api/formateur', formateurRoutes);
+
+// Upload Routes
+const uploadRoutes = require('./routes/upload');
+app.use('/api/upload', uploadRoutes);
 
 // User Routes (we'll create this later)
 // const userRoutes = require('./routes/users');
@@ -126,7 +138,7 @@ const PORT = process.env.PORT || 5000;
 
 const server = app.listen(PORT, () => {
   console.log('='.repeat(50));
-  console.log(` Server running in ${process.env.NODE_ENV} mode`);
+  console.log(`Server running in ${process.env.NODE_ENV} mode`);
   console.log(`Server URL: http://localhost:${PORT}`);
   console.log(`API Base: http://localhost:${PORT}/api`);
   console.log('='.repeat(50));
@@ -134,7 +146,7 @@ const server = app.listen(PORT, () => {
 
 // Handle unhandled promise rejections
 process.on('unhandledRejection', (err, promise) => {
-  console.error(' Unhandled Rejection:', err.message);
+  console.error('Unhandled Rejection:', err.message);
   // Close server & exit process
   server.close(() => process.exit(1));
 });
