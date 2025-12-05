@@ -4,6 +4,12 @@ const { body, validationResult } = require('express-validator');
 const { User, Admin, Formateur, Visiteur } = require('../models/User');
 const Course = require('../models/Course');
 const { protect, authorize } = require('../middleware/auth');
+const {
+  sendFormateurApprovalEmail,
+  sendFormateurRejectionEmail,
+  sendCourseApprovalEmail,
+  sendCourseRejectionEmail
+} = require('../utils/emailService');
 
 // All admin routes require authentication and admin role
 router.use(protect);
@@ -34,7 +40,7 @@ router.get('/dashboard/stats', async (req, res) => {
     const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
     const newUsersThisMonth = await User.countDocuments({ 
       createdAt: { $gte: thirtyDaysAgo },
-      rolwe: { $ne: 'admin' }
+      role: { $ne: 'admin' }
     });
     const newCoursesThisMonth = await Course.countDocuments({ 
       createdAt: { $gte: thirtyDaysAgo }
@@ -132,9 +138,7 @@ router.get('/dashboard/revenue', async (req, res) => {
   }
 });
 
-// ============================================
 // USER MANAGEMENT
-// ============================================
 
 // Get all users with filters and pagination
 router.get('/users', async (req, res) => {
@@ -297,9 +301,7 @@ router.delete('/users/:id', async (req, res) => {
   }
 });
 
-// ============================================
 // FORMATEUR APPROVAL MANAGEMENT
-// ============================================
 
 // Get all pending formateur approvals
 router.get('/formateurs/pending', async (req, res) => {
@@ -339,7 +341,8 @@ router.patch('/formateurs/:id/approve', async (req, res) => {
     
     await formateur.save();
     
-    // TODO: Send approval email to formateur
+    // Send approval email
+    await sendFormateurApprovalEmail(formateur);
     
     res.status(200).json({
       success: true,
@@ -375,7 +378,8 @@ router.patch('/formateurs/:id/reject',
       
       await formateur.save();
       
-      // TODO: Send rejection email to formateur
+      // Send rejection email
+      await sendFormateurRejectionEmail(formateur, req.body.reason);
       
       res.status(200).json({
         success: true,
@@ -389,9 +393,7 @@ router.patch('/formateurs/:id/reject',
   }
 );
 
-// ============================================
 // COURSE APPROVAL MANAGEMENT
-// ============================================
 
 // Get all pending courses
 router.get('/courses/pending', async (req, res) => {
@@ -476,7 +478,9 @@ router.patch('/courses/:id/approve', async (req, res) => {
     
     await course.save();
     
-    // TODO: Send approval email to formateur
+    // Get formateur info and send approval email
+    const formateur = await Formateur.findById(course.formateur);
+    await sendCourseApprovalEmail(course, formateur);
     
     res.status(200).json({
       success: true,
@@ -514,7 +518,9 @@ router.patch('/courses/:id/reject',
       
       await course.save();
       
-      // TODO: Send rejection email to formateur
+      // Get formateur info and send rejection email
+      const formateur = await Formateur.findById(course.formateur);
+      await sendCourseRejectionEmail(course, formateur, req.body.reason);
       
       res.status(200).json({
         success: true,
@@ -572,9 +578,7 @@ router.patch('/courses/:id/featured', async (req, res) => {
   }
 });
 
-// ============================================
 // BULK OPERATIONS
-// ============================================
 
 // Bulk approve formateurs
 router.post('/formateurs/bulk-approve',

@@ -3,6 +3,11 @@ const router = express.Router();
 const { body, validationResult } = require('express-validator');
 const Course = require('../models/Course');
 const { protect, authorize, checkFormateurApproval } = require('../middleware/auth');
+const {
+  sendEnrollmentConfirmationEmail,
+  sendNewStudentNotification
+} = require('../utils/emailService');
+const { Formateur } = require('../models/User');
 
 // PUBLIC ROUTES - No authentication required
 
@@ -42,7 +47,7 @@ router.get('/', async (req, res) => {
       if (req.query.minPrice) filter.price.$gte = parseFloat(req.query.minPrice);
       if (req.query.maxPrice) filter.price.$lte = parseFloat(req.query.maxPrice);
     }
-     
+    
     // Build sort options
     let sort = {};
     if (req.query.sort === 'popular') {
@@ -56,7 +61,7 @@ router.get('/', async (req, res) => {
     } else if (req.query.sort === 'price-high') {
       sort = { price: -1 };
     } else {
-      sort = { createdAt: -1 };
+      sort = { createdAt: -1 }; // Default sort
     }
     
     // Get courses with pagination
@@ -342,6 +347,13 @@ router.post('/:id/enroll', protect, authorize('visiteur'), async (req, res) => {
     }
     
     await course.enrollStudent(req.user.id);
+    
+    // Send enrollment confirmation email to student
+    const formateur = await Formateur.findById(course.formateur);
+    await sendEnrollmentConfirmationEmail(req.user, course, formateur);
+    
+    // Send notification to formateur
+    await sendNewStudentNotification(formateur, req.user, course);
     
     res.status(200).json({
       success: true,

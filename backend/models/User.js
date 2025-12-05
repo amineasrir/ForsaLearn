@@ -40,6 +40,11 @@ const userSchema = new mongoose.Schema({
     type: String,
     default: 'default-avatar.jpg'
   },
+  language: {
+    type: String,
+    enum: ['en', 'fr'],
+    default: 'en'
+  },
   role: {
     type: String,
     enum: ['admin', 'formateur', 'visiteur'],
