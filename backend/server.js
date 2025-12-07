@@ -96,6 +96,10 @@ app.use('/api/formateur', formateurRoutes);
 const uploadRoutes = require('./routes/upload');
 app.use('/api/upload', uploadRoutes);
 
+// Payment Routes
+const paymentRoutes = require('./routes/payment');
+app.use('/api/payment', paymentRoutes);
+
 // User Routes (we'll create this later)
 // const userRoutes = require('./routes/users');
 // app.use('/api/users', userRoutes);
@@ -138,15 +142,15 @@ const PORT = process.env.PORT || 5000;
 
 const server = app.listen(PORT, () => {
   console.log('='.repeat(50));
-  console.log(`Server running in ${process.env.NODE_ENV} mode`);
-  console.log(`Server URL: http://localhost:${PORT}`);
-  console.log(`API Base: http://localhost:${PORT}/api`);
+  console.log(`🚀 Server running in ${process.env.NODE_ENV} mode`);
+  console.log(`📡 Server URL: http://localhost:${PORT}`);
+  console.log(`🌐 API Base: http://localhost:${PORT}/api`);
   console.log('='.repeat(50));
 });
 
 // Handle unhandled promise rejections
 process.on('unhandledRejection', (err, promise) => {
-  console.error('Unhandled Rejection:', err.message);
+  console.error('❌ Unhandled Rejection:', err.message);
   // Close server & exit process
   server.close(() => process.exit(1));
 });

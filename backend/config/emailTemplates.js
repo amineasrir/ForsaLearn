@@ -1,4 +1,3 @@
-// config/emailTemplates.js
 // Multi-language email templates (English & French)
 
 const getTranslations = (language = 'en') => ({
