@@ -100,17 +100,9 @@ app.use('/api/upload', uploadRoutes);
 const paymentRoutes = require('./routes/payment');
 app.use('/api/payment', paymentRoutes);
 
-// User Routes (we'll create this later)
-// const userRoutes = require('./routes/users');
-// app.use('/api/users', userRoutes);
-
-// Admin Routes (we'll create this later)
-// const adminRoutes = require('./routes/admin');
-// app.use('/api/admin', adminRoutes);
-
-// Payment Routes (we'll create this later)
-// const paymentRoutes = require('./routes/payments');
-// app.use('/api/payments', paymentRoutes);
+// Certificate Routes
+const certificateRoutes = require('./routes/certificate');
+app.use('/api/certificate', certificateRoutes);
 
 // ============================================
 // ERROR HANDLING MIDDLEWARE

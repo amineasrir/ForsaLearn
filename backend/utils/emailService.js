@@ -239,6 +239,42 @@ const sendNewStudentNotification = async (formateur, student, course, language =
 
 // Additional email functions can be added similarly...
 
+// COURSE COMPLETION EMAIL
+
+const sendCourseCompletionEmail = async (student, course, language = 'en') => {
+  try {
+    const t = getTranslations(language).courseCompletion;
+    
+    const html = baseTemplate(`
+      <div class="container">
+        <div class="header success">
+          <h1>🏆 ${t.title}</h1>
+        </div>
+        <div class="content" style="text-align: center;">
+          <div style="font-size: 80px; margin: 20px 0;">🏆</div>
+          <h2>${t.greeting(student.firstName)}</h2>
+          <p style="font-size: 18px;">${t.intro}</p>
+          <h3 style="color: #28a745;">${course.title}</h3>
+          <p>${t.message}</p>
+          <p style="text-align: center;">
+            <a href="${process.env.CLIENT_URL}/my-courses/${course._id}/certificate" class="button" style="background-color: #28a745;">${t.button}</a>
+          </p>
+          <p style="margin-top: 30px; color: #666;">${t.footer}</p>
+        </div>
+      </div>
+    `, language);
+    
+    await sendEmail({ 
+      to: student.email, 
+      subject: t.subject(course.title), 
+      html 
+    });
+    console.log(`✅ Course completion email sent to ${student.email}`);
+  } catch (error) {
+    console.error('❌ Error sending completion email:', error);
+  }
+};
+
 module.exports = {
   sendWelcomeEmail,
   sendFormateurApprovalEmail,
@@ -246,5 +282,6 @@ module.exports = {
   sendCourseApprovalEmail,
   sendCourseRejectionEmail,
   sendEnrollmentConfirmationEmail,
-  sendNewStudentNotification
+  sendNewStudentNotification,
+  sendCourseCompletionEmail
 };
