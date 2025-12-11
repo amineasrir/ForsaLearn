@@ -1,4 +1,3 @@
-// config/email.js
 const nodemailer = require('nodemailer');
 
 // ============================================

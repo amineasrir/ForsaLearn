@@ -2,110 +2,123 @@ const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
 
-// CREATE UPLOAD DIRECTORIES IF NOT EXIST
-const createUploadDirs = () => {
-  const dirs = [
-    './uploads',
-    './uploads/courses',
+// CREATE UPLOAD DIRECTORIES
+
+const createUploadDirectories = () => {
+  const directories = [
     './uploads/courses/thumbnails',
     './uploads/courses/videos',
     './uploads/courses/resources',
     './uploads/certificates',
     './uploads/projects',
-    './uploads/profiles'
+    './uploads/profiles',
+    './uploads/messages'
   ];
-  
-  dirs.forEach(dir => {
+
+  directories.forEach(dir => {
     if (!fs.existsSync(dir)) {
       fs.mkdirSync(dir, { recursive: true });
-      console.log(`✅ Created directory: ${dir}`);
+      console.log(`📁 Created directory: ${dir}`);
     }
   });
 };
 
-createUploadDirs();
+// Create directories on module load
+createUploadDirectories();
 
 // STORAGE CONFIGURATION
 
-// Storage for course thumbnails
+// Course Thumbnail Storage
 const courseThumbnailStorage = multer.diskStorage({
   destination: (req, file, cb) => {
     cb(null, './uploads/courses/thumbnails');
   },
   filename: (req, file, cb) => {
-    // Generate unique filename: courseid_timestamp.ext
-    const uniqueName = `course_${Date.now()}${path.extname(file.originalname)}`;
-    cb(null, uniqueName);
+    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+    cb(null, `thumbnail-${uniqueSuffix}${path.extname(file.originalname)}`);
   }
 });
 
-// Storage for course videos
+// Course Video Storage
 const courseVideoStorage = multer.diskStorage({
   destination: (req, file, cb) => {
     cb(null, './uploads/courses/videos');
   },
   filename: (req, file, cb) => {
-    const uniqueName = `video_${Date.now()}${path.extname(file.originalname)}`;
-    cb(null, uniqueName);
+    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+    cb(null, `video-${uniqueSuffix}${path.extname(file.originalname)}`);
   }
 });
 
-// Storage for course resources (PDFs, docs, etc.)
-const courseResourceStorage = multer.diskStorage({
+// Course Resources Storage
+const courseResourcesStorage = multer.diskStorage({
   destination: (req, file, cb) => {
     cb(null, './uploads/courses/resources');
   },
   filename: (req, file, cb) => {
-    const uniqueName = `resource_${Date.now()}${path.extname(file.originalname)}`;
-    cb(null, uniqueName);
+    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+    const sanitizedName = file.originalname.replace(/[^a-zA-Z0-9.-]/g, '_');
+    cb(null, `resource-${uniqueSuffix}-${sanitizedName}`);
   }
 });
 
-// Storage for formateur certificates
+// Certificate Storage
 const certificateStorage = multer.diskStorage({
   destination: (req, file, cb) => {
     cb(null, './uploads/certificates');
   },
   filename: (req, file, cb) => {
-    const uniqueName = `cert_${req.user.id}_${Date.now()}${path.extname(file.originalname)}`;
-    cb(null, uniqueName);
+    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+    cb(null, `cert-${uniqueSuffix}${path.extname(file.originalname)}`);
   }
 });
 
-// Storage for formateur projects
+// Project Storage
 const projectStorage = multer.diskStorage({
   destination: (req, file, cb) => {
     cb(null, './uploads/projects');
   },
   filename: (req, file, cb) => {
-    const uniqueName = `project_${req.user.id}_${Date.now()}${path.extname(file.originalname)}`;
-    cb(null, uniqueName);
+    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+    cb(null, `project-${uniqueSuffix}${path.extname(file.originalname)}`);
   }
 });
 
-// Storage for profile pictures
+// Profile Picture Storage
 const profileStorage = multer.diskStorage({
   destination: (req, file, cb) => {
     cb(null, './uploads/profiles');
   },
   filename: (req, file, cb) => {
-    const uniqueName = `profile_${req.user.id}_${Date.now()}${path.extname(file.originalname)}`;
-    cb(null, uniqueName);
+    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+    cb(null, `profile-${uniqueSuffix}${path.extname(file.originalname)}`);
   }
 });
 
-// FILE FILTER FUNCTIONS
+// Message Attachment Storage
+const messageStorage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, './uploads/messages');
+  },
+  filename: (req, file, cb) => {
+    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+    const sanitizedName = file.originalname.replace(/[^a-zA-Z0-9.-]/g, '_');
+    cb(null, `msg-${uniqueSuffix}-${sanitizedName}`);
+  }
+});
 
-// Image filter (for thumbnails, profiles)
+// FILE FILTERS
+
+// Image filter (for thumbnails and profiles)
 const imageFilter = (req, file, cb) => {
   const allowedTypes = /jpeg|jpg|png|gif|webp/;
   const extname = allowedTypes.test(path.extname(file.originalname).toLowerCase());
   const mimetype = allowedTypes.test(file.mimetype);
-  
+
   if (extname && mimetype) {
-    return cb(null, true);
+    cb(null, true);
   } else {
-    cb(new Error('Only image files (JPEG, JPG, PNG, GIF, WEBP) are allowed!'));
+    cb(new Error('Only image files (JPEG, PNG, GIF, WebP) are allowed!'), false);
   }
 };
 
@@ -114,112 +127,115 @@ const videoFilter = (req, file, cb) => {
   const allowedTypes = /mp4|avi|mov|wmv|flv|mkv|webm/;
   const extname = allowedTypes.test(path.extname(file.originalname).toLowerCase());
   const mimetype = file.mimetype.startsWith('video/');
-  
+
   if (extname && mimetype) {
-    return cb(null, true);
+    cb(null, true);
   } else {
-    cb(new Error('Only video files (MP4, AVI, MOV, etc.) are allowed!'));
+    cb(new Error('Only video files are allowed!'), false);
   }
 };
 
-// Document filter (for resources, certificates)
+// Document filter (for resources, certificates, projects)
 const documentFilter = (req, file, cb) => {
-  const allowedTypes = /pdf|doc|docx|ppt|pptx|xls|xlsx|zip|rar/;
+  const allowedTypes = /pdf|doc|docx|xls|xlsx|ppt|pptx|txt|zip|rar/;
   const extname = allowedTypes.test(path.extname(file.originalname).toLowerCase());
-  
+
   if (extname) {
-    return cb(null, true);
+    cb(null, true);
   } else {
-    cb(new Error('Only document files (PDF, DOC, PPT, XLS, ZIP) are allowed!'));
+    cb(new Error('Only document files (PDF, DOC, XLS, PPT, ZIP) are allowed!'), false);
   }
 };
 
-// General file filter (for projects - allows more types)
-const generalFileFilter = (req, file, cb) => {
-  const allowedTypes = /pdf|doc|docx|ppt|pptx|xls|xlsx|zip|rar|jpg|jpeg|png|gif/;
+// NEW - Message attachment filter (images, videos, documents)
+const messageAttachmentFilter = (req, file, cb) => {
+  const allowedTypes = /jpeg|jpg|png|gif|webp|mp4|avi|mov|pdf|doc|docx|xls|xlsx|txt|zip|rar/;
   const extname = allowedTypes.test(path.extname(file.originalname).toLowerCase());
-  
+
   if (extname) {
-    return cb(null, true);
+    cb(null, true);
   } else {
-    cb(new Error('File type not allowed!'));
+    cb(new Error('File type not allowed for messages!'), false);
   }
 };
 
-// FILE SIZE LIMITS
-const fileSizeLimits = {
-  image: 5 * 1024 * 1024,      // 5 MB for images
-  video: 500 * 1024 * 1024,    // 500 MB for videos
-  document: 10 * 1024 * 1024,  // 10 MB for documents
-  general: 50 * 1024 * 1024    // 50 MB for general files
-};
+// MULTER UPLOAD CONFIGURATIONS
 
-// MULTER UPLOAD INSTANCES
-
-// Upload course thumbnail
+// Course Thumbnail Upload (max 5MB)
 const uploadCourseThumbnail = multer({
   storage: courseThumbnailStorage,
-  limits: { fileSize: fileSizeLimits.image },
+  limits: { fileSize: 5 * 1024 * 1024 }, // 5MB
   fileFilter: imageFilter
 }).single('thumbnail');
 
-// Upload course video
+// Course Video Upload (max 500MB)
 const uploadCourseVideo = multer({
   storage: courseVideoStorage,
-  limits: { fileSize: fileSizeLimits.video },
+  limits: { fileSize: 500 * 1024 * 1024 }, // 500MB
   fileFilter: videoFilter
 }).single('video');
 
-// Upload course resources (multiple files)
+// Course Resources Upload (multiple, max 50MB each)
 const uploadCourseResources = multer({
-  storage: courseResourceStorage,
-  limits: { fileSize: fileSizeLimits.document },
+  storage: courseResourcesStorage,
+  limits: { fileSize: 50 * 1024 * 1024 }, // 50MB per file
   fileFilter: documentFilter
 }).array('resources', 10); // Max 10 files
 
-// Upload formateur certificate
+// Certificate Upload (max 10MB)
 const uploadCertificate = multer({
   storage: certificateStorage,
-  limits: { fileSize: fileSizeLimits.document },
+  limits: { fileSize: 10 * 1024 * 1024 }, // 10MB
   fileFilter: documentFilter
 }).single('certificate');
 
-// Upload formateur project files
+// Project Upload (max 50MB)
 const uploadProject = multer({
   storage: projectStorage,
-  limits: { fileSize: fileSizeLimits.general },
-  fileFilter: generalFileFilter
+  limits: { fileSize: 50 * 1024 * 1024 }, // 50MB
+  fileFilter: documentFilter
 }).single('project');
 
-// Upload profile picture
+// Profile Picture Upload (max 5MB)
 const uploadProfile = multer({
   storage: profileStorage,
-  limits: { fileSize: fileSizeLimits.image },
+  limits: { fileSize: 5 * 1024 * 1024 }, // 5MB
   fileFilter: imageFilter
 }).single('profilePicture');
 
-// ERROR HANDLING MIDDLEWARE
+// Attachment Upload (max 10MB)
+const uploadMessageAttachment = multer({
+  storage: messageStorage,
+  limits: { fileSize: 10 * 1024 * 1024 }, // 10MB
+  fileFilter: messageAttachmentFilter
+}).single('file');
+
+// ERROR HANDLER
 
 const handleUploadError = (err, req, res, next) => {
   if (err instanceof multer.MulterError) {
     // Multer-specific errors
-    if (err.code === 'LIMIT_FILE_SIZE') {
-      return res.status(400).json({
-        success: false,
-        message: 'File is too large. Please check size limits.'
-      });
-    }
-    if (err.code === 'LIMIT_FILE_COUNT') {
-      return res.status(400).json({
-        success: false,
-        message: 'Too many files uploaded.'
-      });
-    }
-    if (err.code === 'LIMIT_UNEXPECTED_FILE') {
-      return res.status(400).json({
-        success: false,
-        message: 'Unexpected field name in upload.'
-      });
+    switch (err.code) {
+      case 'LIMIT_FILE_SIZE':
+        return res.status(400).json({
+          success: false,
+          message: 'File is too large. Please check the size limits.'
+        });
+      case 'LIMIT_FILE_COUNT':
+        return res.status(400).json({
+          success: false,
+          message: 'Too many files uploaded.'
+        });
+      case 'LIMIT_UNEXPECTED_FILE':
+        return res.status(400).json({
+          success: false,
+          message: 'Unexpected field name in upload.'
+        });
+      default:
+        return res.status(400).json({
+          success: false,
+          message: err.message
+        });
     }
   } else if (err) {
     // Custom errors (from file filters)
@@ -231,13 +247,14 @@ const handleUploadError = (err, req, res, next) => {
   next();
 };
 
-// HELPER FUNCTION TO DELETE FILE
+// HELPER FUNCTIONS
 
+// Delete file from server
 const deleteFile = (filePath) => {
   try {
     if (fs.existsSync(filePath)) {
       fs.unlinkSync(filePath);
-      console.log(`File deleted: ${filePath}`);
+      console.log(`🗑️  Deleted file: ${filePath}`);
       return true;
     }
     return false;
@@ -247,8 +264,7 @@ const deleteFile = (filePath) => {
   }
 };
 
-// HELPER FUNCTION TO GET FILE SIZE
-
+// Get file size
 const getFileSize = (filePath) => {
   try {
     if (fs.existsSync(filePath)) {
@@ -262,8 +278,7 @@ const getFileSize = (filePath) => {
   }
 };
 
-// HELPER FUNCTION TO FORMAT FILE SIZE
-
+// Format file size
 const formatFileSize = (bytes) => {
   if (bytes === 0) return '0 Bytes';
   
@@ -271,17 +286,24 @@ const formatFileSize = (bytes) => {
   const sizes = ['Bytes', 'KB', 'MB', 'GB'];
   const i = Math.floor(Math.log(bytes) / Math.log(k));
   
-  return Math.round(bytes / Math.pow(k, i) * 100) / 100 + ' ' + sizes[i];
+  return Math.round((bytes / Math.pow(k, i)) * 100) / 100 + ' ' + sizes[i];
 };
 
-module.exports = {
-  // Upload middleware
+// Check if file exists
+const fileExists = (filePath) => {
+  return fs.existsSync(filePath);
+};
+
+
+module.exports = { 
+  // Upload configurations
   uploadCourseThumbnail,
   uploadCourseVideo,
   uploadCourseResources,
   uploadCertificate,
   uploadProject,
   uploadProfile,
+  uploadMessageAttachment,
   
   // Error handler
   handleUploadError,
@@ -290,7 +312,14 @@ module.exports = {
   deleteFile,
   getFileSize,
   formatFileSize,
+  fileExists,
   
-  // Size limits
-  fileSizeLimits
+  // Storage configurations (if needed elsewhere)
+  courseThumbnailStorage,
+  courseVideoStorage,
+  courseResourcesStorage,
+  certificateStorage,
+  projectStorage,
+  profileStorage,
+  messageStorage
 };

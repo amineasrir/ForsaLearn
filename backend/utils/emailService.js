@@ -275,6 +275,91 @@ const sendCourseCompletionEmail = async (student, course, language = 'en') => {
   }
 };
 
+const sendReminderEmail = async (student, course, daysInactive, progress, language = 'en') => {
+  try {
+    const t = getTranslations(language).reminder;
+    const html = baseTemplate(`
+      <div class="container">
+        <div class="header warning">
+          <h1>⏰ ${t.title}</h1>
+        </div>
+        <div class="content">
+          <h2>${t.intro(course.title, daysInactive)}</h2>
+          <p>${t.encouragement}</p>
+          <p>${t.progress(progress)}</p>
+          <p style="text-align: center;">
+            <a href="${process.env.CLIENT_URL}/my-courses/${course._id}" class="button">${t.button}</a>
+          </p>
+        </div>
+      </div>
+    `, language);
+    await sendEmail({ 
+      to: student.email, 
+      subject: t.subject(course.title),
+      html 
+    });
+    console.log(`✅ Reminder email sent to ${student.email}`);
+  } catch (error) {
+    console.error('❌ Error sending reminder email:', error);
+  }
+};
+
+const sendVerificationEmail = async (user, verificationLink, language = 'en') => {
+  try {
+    const t = getTranslations(language).verification;
+    const html = baseTemplate(`
+      <div class="container">
+        <div class="header">
+          <h1>✉️ ${t.title}</h1>
+        </div>
+        <div class="content">
+          <p>${t.intro}</p>
+          <p style="text-align: center;">
+            <a href="${verificationLink}" class="button">${t.button}</a>
+          </p>
+          <p style="font-size: 12px; color: #888;">${t.note}</p>
+        </div>
+      </div>
+    `, language);
+    await sendEmail({ 
+      to: user.email, 
+      subject: t.subject,
+      html 
+    });
+    console.log(`✅ Verification email sent to ${user.email}`);
+  } catch (error) {
+    console.error('❌ Error sending verification email:', error);
+  }
+};
+
+const sendPasswordResetEmail = async (user, resetLink, language = 'en') => {
+  try {
+    const t = getTranslations(language).passwordReset;
+    const html = baseTemplate(`
+      <div class="container">
+        <div class="header">
+          <h1>🔒 ${t.title}</h1>
+        </div>
+        <div class="content">
+          <p>${t.intro}</p>
+          <p style="text-align: center;">
+            <a href="${resetLink}" class="button">${t.button}</a>
+          </p>
+          <p style="font-size: 12px; color: #888;">${t.note}</p>
+        </div>
+      </div>
+    `, language);
+    await sendEmail({
+      to: user.email,
+      subject: t.subject,
+      html
+    });
+    console.log(`✅ Password reset email sent to ${user.email}`);
+  } catch (error) {
+    console.error('❌ Error sending password reset email:', error);
+  }
+};
+
 module.exports = {
   sendWelcomeEmail,
   sendFormateurApprovalEmail,
@@ -283,5 +368,8 @@ module.exports = {
   sendCourseRejectionEmail,
   sendEnrollmentConfirmationEmail,
   sendNewStudentNotification,
-  sendCourseCompletionEmail
+  sendCourseCompletionEmail,
+  sendReminderEmail,
+  sendVerificationEmail,
+  sendPasswordResetEmail
 };

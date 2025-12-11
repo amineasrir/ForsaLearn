@@ -1,4 +1,3 @@
-// routes/upload.js
 const express = require('express');
 const router = express.Router();
 const path = require('path');
@@ -10,6 +9,7 @@ const {
   uploadCertificate,
   uploadProject,
   uploadProfile,
+  uploadMessageAttachment,
   handleUploadError,
   deleteFile,
   getFileSize,
@@ -18,9 +18,7 @@ const {
 const Course = require('../models/Course');
 const { Formateur, User } = require('../models/User');
 
-// ============================================
 // COURSE THUMBNAIL UPLOAD
-// ============================================
 
 // Upload course thumbnail (Formateur only)
 router.post('/course/thumbnail',
@@ -65,9 +63,7 @@ router.post('/course/thumbnail',
   }
 );
 
-// ============================================
 // COURSE VIDEO UPLOAD
-// ============================================
 
 // Upload course video (Formateur only)
 router.post('/course/video',
@@ -111,9 +107,7 @@ router.post('/course/video',
   }
 );
 
-// ============================================
 // COURSE RESOURCES UPLOAD
-// ============================================
 
 // Upload course resources (multiple files)
 router.post('/course/resources',
@@ -157,9 +151,7 @@ router.post('/course/resources',
   }
 );
 
-// ============================================
 // FORMATEUR CERTIFICATE UPLOAD
-// ============================================
 
 // Upload formateur certificate
 router.post('/formateur/certificate',
@@ -224,9 +216,7 @@ router.post('/formateur/certificate',
   }
 );
 
-// ============================================
 // FORMATEUR PROJECT UPLOAD
-// ============================================
 
 // Upload formateur project
 router.post('/formateur/project',
@@ -291,9 +281,7 @@ router.post('/formateur/project',
   }
 );
 
-// ============================================
 // PROFILE PICTURE UPLOAD
-// ============================================
 
 // Upload profile picture (All users)
 router.post('/profile/picture',
@@ -344,9 +332,64 @@ router.post('/profile/picture',
   }
 );
 
-// ============================================
+// MESSAGE ATTACHMENT UPLOAD
+
+// Upload message attachment (All authenticated users)
+router.post('/message/attachment',
+  protect,
+  (req, res, next) => {
+    uploadMessageAttachment(req, res, (err) => {
+      if (err) {
+        return handleUploadError(err, req, res, next);
+      }
+      next();
+    });
+  },
+  async (req, res) => {
+    try {
+      if (!req.file) {
+        return res.status(400).json({
+          success: false,
+          message: 'Please upload a file'
+        });
+      }
+      
+      const fileUrl = `/uploads/messages/${req.file.filename}`;
+      const fileSize = getFileSize(req.file.path);
+      
+      // Determine file type
+      let fileType = 'file';
+      if (req.file.mimetype.startsWith('image/')) {
+        fileType = 'image';
+      } else if (req.file.mimetype.startsWith('video/')) {
+        fileType = 'video';
+      }
+      
+      res.status(200).json({
+        success: true,
+        message: 'File uploaded successfully',
+        data: {
+          filename: req.file.filename,
+          originalName: req.file.originalname,
+          url: fileUrl,
+          size: formatFileSize(fileSize),
+          sizeBytes: fileSize,
+          mimetype: req.file.mimetype,
+          type: fileType
+        }
+      });
+    } catch (error) {
+      console.error('Upload message attachment error:', error);
+      if (req.file) deleteFile(req.file.path);
+      res.status(500).json({ 
+        success: false,
+        message: 'Error uploading file' 
+      });
+    }
+  }
+);
+
 // FILE DELETION
-// ============================================
 
 // Delete file (Owner only)
 router.delete('/file',
@@ -393,9 +436,7 @@ router.delete('/file',
   }
 );
 
-// ============================================
 // GET FILE INFO
-// ============================================
 
 // Get file information
 router.get('/file/info',

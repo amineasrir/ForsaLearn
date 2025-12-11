@@ -1,8 +1,9 @@
-// server.js
 const express = require('express');
+const http = require('http'); 
 const dotenv = require('dotenv');
 const cors = require('cors');
 const connectDB = require('./config/db');
+const { initializeSocket } = require('./config/socket'); 
 
 // ============================================
 // LOAD ENVIRONMENT VARIABLES
@@ -104,6 +105,10 @@ app.use('/api/payment', paymentRoutes);
 const certificateRoutes = require('./routes/certificate');
 app.use('/api/certificate', certificateRoutes);
 
+// Message Routes 
+const messageRoutes = require('./routes/message');
+app.use('/api/messages', messageRoutes);
+
 // ============================================
 // ERROR HANDLING MIDDLEWARE
 // ============================================
@@ -128,15 +133,26 @@ app.use((err, req, res, next) => {
 });
 
 // ============================================
+// CREATE HTTP SERVER & INITIALIZE SOCKET.IO
+// ============================================
+
+// Create HTTP server (required for Socket.IO)
+const server = http.createServer(app);
+
+// Initialize Socket.IO
+initializeSocket(server);
+
+// ============================================
 // START SERVER
 // ============================================
 const PORT = process.env.PORT || 5000;
 
-const server = app.listen(PORT, () => {
+server.listen(PORT, () => {
   console.log('='.repeat(50));
   console.log(`🚀 Server running in ${process.env.NODE_ENV} mode`);
   console.log(`📡 Server URL: http://localhost:${PORT}`);
   console.log(`🌐 API Base: http://localhost:${PORT}/api`);
+  console.log(`💬 Socket.IO: Initialized`);
   console.log('='.repeat(50));
 });
 
