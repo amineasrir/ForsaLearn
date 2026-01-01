@@ -277,7 +277,7 @@ body {
   width: 160px;
   height: 200px;
   position: absolute;
-  right: 220px;
+  right: 60%;
   bottom: -20px;
 }
 .image-card img {

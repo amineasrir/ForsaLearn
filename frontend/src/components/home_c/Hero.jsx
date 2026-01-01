@@ -1,16 +1,16 @@
 import image1 from "../../assets/image/home_page/image1.png";
+import { useTranslation } from "react-i18next";
 const Hero = () => {
+  const { t } = useTranslation();
   return (
     <section className="hero">
       <div className="hero-text">
-        <button className="btn1">The Leader in Online Learning</button>
+        <button className="btn1">{t("homePage.hero.leader")}</button>
         <h1>
-          Engaging <span>&</span> Accessible <br />
-          online courses for all
+          {t("homePage.hero.engaging")} <span>&</span> {t("homePage.hero.accessible")} <br />
+          {t("homePage.hero.courses_for_all")}
         </h1>
-        <p>
-          Our specialized online courses are designed to bring the classroom experience to you,<br></br> no matter where you are.
-        </p>
+        <p>{t("homePage.hero.lead")}</p>
       </div>
 
       <div className="hero-img">

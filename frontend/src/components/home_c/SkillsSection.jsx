@@ -1,4 +1,5 @@
 import React from "react";
+import { useTranslation } from 'react-i18next';
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faCertificate,
@@ -11,6 +12,8 @@ import image2_fe from '../../assets/image/home_page/image2_fe.png';
 import image3_ho from '../../assets/image/home_page/image3_ho.png';
 
 function SkillsSection() {
+  const { t } = useTranslation();
+
   return (
     <section className="skills-section">
       <div className="container">
@@ -37,11 +40,11 @@ function SkillsSection() {
         <div className="skills-content">
           {/* Text Content */}
           <h1 className="skills-title">
-            Master the skills to drive your career
+            {t("homePage.skills.title")}
           </h1>
 
           <p className="skills-lead">
-            Get certified, master modern tech skills, and level up your career whether you are starting out or a seasoned pro.  95% of eLearning learners report our hands-on content directly helped their careers.
+            {t("homePage.skills.lead")}
           </p>
 
           {/* Features Grid */}
@@ -53,7 +56,7 @@ function SkillsSection() {
               </div>
               <div>
                 <h3 className="feature-title2">
-                  Get certified with 100+ certification courses
+                  {t("homePage.skills.feature1")}
                 </h3>
               </div>
             </div>
@@ -65,7 +68,7 @@ function SkillsSection() {
               </div>
               <div>
                 <h3 className="feature-title2">
-                  Build skills your way, from labs to courses
+                  {t("homePage.skills.feature2")}
                 </h3>
               </div>
             </div>
@@ -77,7 +80,7 @@ function SkillsSection() {
               </div>
               <div>
                 <h3 className="feature-title2">
-                  Stay motivated with engaging instructors
+                  {t("homePage.skills.feature3")}
                 </h3>
               </div>
             </div>
@@ -89,7 +92,7 @@ function SkillsSection() {
               </div>
               <div>
                 <h3 className="feature-title2">
-                  Keep up with the latest in cloud technology
+                  {t("homePage.skills.feature4")}
                 </h3>
               </div>
             </div>

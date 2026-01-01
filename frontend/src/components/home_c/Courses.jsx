@@ -45,10 +45,13 @@ const courses = [
   }
 ];
 
+import { useTranslation } from 'react-i18next';
+
 const Courses = () => {
+  const { t } = useTranslation();
   return (
     <section className="courses">
-      <h1>Popular Courses</h1>
+      <h1>{t('homePage.courses.title')}</h1>
 
       <div className="course-grid">
         {courses.map((course, index) => (
@@ -58,10 +61,10 @@ const Courses = () => {
               <span className="fav-badge"><FontAwesomeIcon icon={faHeart} /></span>
             </div>
             <div className="course-info">
-              <a href="#" className="course-category">{course.category}</a>
+              <a href="#" className="course-category">{t(course.category)}</a>
               <h3>{course.title}</h3>
               <div className="course-students">
-                <FontAwesomeIcon icon={faUsers} /> <span className="students-count">{course.students} Students</span>
+                <FontAwesomeIcon icon={faUsers} /> <span className="students-count">{t('homePage.courses.students', { count: course.students })}</span>
               </div>
               <hr />
               <div className="course-footer">
@@ -77,7 +80,7 @@ const Courses = () => {
         ))}
       </div>
 
-      <button className="view-all-btn">View all Courses</button>
+      <button className="view-all-btn">{t('homePage.courses.view_all')}</button>
     </section>
   );
 };

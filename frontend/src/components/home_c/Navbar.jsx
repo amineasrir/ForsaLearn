@@ -35,10 +35,10 @@ const Navbar = () => {
     <nav className="navbar">
       <img className="logo" src={logo_rem} alt="Logo" />
       <ul className="nav-links">
-        <li>{t("Home")}</li>
-        <li>{t("Courses")}</li>
-        <li>{t("Blog")}</li>
-        <li>{t("Contact")}</li>
+        <li>{t("home")}</li>
+        <li>{t("courses")}</li>
+        <li>{t("blog")}</li>
+        <li>{t("contact")}</li>
       </ul>
 
       <div className="nav-actions">
@@ -48,7 +48,7 @@ const Navbar = () => {
         </button>
 
         <button className="btn-outline">{t("login")}</button>
-        <button className="btn-primary">{t("Register")}</button>
+        <button className="btn-primary">{t("register")}</button>
       </div>
     </nav>
   );

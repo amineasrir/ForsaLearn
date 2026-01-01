@@ -2,13 +2,16 @@ import React from 'react';
 import image11 from "../../assets/image/home_page/image11.png";
 import image12 from "../../assets/image/home_page/image12.png";
 
+import { useTranslation } from 'react-i18next';
+
 const Testimonials = () => {
+  const { t } = useTranslation();
   return (
     <section className="testimonials-section">
       <div className="testimonials-top">
         <div className="testimonials-header">
-          <p className="eyebrow">Check out these real reviews</p>
-          <h2 className="testimonials-title">Users-love-us Don't take it from us.</h2>
+          <p className="eyebrow">{t('homePage.testimonials.eyebrow')}</p>
+          <h2 className="testimonials-title">{t('homePage.testimonials.title')}</h2>
         </div>
 
         <div className="testimonials-wrap">
@@ -17,9 +20,7 @@ const Testimonials = () => {
             <span className="quote quote-right">”</span>
 
             <p className="testimonial-text">
-              I really appreciated my mentor's insight, but sometimes I felt overwhelmed by the amount of
-              information they provided. It would have been helpful to focus on one or two areas at a time
-              rather than trying to cover everything.
+              {t('homePage.testimonials.testimonial_text')}
             </p>
 
             <button className="nav-arrow left" aria-label="previous">‹</button>
@@ -39,9 +40,9 @@ const Testimonials = () => {
       <div className="promo-row">
         <div className="promo-card purple">
           <div className="promo-content">
-            <h3>Become An Instructor</h3>
-            <p>Top instructors from around the world teach millions of students on Mentoring.</p>
-            <button className="promo-btn">Register as Instructor</button>
+            <h3>{t('homePage.testimonials.promo1_title')}</h3>
+            <p>{t('homePage.testimonials.promo1_text')}</p>
+            <button className="promo-btn">{t('homePage.testimonials.promo1_btn')}</button>
           </div>
           <div className="promo-figure" aria-hidden="true">
             <img src={image11} alt="instructor" className="promo-img" />
@@ -50,9 +51,9 @@ const Testimonials = () => {
 
         <div className="promo-card dark">
           <div className="promo-content">
-            <h3>Transform Access</h3>
-            <p>Create an account to receive our newsletter course promotions.</p>
-            <button className="promo-btn outline">Register as student</button>
+            <h3>{t('homePage.testimonials.promo2_title')}</h3>
+            <p>{t('homePage.testimonials.promo2_text')}</p>
+            <button className="promo-btn outline">{t('homePage.testimonials.promo2_btn')}</button>
           </div>
           <div className="promo-figure" aria-hidden="true">
             <img src={image12} alt="student" className="promo-img" />

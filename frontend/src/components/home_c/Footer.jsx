@@ -4,6 +4,7 @@ import { FaFacebookF, FaInstagram, FaLinkedinIn } from "react-icons/fa";
 
 const Footer = () => {
   const year = new Date().getFullYear();
+  const { t } = require('react-i18next').useTranslation ? require('react-i18next').useTranslation() : { t: (k) => k };
   return (
     <footer className="footer">
       <div className="footer-container">
@@ -12,41 +13,41 @@ const Footer = () => {
         </div>
 
         <div className="footer-col">
-          <h4>For Instructor</h4>
+          <h4>{t('homePage.footer.for_instructor')}</h4>
           <ul>
-            <li>Profile</li>
-            <li>Login</li>
-            <li>Register</li>
-            <li>Instructor</li>
-            <li>Dashboard</li>
+            <li>{t('homePage.footer.profile')}</li>
+            <li>{t('homePage.footer.login')}</li>
+            <li>{t('homePage.footer.register')}</li>
+            <li>{t('homePage.footer.instructor')}</li>
+            <li>{t('homePage.footer.dashboard')}</li>
           </ul>
         </div>
 
         <div className="footer-col">
-          <h4>For Student</h4>
+          <h4>{t('homePage.footer.for_student')}</h4>
           <ul>
-            <li>Profile</li>
-            <li>Login</li>
-            <li>Register</li>
-            <li>Student</li>
-            <li>Dashboard</li>
+            <li>{t('homePage.footer.profile')}</li>
+            <li>{t('homePage.footer.login')}</li>
+            <li>{t('homePage.footer.register')}</li>
+            <li>{t('homePage.footer.instructor')}</li>
+            <li>{t('homePage.footer.dashboard')}</li>
           </ul>
         </div>
 
         <div className="footer-col footer-contact">
-          <h4>Get in touch</h4>
-          <p>Phone Number<br /><span>+212601234566</span></p>
-          <p>Mail Address<br /><span>forsa.learn@gmail.com</span></p>
-          <p>Address<br /><span>Atlas MARRAKECH, MAROC</span></p>
+          <h4>{t('homePage.footer.get_in_touch')}</h4>
+          <p>{t('homePage.footer.phone_number')}<br /><span>+212601234566</span></p>
+          <p>{t('homePage.footer.mail_address')}<br /><span>forsa.learn@gmail.com</span></p>
+          <p>{t('homePage.footer.address')}<br /><span>Atlas MARRAKECH, MAROC</span></p>
         </div>
       </div>
 
       <div className="footer-bottom">
-        <small>© {year} <span>ForsaLearn</span>. All rights reserved.</small>
+        <small>© {year} <span>ForsaLearn</span>. {t('homePage.footer.rights')}</small>
 
         <div className="footer-links">
-          <a href="#">Terms &amp; Policy</a>
-          <a href="#">Privacy Policy</a>
+          <a href="#">{t('homePage.footer.terms')}</a>
+          <a href="#">{t('homePage.footer.privacy')}</a>
         </div>
 
         <div className="footer-social">

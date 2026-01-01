@@ -4,31 +4,34 @@ import { faCheckCircle, faChalkboardTeacher, faCertificate, faCompass } from "@f
 
 import image3 from '../../assets/image/home_page/image3.png';
 
+import { useTranslation } from 'react-i18next';
+
 const Mentor = () => {
+  const { t } = useTranslation();
   return (
     <section className="mentor-section">
       <div className="mentor-hero">
         <div className="container mentor-hero-inner">
-          <h2 className="mentor-title">Master the skills to drive your career</h2>
-          <p className="mentor-sub">The right course, guided by an expert mentor, can provide invaluable insights, practical skills</p>
+          <h2 className="mentor-title">{t('homePage.mentor.title')}</h2>
+          <p className="mentor-sub">{t('homePage.mentor.sub')}</p>
 
           <div className="mentor-features">
             <div className="mentor-feature">
               <div className="mf-icon"><FontAwesomeIcon icon={faChalkboardTeacher} /></div>
-              <h4>Stay motivated with instructors</h4>
-              <p>Stay motivated with engaging instructors on our platform, guiding you through every course.</p>
+              <h4>{t('homePage.mentor.feature1_title')}</h4>
+              <p>{t('homePage.mentor.feature1_text')}</p>
             </div>
 
             <div className="mentor-feature " >
               <div className="mf-icon" ><FontAwesomeIcon icon={faCertificate}  style={{color:"FF4667"}}/></div>
-              <h4>Get certified on courses</h4>
-              <p>Get certified, master modern tech skills, and level up your career whether you're starting.</p>
+              <h4>{t('homePage.mentor.feature2_title')}</h4>
+              <p>{t('homePage.mentor.feature2_text')}</p>
             </div>
 
             <div className="mentor-feature">
               <div className="mf-icon"><FontAwesomeIcon icon={faCompass}  /></div>
-              <h4>Build skills on your way</h4>
-              <p>Build skills your way with hands-on labs and immersive courses, tailored to fit.</p>
+              <h4>{t('homePage.mentor.feature3_title')}</h4>
+              <p>{t('homePage.mentor.feature3_text')}</p>
             </div>
           </div>
         </div>
@@ -41,17 +44,16 @@ const Mentor = () => {
           </div>
 
           <div className="mentor-content">
-            <h3>Want to share your knowledge? Join us a Mentor</h3>
-            <p className="mentor-lead">High-definition video is video of higher resolution and quality than standard-definition. While there is no standardized meaning for high-definition, generally any video.</p>
+            <h3>{t('homePage.mentor.join_title')}</h3>
+            <p className="mentor-lead">{t('homePage.mentor.join_lead')}</p>
 
             <ul className="mentor-checks">
-              <li><FontAwesomeIcon icon={faCheckCircle} className="check-icon" /> Access Your Class anywhere</li>
-              <li><FontAwesomeIcon icon={faCheckCircle} className="check-icon" /> Flexible Course Plan</li>
-              <li><FontAwesomeIcon icon={faCheckCircle} className="check-icon" /> Quality Assurance</li>
-              <li><FontAwesomeIcon icon={faCheckCircle} className="check-icon" /> The Most World Class Instructors</li>
+              {t('homePage.mentor.checks', { returnObjects: true }).map((c, i) => (
+                <li key={i}><FontAwesomeIcon icon={faCheckCircle} className="check-icon" /> {c}</li>
+              ))}
             </ul>
 
-            <button className="btn-primary">Read More</button>
+            <button className="btn-primary">{t('homePage.mentor.read_more')}</button>
           </div>
         </div>
       </div>
