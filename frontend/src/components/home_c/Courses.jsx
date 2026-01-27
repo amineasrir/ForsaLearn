@@ -1,4 +1,5 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faClock, faUsers } from '@fortawesome/free-solid-svg-icons';
 import { faHeart } from '@fortawesome/free-regular-svg-icons';
@@ -44,8 +45,6 @@ const courses = [
     image: { src: cours3 },
   }
 ];
-
-import { useTranslation } from 'react-i18next';
 
 const Courses = () => {
   const { t } = useTranslation();

@@ -1,4 +1,5 @@
 import { useTranslation } from "react-i18next";
+import { Link } from "react-router-dom";
 import i18nInstance from "../../i18n";
 import logo_rem from "../../assets/image/home_page/logo_rem.png";
 import 'flag-icons/css/flag-icons.min.css'; // Import CSS des drapeaux
@@ -47,8 +48,12 @@ const Navbar = () => {
           <span>{currentLang.toUpperCase()}</span>
         </button>
 
-        <button className="btn-outline">{t("login")}</button>
-        <button className="btn-primary">{t("register")}</button>
+        <Link to="/signin">
+          <button className="btn-outline">{t("login")}</button>
+        </Link>
+        <Link to="/signup">
+          <button className="btn-primary">{t("register")}</button>
+        </Link>
       </div>
     </nav>
   );
