@@ -1,6 +1,7 @@
 import React from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faTrophy, faClock, faCertificate } from "@fortawesome/free-solid-svg-icons";
+import { useTranslation } from 'react-i18next';
 import imgA from "../../assets/image/home_page/image4.png";
 import imgB from "../../assets/image/home_page/image5.png";
 import imgC from "../../assets/image/home_page/image6.png";
