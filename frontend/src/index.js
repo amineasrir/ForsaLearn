@@ -4,11 +4,20 @@ import './index.css';
 import './i18n';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import AppAdmin from './AppAdmin';
+import AppFormateur from './AppFormateur';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <React.StrictMode>
-    <App />
+    <Router>
+      <Routes>
+        <Route path="/*" element={<App />} />
+        <Route path="/admin/*" element={<AppAdmin />} />
+        <Route path="/formateur/*" element={<AppFormateur />} />
+      </Routes>
+    </Router>
   </React.StrictMode>
 );
 

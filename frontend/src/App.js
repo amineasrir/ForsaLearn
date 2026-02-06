@@ -8,9 +8,8 @@ import ForgotPassword from "./pages/loginPage/ForgotPassword";import OTPVerifica
 import SetPassword from "./pages/loginPage/SetPassword";
 import WelcomeBack from "./pages/loginPage/WelcomeBack";
 
-function App() {
+function App(){
   return (
-    <Router>
       <div className="App">
         <Routes>
           <Route path="/" element={<Home />} />
@@ -28,7 +27,6 @@ function App() {
           <Route path="/welcome-back" element={<WelcomeBack />} />
         </Routes>
       </div>
-    </Router>
   );
 }
 
