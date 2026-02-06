@@ -70,7 +70,7 @@ const SignUp = () => {
           </div>
 
           <div className="auth-form-container">
-            <h2 style={{ textAlign: 'center' }}>{t('signUpTitle') || 'Sign Up'}</h2>
+            <h2>{t('signUpTitle') || 'Sign Up'}</h2>
 
             {/* Role Selector */}
             <div className="role-selector">
@@ -175,12 +175,12 @@ const SignUp = () => {
               </button>
             </form>
             <div className="auth-footer">
-                         <p>
-  {t('already Have Account?') || "Already have an account?"}{' '}
-  <Link to="/signin">{t('signIn') || 'Sign in'}</Link>
-</p>
+              <p>
+                {t('haveAccount', 'Already have an account?')}{' '}
+                <Link to="/signin">{t('signIn')}</Link>
+              </p>
 
-                        </div>
+            </div>
           </div>
         </div>
       </div>

@@ -7,7 +7,6 @@ import cours from '../../assets/image/cours/cours.jpg'
 import cours1 from '../../assets/image/cours/cours1.jpg'
 import cours2 from '../../assets/image/cours/cours2.jpg'
 import cours3 from '../../assets/image/cours/cours3.jpg'
-import { useTranslation } from 'react-i18next';
 const courses = [
   {
     category: 'Web Design',

@@ -8,7 +8,6 @@ import imgC from "../../assets/image/home_page/image6.png";
 import imgD from "../../assets/image/home_page/image7.png";
 import imgE from "../../assets/image/home_page/image8.png";
 import imgF from "../../assets/image/home_page/image9.png";
-import { useTranslation } from 'react-i18next';
 
 const Feature = ({ title, semi_title, bullets, image, reverse, icon, colorClass }) => (
     <section className={`feature-section ${reverse ? "reverse" : ""} ${colorClass || ""}`}>

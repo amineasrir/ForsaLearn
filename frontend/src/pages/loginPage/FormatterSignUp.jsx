@@ -278,6 +278,13 @@ const FormatterSignUp = () => {
                 </div>
               </form>
             )}
+          
+            <div className="auth-footer">
+              <p>
+                {t('haveAccount', 'Already have an account?')}{' '}
+                <Link to="/signin">{t('signIn')}</Link>
+              </p>
+            </div>
           </div>
         </div>
       </div>
