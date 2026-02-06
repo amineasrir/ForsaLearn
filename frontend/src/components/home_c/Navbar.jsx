@@ -17,6 +17,13 @@ const Navbar = () => {
     }
   };
 
+  const scrollToSection = (id) => {
+    const element = document.getElementById(id);
+    if (element) {
+      element.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
+
   // Fonction pour obtenir le code du drapeau
   const getFlagClass = (lang) => {
     switch (lang) {
@@ -35,12 +42,15 @@ const Navbar = () => {
   return (
     <nav className="navbar">
       <img className="logo" src={logo_rem} alt="Logo" />
+
       <ul className="nav-links">
-        <li>{t("home")}</li>
-        <li>{t("courses")}</li>
-        <li>{t("blog")}</li>
-        <li>{t("contact")}</li>
+        <li><button onClick={() => scrollToSection('hero')} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'inherit', fontSize: 'inherit' }}>{t("home")}</button></li>
+        <li><button onClick={() => scrollToSection('courses')} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'inherit', fontSize: 'inherit' }}>{t("courses")}</button></li>
+        <li><button onClick={() => scrollToSection('blog')} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'inherit', fontSize: 'inherit' }}>{t("blog")}</button></li>
+        <li><button onClick={() => scrollToSection('footer')} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'inherit', fontSize: 'inherit' }}>{t("contact")}</button></li>
       </ul>
+
+
 
       <div className="nav-actions">
         <button className="lang-btn" onClick={changeLanguage} style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
