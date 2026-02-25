@@ -1,14 +1,31 @@
-import React from 'react';
-import ReactDOM from 'react-dom/client';
-import './index.css';
-import './i18n';
-import App from './App';
-import reportWebVitals from './reportWebVitals';
+import React from "react";
+import ReactDOM from "react-dom/client";
+import "./index.css";
+import "./i18n";
+import App from "./App";
+import reportWebVitals from "./reportWebVitals";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import AppAdmin from "./AppAdmin";
+import AppFormateur from "./AppFormateur";
+import SignIn from "./pages/loginPage/SignIn";
+import ForgotPassword from "./pages/loginPage/ForgotPassword";
+import OTPVerification from "./pages/loginPage/OTPVerification";
+import SetPassword from "./pages/loginPage/SetPassword";
 
-const root = ReactDOM.createRoot(document.getElementById('root'));
+const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
   <React.StrictMode>
-    <App />
+    <Router>
+      <Routes>
+        <Route path="/*" element={<App />} />
+        <Route path="/admin/*" element={<AppAdmin />} />
+        <Route path="/formateur/*" element={<AppFormateur />} />
+        <Route path="/signin" element={<SignIn />} />
+        <Route path="/forgot-password" element={<ForgotPassword />} />
+        <Route path="/otp-verification" element={<OTPVerification />} />
+        <Route path="/set-password" element={<SetPassword />} />
+      </Routes>
+    </Router>
   </React.StrictMode>
 );
 

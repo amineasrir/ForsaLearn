@@ -83,3 +83,9 @@ coverage/
 *.swp
 *.swo
 *~
+
+# ============================================
+
+.scannerwork/
+# SonarQube
+.sonar/
