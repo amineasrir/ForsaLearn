@@ -27,9 +27,10 @@ const SignIn = () => {
 
     // Redirect based on user type
     if (userType === 'formateur') {
-      navigate('/formateur/dashboard');
+      navigate('/formateur');
     } else {
-      navigate('/');
+      // After successful apprenant login, go to the Apprenant dashboard/page
+      navigate('/apprenant');
     }
   };
 
@@ -46,6 +47,24 @@ const SignIn = () => {
 
           <div className="auth-form-container">
             <h2 style={{ textAlign: 'center' }}>{t('signInTitle') || 'Sign into Your Account'}</h2>
+
+            {/* User Type Selection */}
+            <div className="user-type-selector">
+              <button
+                type="button"
+                className={`user-type-btn ${userType === 'apprenant' ? 'active' : ''}`}
+                onClick={() => setUserType('apprenant')}
+              >
+                👨‍🎓 Apprenant
+              </button>
+              <button
+                type="button"
+                className={`user-type-btn ${userType === 'formateur' ? 'active' : ''}`}
+                onClick={() => setUserType('formateur')}
+              >
+                👨‍🏫 Formateur
+              </button>
+            </div>
 
             {error && <div className="error-message">{error}</div>}
 

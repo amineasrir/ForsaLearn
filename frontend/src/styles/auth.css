@@ -494,6 +494,41 @@
 }
 
 /* =====================
+   USER TYPE SELECTOR
+===================== */
+.user-type-selector {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 30px;
+    justify-content: center;
+}
+
+.user-type-btn {
+    flex: 1;
+    padding: 12px 20px;
+    border: 2px solid #e6e6e6;
+    background: #fff;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--text-muted);
+    transition: all 0.3s ease;
+}
+
+.user-type-btn:hover {
+    border-color: var(--primary);
+    color: var(--primary);
+    background: #fff5f7;
+}
+
+.user-type-btn.active {
+    background: var(--primary);
+    color: #fff;
+    border-color: var(--primary);
+}
+
+/* =====================
    RESPONSIVE
 ===================== */
 @media (max-width: 768px) {
