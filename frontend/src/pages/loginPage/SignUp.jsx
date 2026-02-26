@@ -22,11 +22,7 @@ const SignUp = () => {
   const [error, setError] = useState('');
 
   // Redirect to FormatterSignUp if formateur is selected
-  useEffect(() => {
-    if (userType === 'formateur') {
-      navigate('/formateur/signup');
-    }
-  }, [userType, navigate]);
+
 
   const handleChange = (e) => {
     const { name, value } = e.target;

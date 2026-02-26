@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import '../../styles/formateur.css';
-import Footer from '../../components/home_c/Footer';
 import logo_rem from '../../assets/image/home_page/logo_rem.png';
 import i18nInstance from '../../i18n';
 import { useTranslation } from 'react-i18next';
@@ -111,7 +110,8 @@ const FormateurPage = () => {
           
           <div className="navbar-dashboard-center">
             <h1>Dashboard</h1>
-            <p>Home</p>
+            <a href="/">Home</a>
+            <span style={{color:"#6b7280"}}>/Dashboard</span>
           </div>
           
           <div className="navbar-dashboard-right">
@@ -239,9 +239,6 @@ const FormateurPage = () => {
           </div>
         </main>
       </div>
-
-      {/* Footer */}
-      <Footer />
     </div>
   );
 };
