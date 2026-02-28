@@ -11,6 +11,7 @@ import SignIn from "./pages/loginPage/SignIn";
 import ForgotPassword from "./pages/loginPage/ForgotPassword";
 import OTPVerification from "./pages/loginPage/OTPVerification";
 import SetPassword from "./pages/loginPage/SetPassword";
+import WelcomeBack from "./pages/loginPage/WelcomeBack";
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
@@ -24,6 +25,8 @@ root.render(
         <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/otp-verification" element={<OTPVerification />} />
         <Route path="/set-password" element={<SetPassword />} />
+        <Route path="/welcome-back" element={<WelcomeBack />} />
+
       </Routes>
     </Router>
   </React.StrictMode>
