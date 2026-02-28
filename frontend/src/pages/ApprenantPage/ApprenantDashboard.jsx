@@ -6,7 +6,6 @@ import {
   FaCog, FaSignOutAlt, FaStar, FaCheckCircle, FaClock,
   FaFileAlt, FaPen
 } from 'react-icons/fa';
-import Footer from "../../components/home_c/Footer";
 import cours1 from '../../assets/image/cours/cours1.jpg'
 import cours2 from '../../assets/image/cours/cours2.jpg'
 import cours3 from '../../assets/image/cours/cours3.jpg'

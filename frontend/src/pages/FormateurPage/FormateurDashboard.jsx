@@ -1,14 +1,37 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import '../../styles/formateur.css';
 import logo_rem from '../../assets/image/home_page/logo_rem.png';
 import i18nInstance from '../../i18n';
 import { useTranslation } from 'react-i18next';
 import 'flag-icons/css/flag-icons.min.css';
+import EarningsChart from '../../components/charts/EarningsChart';
+import { useNavigate, useLocation } from 'react-router-dom';
+import SidebarF from '../../components/formateur/sidebarF';
+import ProfilSection from '../../components/formateur/profilSection';
+import { FaChartBar, FaUser, FaBook, FaUsers, FaQuestionCircle, FaClipboardList, FaTrophy, FaDollarSign, FaEnvelope, FaHeadset, FaCog, FaSignOutAlt } from 'react-icons/fa';
+
+
+
 
 
 const FormateurPage = () => {
   const { i18n } = useTranslation();
   const [activeMenu, setActiveMenu] = useState('dashboard');
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  // sync active menu with the current path
+  useEffect(() => {
+    if (location.pathname.includes('/profile')) {
+      setActiveMenu('profile');
+    } else if (location.pathname.includes('/courses')) {
+      setActiveMenu('mycourses');
+    } else if (location.pathname.includes('/students')) {
+      setActiveMenu('students');
+    } else {
+      setActiveMenu('dashboard');
+    }
+  }, [location.pathname]);
 
   const changeLanguage = () => {
     const lang = (i18n && i18n.language === "en") ? "fr" : "en";
@@ -84,20 +107,7 @@ const FormateurPage = () => {
     },
   ];
 
-  const earningsData = [75, 80, 65, 90, 70, 85, 75, 88, 72, 80, 78, 85];
 
-  const menuItems = [
-    { id: 'dashboard', label: 'Dashboard', icon: '📊' },
-    { id: 'profile', label: 'Profile', icon: '👤' },
-    { id: 'mycourses', label: 'My Courses', icon: '📚' },
-    { id: 'students', label: 'Students', icon: '👥' },
-    { id: 'Quiz', label: 'Quiz', icon: '❓' },
-    { id: 'Quiz Results', label: 'Quiz Results', icon: '📊' },
-    { id: 'Certificates', label: 'Certificates', icon: '📜' },
-    { id: 'earnings', label: 'Earnings', icon: '💰' },
-    { id: 'messages', label: 'Messages', icon: '💬' },
-    {id: 'support', label: 'Support', icon: '❓' },
-  ];
 
   return (
     <div className="formateur-page">
@@ -125,56 +135,11 @@ const FormateurPage = () => {
 
       <div className="formateur-container">
         {/* Sidebar */}
-        <aside className="formateur-sidebar">
-          <div className="sidebar-section">
-            <h3>View Menu</h3>
-            <ul className="menu-list">
-              {menuItems.map((item) => (
-                <li key={item.id}>
-                  <button
-                    className={`menu-item ${activeMenu === item.id ? 'active' : ''}`}
-                    onClick={() => setActiveMenu(item.id)}
-                  >
-                    <span className="menu-icon">{item.icon}</span>
-                    <span className="menu-label">{item.label}</span>
-                  </button>
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          <div className="sidebar-section account-settings">
-            <h3>Account Settings</h3>
-            <ul className="menu-list">
-              <li>
-                <button className="menu-item">
-                  <span className="menu-icon">⚙️</span>
-                  <span className="menu-label">Setting</span>
-                </button>
-              </li>
-              <li>
-                <button className="menu-item">
-                  <span className="menu-icon">🚪</span>
-                  <span className="menu-label">Logout</span>
-                </button>
-              </li>
-            </ul>
-          </div>
-        </aside>
-
+        <SidebarF />
         {/* Main Content */}
         <main className="formateur-main">
           {/* Profile Section */}
-          <div className="profile-section">
-            <div className="profile-content">
-              <img src={formateur.avatar} alt="Profile" className="profile-avatar" />
-              <div className="profile-info">
-                <h1>{formateur.name}</h1>
-                <span className="instructor-badge">Instructor</span>
-              </div>
-            </div>
-            <button className="add-course-btn">Add New Course</button>
-          </div>
+          <ProfilSection />
 
           {/* Stats Cards */}
           <div className="stats-grid">
@@ -193,25 +158,8 @@ const FormateurPage = () => {
 
           {/* Earnings Chart */}
           <div className="earnings-section">
-            <h2>Earnings by Year</h2>
-            <div className="chart-container">
-              <div className="chart">
-                {earningsData.map((value, index) => (
-                  <div key={index} className="chart-bar-wrapper">
-                    <div
-                      className="chart-bar"
-                      style={{ height: `${(value / 100) * 100}%` }}
-                    >
-                      <div className="bar-segment" style={{ backgroundColor: '#4F46E5', height: '50%' }}></div>
-                      <div className="bar-segment" style={{ backgroundColor: '#FF6B9D', height: '50%' }}></div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-              <div className="chart-legend">
-                <span>Jan 2025 - Dec 2025</span>
-              </div>
-            </div>
+            {/* the custom bar chart replaced by a Recharts line chart component */}
+            <EarningsChart />
           </div>
 
           {/* Recently Created Courses */}
