@@ -1,11 +1,22 @@
 import React from 'react';
-import FormateurPage from './pages/FormateurPage/FormateurPage';
+import { Routes, Route, Navigate } from 'react-router-dom';
+import FormateurDashboard from './pages/FormateurPage/FormateurDashboard';
+import FormateurProfile from './pages/FormateurPage/FormateurProfile';
+import FormateurCourses from './pages/FormateurPage/FormateurCourses';
+import FormateurStudent from './pages/FormateurPage/FormateurStudent';
 
 const AppFormateur = () => {
-  // You can expand this to include nested routes for the formateur area
+  // nested routes for the instructor area
   return (
     <div>
-      <FormateurPage />
+      <Routes>
+        <Route path="dashboard" element={<FormateurDashboard />} />
+        <Route path="profile" element={<FormateurProfile />} />
+        <Route path="courses" element={<FormateurCourses />} />
+        <Route path="students" element={<FormateurStudent />} />
+        {/* redirect any unknown path to dashboard */}
+        <Route path="*" element={<Navigate to="dashboard" replace />} />
+      </Routes>
     </div>
   );
 };
