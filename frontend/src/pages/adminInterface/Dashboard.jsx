@@ -3,23 +3,26 @@ import logo from "../../assets/image/home_page/logo_rem.png";
 import { NavLink } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import i18nInstance from "../../i18n";
-import 'flag-icons/css/flag-icons.min.css'; // Import CSS des drapeaux
+import "flag-icons/css/flag-icons.min.css"; // Import CSS des drapeaux
 import "../../styles/dashboard.css";
+import Sidebar from "../../components/admin/Sidebar";
+import { FaBook, FaBookOpen, FaBookReader, FaUserTie } from "react-icons/fa";
+import { FcMoneyTransfer } from "react-icons/fc";
 
 const Dashboard = () => {
   const [selectedYear, setSelectedYear] = useState(2025);
   const { t, i18n } = useTranslation();
 
   const changeLanguage = () => {
-    const lang = (i18n && i18n.language === "en") ? "fr" : "en";
-    const instance = (i18n && typeof i18n.changeLanguage === "function") ? i18n : i18nInstance;
+    const lang = i18n && i18n.language === "en" ? "fr" : "en";
+    const instance =
+      i18n && typeof i18n.changeLanguage === "function" ? i18n : i18nInstance;
     if (instance && typeof instance.changeLanguage === "function") {
       instance.changeLanguage(lang);
     } else {
       console.warn("i18n.changeLanguage is not available");
     }
   };
-
 
   const studentGrowthData = [
     { month: "Jan", value: 20 },
@@ -38,7 +41,6 @@ const Dashboard = () => {
 
   const maxValue = 120;
 
-  
   // Fonction pour obtenir le code du drapeau
   const getFlagClass = (lang) => {
     switch (lang) {
@@ -52,84 +54,40 @@ const Dashboard = () => {
   };
 
   // Ensure we have a valid language string before calling string methods
-  const currentLang = (i18n && i18n.language) ? i18n.language : "en";
-
+  const currentLang = i18n && i18n.language ? i18n.language : "en";
 
   return (
     <div className="dashboard">
-
       {/* Hero Section */}
       <div className="hero">
         <div className="container">
-        <div className="logo">
-              <img src={logo} alt="ForsaLearn Logo" className="logo-icon" />
-            </div>
+          <div className="logo">
+            <img src={logo} alt="ForsaLearn Logo" className="logo-icon" />
+          </div>
 
           <h1 className="hero-title">Dashboard</h1>
           <div className="nav-actions">
-              <button
-                className="lang-btn"
-                onClick={changeLanguage}
-                style={{ display: "flex", alignItems: "center", gap: "5px" }}
-              >
-                <span
-                  className={getFlagClass(currentLang)}
-                  style={{ fontSize: "18px" }}
-                ></span>
-                <span>{currentLang.toUpperCase()}</span>
-              </button>
-            </div>
+            <button
+              className="lang-btn"
+              onClick={changeLanguage}
+              style={{ display: "flex", alignItems: "center", gap: "5px" }}
+            >
+              <span
+                className={getFlagClass(currentLang)}
+                style={{ fontSize: "18px" }}
+              ></span>
+              <span>{currentLang.toUpperCase()}</span>
+            </button>
+          </div>
         </div>
       </div>
 
       {/* Main Content */}
       <div className="container main-content">
         <div className="content-wrapper">
-          {/* Sidebar */}
           <aside className="sidebar">
-            <div className="sidebar-card">
-              <h3 className="sidebar-title">Main Menu</h3>
-              <nav className="sidebar-nav">
-                <NavLink to="#" className="sidebar-link active">
-                  <span className="sidebar-icon">📊</span>
-                  <span>Dashboard</span>
-                </NavLink>
-                <NavLink to="#" className="sidebar-link">
-                  <span className="sidebar-icon">👤</span>
-                  <span>My Profile</span>
-                </NavLink>
-                <NavLink to="#" className="sidebar-link">
-                  <span className="sidebar-icon">📚</span>
-                  <span>Courses</span>
-                </NavLink>
-                <NavLink to="#" className="sidebar-link">
-                  <span className="sidebar-icon">👨‍🏫</span>
-                  <span>Instructors</span>
-                </NavLink>
-                <NavLink to="#" className="sidebar-link">
-                  <span className="sidebar-icon">👥</span>
-                  <span>Students</span>
-                </NavLink>
-                <NavLink to="#" className="sidebar-link">
-                  <span className="sidebar-icon">🎫</span>
-                  <span>Support Tickets</span>
-                </NavLink>
-              </nav>
-
-              <h3 className="sidebar-title">Account Settings</h3>
-              <nav className="sidebar-nav">
-                <NavLink to="#" className="sidebar-link">
-                  <span className="sidebar-icon">⚙️</span>
-                  <span>Settings</span>
-                </NavLink>
-                <NavLink to="#" className="sidebar-link">
-                  <span className="sidebar-icon">🚪</span>
-                  <span>Logout</span>
-                </NavLink>
-              </nav>
-            </div>
+            <Sidebar />
           </aside>
-
           {/* Main Dashboard Content */}
           <main className="main">
             {/* Profile Card */}
@@ -154,32 +112,36 @@ const Dashboard = () => {
             <div className="stats-grid">
               <div className="stat-card">
                 <div className="stat-header">
+                  <div className="stat-icon purple">
+                    <FaUserTie />
+                  </div>
                   <span className="stat-label">Total instructor</span>
-                  <div className="stat-icon purple">👨‍🏫</div>
                 </div>
                 <p className="stat-value">13</p>
               </div>
 
               <div className="stat-card">
                 <div className="stat-header">
+                  <div className="stat-icon pink">
+                    <FaBookOpen />
+                  </div>
                   <span className="stat-label">Active Courses</span>
-                  <div className="stat-icon pink">📖</div>
                 </div>
                 <p className="stat-value">08</p>
               </div>
 
               <div className="stat-card">
                 <div className="stat-header">
+                <div className="stat-icon purple"><FaBookReader /></div>
                   <span className="stat-label">Total Students</span>
-                  <div className="stat-icon purple">👥</div>
                 </div>
                 <p className="stat-value">17</p>
               </div>
 
               <div className="stat-card">
                 <div className="stat-header">
+                <div className="stat-icon cyan"><FaBook /></div>
                   <span className="stat-label">Total Courses</span>
-                  <div className="stat-icon cyan">📚</div>
                 </div>
                 <p className="stat-value">11</p>
               </div>
@@ -188,8 +150,8 @@ const Dashboard = () => {
             {/* Total Earnings */}
             <div className="stat-card earnings-card">
               <div className="stat-header">
+              <div className="stat-icon purple-gradient"><FcMoneyTransfer /></div>
                 <span className="stat-label">Total Earnings</span>
-                <div className="stat-icon purple-gradient">💰</div>
               </div>
               <p className="stat-value">$486</p>
             </div>
@@ -231,7 +193,6 @@ const Dashboard = () => {
           </main>
         </div>
       </div>
- 
     </div>
   );
 };
