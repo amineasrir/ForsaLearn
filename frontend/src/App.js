@@ -7,6 +7,8 @@ import OTPVerification from "./pages/loginPage/OTPVerification";
 import SetPassword from "./pages/loginPage/SetPassword";
 import WelcomeBack from "./pages/loginPage/WelcomeBack";
 import ApprenantDashboard from "./pages/ApprenantPage/ApprenantDashboard";
+import ApprenantProfile from "./pages/ApprenantPage/ApprenantProfile";
+import ApprenantEnrolled from "./pages/ApprenantPage/ApprenantEnrolled";
 
 function App(){
   return (
@@ -20,6 +22,8 @@ function App(){
           <Route path="/set-password" element={<SetPassword />} />
           <Route path="/welcome-back" element={<WelcomeBack />} />
           <Route path="/apprenant/dashboard" element={<ApprenantDashboard />} />
+          <Route path="/apprenant/profile" element={<ApprenantProfile />} />
+          <Route path="/apprenant/enrolled" element={<ApprenantEnrolled />} />
         </Routes>
       </div>
   );
