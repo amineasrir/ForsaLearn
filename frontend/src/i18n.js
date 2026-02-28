@@ -42,6 +42,7 @@ i18n.use(initReactI18next).init({
         bio: "Bio",
         professionalInfo: "Professional Information",
         previous: "Previous",
+        
         // Password Reset
         forgotPasswordTitle: "Forgot Password?",
         forgotPasswordSubtitle: "Enter your email to reset your password.",

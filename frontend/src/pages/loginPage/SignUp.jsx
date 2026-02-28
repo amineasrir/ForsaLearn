@@ -22,11 +22,7 @@ const SignUp = () => {
   const [error, setError] = useState('');
 
   // Redirect to FormatterSignUp if formateur is selected
-  useEffect(() => {
-    if (userType === 'formateur') {
-      navigate('/formateur/signup');
-    }
-  }, [userType, navigate]);
+
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -54,7 +50,8 @@ const SignUp = () => {
     if (userType === 'formateur') {
       navigate('/formateur/signup');
     } else {
-      navigate('/');
+      // Redirect student to apprenant dashboard
+      navigate('/apprenant/dashboard');
     }
   };
 
@@ -170,9 +167,10 @@ const SignUp = () => {
                 </label>
               </div>
 
-              <button type="submit" className="btn-signup" disabled={false}>
-                {(t('continue') || 'Continue')}
-              </button>
+        <button type="submit" className="btn-signup">
+  {t("signUp")}
+</button>
+
             </form>
             <div className="auth-footer">
               <p>
