@@ -58,7 +58,7 @@ body { font-family: "Poppins", Inter, system-ui, sans-serif; color: var(--text);
 }
 
 /* ================= SIDEBAR ================= */
-.sidebar {
+.apprenant-sidebar {
   background: var(--card);
   border-radius: 8px;
   padding: 1.25rem;
@@ -68,15 +68,15 @@ body { font-family: "Poppins", Inter, system-ui, sans-serif; color: var(--text);
   height: fit-content;
 }
 
-.menu-title {
+.apprenant-menu-title {
   font-size: 0.75rem;
   text-transform: uppercase;
   color: var(--muted);
   margin: 1.25rem 0 0.75rem;
 }
 
-.menu { display: flex; flex-direction: column; gap: 0.25rem; }
-.menu-item {
+.apprenant-menu { display: flex; flex-direction: column; gap: 0.25rem; }
+.apprenant-menu-item {
   display: flex;
   align-items: center;
   gap: 0.75rem;
@@ -88,72 +88,61 @@ body { font-family: "Poppins", Inter, system-ui, sans-serif; color: var(--text);
   transition: 0.2s ease;
 }
 
-.menu-item .menu-icon {
-  width: 20px;
-  height: 20px;
+.apprenant-menu-item .menu-icon {
+ 
   display: flex;
   align-items: center;
   justify-content: center;
   border-radius: 50%;
-  color: var(--muted);
+  color: var(--text);
   flex-shrink: 0;
-  font-size: 0.7rem;
+  font-size: 20px;
 }
 
-.menu-item svg { width: 18px; height: 18px; }
-.menu-item .menu-text { display: inline-block; }
+.apprenant-menu-item svg { width: 18px; height: 18px; }
+.apprenant-menu-item .menu-text { display: inline-block; color: #434242; font-size: small; }
 
-.menu-item:hover { background: rgba(124,58,237,0.06); color: #7c3aed; }
-.menu-item:hover .menu-icon { background: rgba(124,58,237,0.08); color: #7c3aed; }
+.apprenant-menu-item:hover { background: rgba(124,58,237,0.06); }
+.apprenant-menu-item:hover .menu-icon { background: rgba(124,58,237,0.08);  }
 
-.menu-item.active {
-  background: rgba(255,59,99,0.08);
-  border-left: 4px solid var(--primary);
-  color: var(--primary);
-  padding-left: 0.75rem;
-}
 
-.menu-item.active .menu-icon {
-  background: rgba(255,59,99,0.12);
-  color: var(--primary);
-}
+
+
 
 /* ================= PROFILE CARD ================= */
-.profile-section {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+.apprenant-profil-section {
+  background: linear-gradient(#0936CB,#2C7A9C 100%);
   border-radius: 12px;
   padding: 2rem;
   display: flex;
-  justify-content: space-between;
+  justify-content: center;
   align-items: center;
   margin-bottom: 2rem;
   color: #fff;
-}
-
-.profile-content {
+  margin-right: 46px;
+  margin-left: 46px;
+  }
+.apprenant-profil-content {
   display: flex;
   align-items: center;
   gap: 1.5rem;
 }
 
-.profile-avatar {
+.apprenant-profil-avatar {
   width: 80px;
   height: 80px;
   border-radius: 50%;
-  border: 3px solid #fff;
   object-fit: cover;
 }
 
-.profile-info h1 {
+.apprenant-profil-info h1 {
   margin: 0;
   font-size: 1.5rem;
   font-weight: 700;
 }
 
-.instructor-badge {
+.apprenant-student-badge {
   display: inline-block;
-  background: rgba(255, 255, 255, 0.2);
-  border: 1px solid rgba(255, 255, 255, 0.4);
   color: #fff;
   padding: 0.25rem 0.75rem;
   border-radius: 20px;
@@ -161,43 +150,27 @@ body { font-family: "Poppins", Inter, system-ui, sans-serif; color: var(--text);
   margin-top: 0.5rem;
 }
 
-.add-course-btn {
-  background: rgba(255, 255, 255, 0.2);
-  color: #fff;
-  border: 2px solid #fff;
-  padding: 0.75rem 1.5rem;
-  border-radius: 6px;
-  cursor: pointer;
-  font-weight: 600;
-  transition: all 0.3s ease;
-}
-
-.add-course-btn:hover {
-  background: #fff;
-  color: #667eea;
-}
 
 /* ================= STATS ================= */
-.stats-cards {
+.apprenant-stats-cards {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
   gap: 1.5rem;
   margin-top: 1rem;
 }
 
-.stat-card {
-  background: var(--card);
+.apprenant-stat-card {
+  /* background: var(--card); */
   border-radius: 15px;
   padding: 1rem;
   display: flex;
   gap: 1rem;
   align-items: center;
-  border: 1px solid var(--border);
   box-shadow: 0 6px 18px rgba(15,23,42,0.04);
   transition: 0.3s;
 }
 
-.stat-card:hover { transform: translateY(-2px); }
+.apprenant-stat-card:hover { transform: translateY(-2px); }
 
 .stat-icon {
   width: 50px;
@@ -218,7 +191,7 @@ body { font-family: "Poppins", Inter, system-ui, sans-serif; color: var(--text);
 .stat-content h3 { margin: 0.25rem 0 0; font-weight: 700; font-size: 1.5rem; }
 
 /* ================= QUIZ SECTION ================= */
-.quiz-section {
+.apprenant-quiz-section {
 background: linear-gradient(90deg, rgba(209, 205, 205, 0.313), white); 
  border: 1px solid var(--border);
   border-radius: 12px;
@@ -230,10 +203,10 @@ background: linear-gradient(90deg, rgba(209, 205, 205, 0.313), white);
  
 }
 
-.quiz-content h3 { font-size: 1rem; margin: 0; font-weight: 700; }
-.quiz-content p { margin: 0.5rem 0 0; font-size: 0.875rem; color: var(--muted); }
+.apprenant-quiz-content h3 { font-size: 1rem; margin: 0; font-weight: 700; }
+.apprenant-quiz-content p { margin: 0.5rem 0 0; font-size: 0.875rem; color: var(--muted); }
 
-.continue-button {
+.apprenant-continue-button {
   background: #392C7D;
   color: white;
   border: none;
@@ -244,11 +217,42 @@ background: linear-gradient(90deg, rgba(209, 205, 205, 0.313), white);
   transition: 0.3s;
 }
 
-.continue-button:hover { transform: translateY(-2px); }
+.apprenant-continue-button:hover { transform: translateY(-2px); }
 
 /* ================= COURSES ================= */
 .enrolled-courses { margin-top: 2rem; }
 .enrolled-courses h2 { font-size: 1.25rem; font-weight: 700; margin-bottom: 1.25rem; }
+
+/* enrolled page tabs */
+.courses-header-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  margin: 1rem 0 1rem;
+  border-bottom: 1.5px solid var(--border);
+}
+
+.courses-tabs {
+  display: flex;
+  gap: 0.75rem;
+  margin-top: 0.5rem;
+}
+.courses-tabs button {
+  padding: 0.5rem 1rem;
+  border: 1px solid #ddd;
+  border-radius: 20px;
+  background: #f9fafb;
+  cursor: pointer;
+  font-weight: 600;
+  transition: background 0.2s;
+}
+.courses-tabs button.active {
+  background: #ff4667;
+  color: #fff;
+  border-color: transparent;
+}
+.courses-tabs button:hover { background: #eee; }
 
 .courses-container {
   display: grid;
@@ -316,6 +320,103 @@ background: linear-gradient(90deg, rgba(209, 205, 205, 0.313), white);
   border-radius: 999px;
   box-shadow: 0 6px 18px rgba(2,6,23,0.08);
 }
+
+/* ================= PROFILE PAGE ================= */
+.profile-page-content {
+  margin-top: 30px;
+}
+.profile-title {
+  font-size: 1.4rem;
+  font-weight: 700;
+  margin-bottom: 1.5rem;
+  color: #111827;
+  margin-left: 7px;
+  border-bottom: 1.5px solid var(--border);
+  padding: 8px;
+}
+
+/* editable state styles */
+.profile-title {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.title-edit-btn {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  font-size: 1rem;
+  color: var(--muted);
+  transition: color 0.2s;
+}
+
+.title-edit-btn:hover {
+  color: var(--text);
+}
+
+.profile-details input,
+.profile-details select,
+.profile-details textarea {
+  width: 100%;
+  padding: 0.5rem;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  font-size: 0.95rem;
+}
+
+.profile-actions {
+  margin-top: 1rem;
+  display: flex;
+  gap: 0.5rem;
+}
+
+.save-btn,
+.cancel-btn {
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.save-btn { background: var(--primary); color: #fff; }
+.cancel-btn { background: #ddd; color: #333; }
+
+.profile-details {
+  background: #ffffff;
+  padding: 2rem;
+  border-radius: 10px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.8rem 3rem;
+  border: 1px solid #e5e7eb;
+}
+
+/* Label */
+.profile-details label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #111827; /* gris soft */
+  display: block;
+  margin-bottom: 6px;
+}
+
+/* Value */
+.profile-details .value {
+  font-size: 0.95rem;
+  font-weight: 500;
+  color:#6b7280c7 ;
+  margin: 0;
+}
+
+/* Bio full width */
+.profile-details div:last-child {
+  grid-column: 1 / -1;
+}
+
+
+
 
 /* ================= TWO COLUMN ================= */
 .two-column-section {
@@ -435,10 +536,10 @@ background: linear-gradient(90deg, rgba(209, 205, 205, 0.313), white);
   .dashboard-header { padding: 2rem 0 4rem; }
   .header-center { position: static; transform: none; margin-bottom: 0.75rem; }
   .dashboard-container { grid-template-columns: 1fr; gap: 1rem; }
-  .sidebar { position: relative; top: auto; }
+  .apprenant-sidebar { position: relative; top: auto; }
   .courses-container { grid-template-columns: 1fr; }
-  .stats-cards { grid-template-columns: 1fr; }
+  .apprenant-stats-cards { grid-template-columns: 1fr; }
   .two-column-section { grid-template-columns: 1fr; }
-  .profile-card { padding: 1.75rem; margin-top: -3rem; }
+  .apprenant-profile-card { padding: 1.75rem; margin-top: -3rem; }
   
 }

@@ -1,21 +1,22 @@
 import React, { useState } from 'react';
 import './dashboard.css';
+<<<<<<< HEAD
 import { 
   FaHome, FaUser, FaBook, FaTrophy, FaHeart, 
   FaClipboardList, FaHistory, FaEnvelope, FaHeadset, 
   FaCog, FaSignOutAlt, FaStar, FaCheckCircle, FaClock,
   FaFileAlt, FaPen
 } from 'react-icons/fa';
+=======
+import { FaBook, FaCheckCircle, FaStar, FaFileAlt } from 'react-icons/fa';
+>>>>>>> dda926c42f83c61d19783bda8fdc32cb86014317
 import cours1 from '../../assets/image/cours/cours1.jpg'
 import cours2 from '../../assets/image/cours/cours2.jpg'
 import cours3 from '../../assets/image/cours/cours3.jpg'
-
+import CardP from '../../components/apprenant/CardP';
+import Sidebar from '../../components/apprenant/Sidebar';
 const ApprenantDashboard = () => {
-  const userData = {
-    name: 'Elrhouat chaima',
-    role: 'Student',
-    avatar: 'https://via.placeholder.com/80/8B5CF6/FFFFFF?text=EC',
-  };
+ 
 
   const enrolledCourses = [
     {
@@ -26,7 +27,7 @@ const ApprenantDashboard = () => {
       rating: 4.9,
       reviews: 200,
       price: '$120',
-      image:  cours1
+      image: cours1
     },
     {
       id: 2,
@@ -36,7 +37,7 @@ const ApprenantDashboard = () => {
       rating: 4.4,
       reviews: 160,
       price: '$140',
-      image:  cours2
+      image: cours2
     },
     {
       id: 3,
@@ -46,7 +47,7 @@ const ApprenantDashboard = () => {
       rating: 4.6,
       reviews: 170,
       price: '$160',
-      image:  cours3
+      image: cours3
     },
   ];
 
@@ -89,91 +90,28 @@ const ApprenantDashboard = () => {
           </nav>
         </div>
       </header>
-
+ <CardP/>
       <div className="dashboard-container">
         {/* Sidebar */}
-        <aside className="sidebar">
-          <div className="sidebar-content">
-            <h3 className="menu-title">Main Menu</h3>
-            <nav className="menu">
-              <a href="#" className="menu-item active">
-                <span className="menu-icon"><FaHome /></span>
-                <span className="menu-text">Dashboard</span>
-              </a>
-              <a href="#" className="menu-item">
-                <span className="menu-icon"><FaUser /></span>
-                <span className="menu-text">My Profile</span>
-              </a>
-              <a href="#" className="menu-item">
-                <span className="menu-icon"><FaBook /></span>
-                <span className="menu-text">Enrolled Courses</span>
-              </a>
-              <a href="#" className="menu-item">
-                <span className="menu-icon"><FaTrophy /></span>
-                <span className="menu-text">My Certificates</span>
-              </a>
-              <a href="#" className="menu-item">
-                <span className="menu-icon"><FaHeart /></span>
-                <span className="menu-text">Wishlist</span>
-              </a>
-              <a href="#" className="menu-item">
-                <span className="menu-icon"><FaClipboardList /></span>
-                <span className="menu-text">My Quiz Attempts</span>
-              </a>
-              <a href="#" className="menu-item">
-                <span className="menu-icon"><FaHistory /></span>
-                <span className="menu-text">Order History</span>
-              </a>
-              <a href="#" className="menu-item">
-                <span className="menu-icon"><FaEnvelope /></span>
-                <span className="menu-text">Messages</span>
-              </a>
-              <a href="#" className="menu-item">
-                <span className="menu-icon"><FaHeadset /></span>
-                <span className="menu-text">Support Tickets</span>
-              </a>
-            </nav>
-
-            <h3 className="menu-title">Account Settings</h3>
-            <nav className="menu">
-              <a href="#" className="menu-item">
-                <span className="menu-icon"><FaCog /></span>
-                <span className="menu-text">Settings</span>
-              </a>
-              <a href="#" className="menu-item">
-                <span className="menu-icon"><FaSignOutAlt /></span>
-                <span className="menu-text">Logout</span>
-              </a>
-            </nav>
-          </div>
-        </aside>
-
+          <Sidebar/>
+        
         {/* Main Content */}
         <main className="main-content">
           {/* Profile Section */}
-         <div className="profile-section" style={{marginTop:"20px"}}>
-            <div className="profile-content">
-              <img src={userData.avatar} alt="Profile" className="profile-avatar" />
-              <div className="profile-info">
-                <h1>{userData.name}</h1>
-                <span className="instructor-badge">Instructor</span>
-              </div>
-            </div>
-            <button className="add-course-btn">Add New Course</button>
-          </div>
+        
 
           {/* Quiz Section */}
-          <div className="quiz-section">
-            <div className="quiz-content">
+          <div className="apprenant-quiz-section">
+            <div className="apprenant-quiz-content">
               <h3>Quiz : Build Responsive Real World</h3>
               <p>Answered : 15/22</p>
             </div>
-            <button className="continue-button">Continue Quiz</button>
+            <button className="apprenant-continue-button">Continue Quiz</button>
           </div>
 
           {/* Stats Cards */}
-          <div className="stats-cards">
-            <div className="stat-card">
+          <div className="apprenant-stats-cards">
+            <div className="apprenant-stat-card">
               <div className="stat-icon enrolled">
                 <FaBook />
               </div>
@@ -182,7 +120,7 @@ const ApprenantDashboard = () => {
                 <h3>12</h3>
               </div>
             </div>
-            <div className="stat-card">
+            <div className="apprenant-stat-card">
               <div className="stat-icon active">
                 <FaBook />
               </div>
@@ -191,7 +129,7 @@ const ApprenantDashboard = () => {
                 <h3>03</h3>
               </div>
             </div>
-            <div className="stat-card">
+            <div className="apprenant-stat-card">
               <div className="stat-icon completed">
                 <FaCheckCircle />
               </div>
@@ -238,15 +176,15 @@ const ApprenantDashboard = () => {
                 {recentInvoices.map(invoice => (
                   <div key={invoice.id} className="invoice-item">
                     <div className="invoice-info">
-                     
+
                       <p className="invoice-title">{invoice.title}</p>
-                       <p className="invoice-id">{invoice.id}</p>
+                      <p className="invoice-id">{invoice.id}</p>
                     </div>
                     <div className="invoice-amount">
                       <span>{invoice.amount}</span>
-                      <span className={`status ${invoice.status}`} style={{marginRight:"6px"}}>✓ Paid</span>
+                      <span className={`status ${invoice.status}`} style={{ marginRight: "6px" }}>✓ Paid</span>
                     </div>
-                    <FaFileAlt className="invoice-icon"  />
+                    <FaFileAlt className="invoice-icon" />
                   </div>
                 ))}
               </div>
@@ -275,7 +213,7 @@ const ApprenantDashboard = () => {
           </div>
         </main>
       </div>
-     
+
     </div>
   );
 };
