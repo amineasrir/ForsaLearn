@@ -198,6 +198,102 @@
   color: #fff;
 }
 
+/* ==================== MESSAGE PAGE ==================== */
+.message-page .message-wrapper {
+  display: flex;
+  flex: 1;
+  gap: 1rem;
+}
+
+.conv-list {
+  width: 240px;
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  overflow-y: auto;
+}
+
+.conv-item {
+  padding: 0.75rem 1rem;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.conv-item:hover,
+.conv-item.active {
+  background: #f3f4f6;
+}
+
+.conv-student-name {
+  font-weight: 600;
+  color: #1f2937;
+}
+
+.chat-window {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.chat-body {
+  flex: 1;
+  padding: 1rem;
+  overflow-y: auto;
+}
+
+.chat-message {
+  margin-bottom: 0.75rem;
+  display: flex;
+}
+.chat-message.sent {
+  justify-content: flex-end;
+}
+.chat-message.received {
+  justify-content: flex-start;
+}
+
+.chat-bubble {
+  max-width: 70%;
+  padding: 0.5rem 0.75rem;
+  border-radius: 12px;
+  line-height: 1.4;
+}
+.chat-message.sent .chat-bubble {
+  background: #4F46E5;
+  color: #fff;
+}
+.chat-message.received .chat-bubble {
+  background: #e5e7eb;
+  color: #111827;
+}
+
+.chat-input {
+  display: flex;
+  border-top: 1px solid #e5e7eb;
+  padding: 0.5rem;
+}
+.chat-input input {
+  flex: 1;
+  border: 1px solid #d1d5db;
+  border-radius: 4px;
+  padding: 0.5rem;
+}
+.chat-input button {
+  margin-left: 0.5rem;
+  padding: 0.5rem 1rem;
+  background: #4F46E5;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+.chat-input button:hover {
+  opacity: 0.9;
+}
+
 .profile-content {
   display: flex;
   align-items: center;

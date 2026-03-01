@@ -1,14 +1,12 @@
 import React, { useState } from 'react'
 import { FaChartBar, FaUser, FaBook, FaUsers, FaQuestionCircle, FaClipboardList, FaTrophy, FaDollarSign, FaEnvelope, FaHeadset, FaCog, FaSignOutAlt } from 'react-icons/fa';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import '../../styles/formateur.css';  
 
 const SidebarF = ({ activeMenu: propActive, setActiveMenu: propSetActive }) => {
   const navigate = useNavigate();
+  const location = useLocation();
   const [internalActive, setInternalActive] = useState('dashboard');
-  const activeMenu = propActive !== undefined ? propActive : internalActive;
-  const setActiveMenu = propSetActive !== undefined ? propSetActive : setInternalActive;
-
   const menuItems = [
     { id: 'dashboard', label: 'Dashboard', icon: FaChartBar, path: '/formateur/dashboard' },
     { id: 'profile', label: 'Profile', icon: FaUser, path: '/formateur/profile' },
@@ -16,11 +14,22 @@ const SidebarF = ({ activeMenu: propActive, setActiveMenu: propSetActive }) => {
     { id: 'students', label: 'Students', icon: FaUsers, path: '/formateur/students' },
     { id: 'quiz', label: 'Quiz', icon: FaQuestionCircle },
     { id: 'quizResults', label: 'Quiz Results', icon: FaClipboardList },
-    { id: 'certificates', label: 'Certificates', icon: FaTrophy },
-    { id: 'earnings', label: 'Earnings', icon: FaDollarSign },
-    { id: 'messages', label: 'Messages', icon: FaEnvelope },
+    { id: 'certificates', label: 'Certificates', icon: FaTrophy, path: '/formateur/certificates' },
+    { id: 'earnings', label: 'Earnings', icon: FaDollarSign, path: '/formateur/earnings' },
+    { id: 'messages', label: 'Messages', icon: FaEnvelope, path: '/formateur/messages' },
     { id: 'support', label: 'Support', icon: FaHeadset },
   ];
+
+  const computeActive = () => {
+    if (propActive !== undefined) return propActive;
+    const path = location.pathname || '';
+    const matched = menuItems.find(item => item.path && path.startsWith(item.path));
+    if (matched) return matched.id;
+    return internalActive;
+  };
+
+  const activeMenu = computeActive();
+  const setActiveMenu = propSetActive !== undefined ? propSetActive : setInternalActive;
 
   return (
     <div>
