@@ -1,15 +1,6 @@
 import React, { useState } from 'react';
 import './dashboard.css';
-<<<<<<< HEAD
 import { FaBook, FaCheckCircle, FaStar, FaFileAlt } from 'react-icons/fa';
-=======
-import { 
-  FaHome, FaUser, FaBook, FaTrophy, FaHeart, 
-  FaClipboardList, FaHistory, FaEnvelope, FaHeadset, 
-  FaCog, FaSignOutAlt, FaStar, FaCheckCircle, FaClock,
-  FaFileAlt, FaPen
-} from 'react-icons/fa';
->>>>>>> f20e18adb328e9efdd7cbc19b406682d8e2f6bcd
 import cours1 from '../../assets/image/cours/cours1.jpg'
 import cours2 from '../../assets/image/cours/cours2.jpg'
 import cours3 from '../../assets/image/cours/cours3.jpg'

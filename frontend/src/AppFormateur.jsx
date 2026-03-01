@@ -7,6 +7,10 @@ import FormateurStudent from './pages/FormateurPage/FormateurStudent';
 import FormateurEarnings from './pages/FormateurPage/FormateurEarnings';
 import FormateurCertificats from './pages/FormateurPage/FormateurCertificats';
 import FormateurMessage from './pages/FormateurPage/FormateurMessage';
+import FormateurSupport from './pages/FormateurPage/FormateurSupport';
+import FormateurQuiz from './pages/FormateurPage/FormateurQuiz';
+import FormateurQuizResult from './pages/FormateurPage/FormateurQuizResult';
+import FormateurSetting from './pages/FormateurPage/FormateurSetting';
 
 const AppFormateur = () => {
   // nested routes for the instructor area
@@ -20,6 +24,10 @@ const AppFormateur = () => {
         <Route path="earnings" element={<FormateurEarnings />} />
         <Route path="certificates" element={<FormateurCertificats />} />
         <Route path="messages" element={<FormateurMessage />} />
+        <Route path="support" element={<FormateurSupport />} />
+        <Route path="quiz" element={<FormateurQuiz />} />
+        <Route path="quiz-results" element={<FormateurQuizResult />} />
+        <Route path="settings" element={<FormateurSetting />} />
         {/* redirect any unknown path to dashboard */}
         <Route path="*" element={<Navigate to="dashboard" replace />} />
       </Routes>

@@ -7,17 +7,26 @@ const SidebarF = ({ activeMenu: propActive, setActiveMenu: propSetActive }) => {
   const navigate = useNavigate();
   const location = useLocation();
   const [internalActive, setInternalActive] = useState('dashboard');
+
+  const handleLogout = () => {
+    // Clear authentication token and user data
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+    // Redirect to sign in page
+    navigate('/signin');
+  };
+
   const menuItems = [
     { id: 'dashboard', label: 'Dashboard', icon: FaChartBar, path: '/formateur/dashboard' },
     { id: 'profile', label: 'Profile', icon: FaUser, path: '/formateur/profile' },
     { id: 'mycourses', label: 'My Courses', icon: FaBook, path: '/formateur/courses' },
     { id: 'students', label: 'Students', icon: FaUsers, path: '/formateur/students' },
-    { id: 'quiz', label: 'Quiz', icon: FaQuestionCircle },
-    { id: 'quizResults', label: 'Quiz Results', icon: FaClipboardList },
+    { id: 'quiz', label: 'Quiz', icon: FaQuestionCircle, path: '/formateur/quiz' },
+    { id: 'quizResults', label: 'Quiz Results', icon: FaClipboardList, path: '/formateur/quiz-results' },
     { id: 'certificates', label: 'Certificates', icon: FaTrophy, path: '/formateur/certificates' },
     { id: 'earnings', label: 'Earnings', icon: FaDollarSign, path: '/formateur/earnings' },
     { id: 'messages', label: 'Messages', icon: FaEnvelope, path: '/formateur/messages' },
-    { id: 'support', label: 'Support', icon: FaHeadset },
+    { id: 'support', label: 'Support', icon: FaHeadset, path: '/formateur/support' },
   ];
 
   const computeActive = () => {
@@ -61,13 +70,22 @@ const SidebarF = ({ activeMenu: propActive, setActiveMenu: propSetActive }) => {
                   <h3>Account Settings</h3>
                   <ul className="menu-list">
                     <li>
-                      <button className="menu-item">
+                      <button 
+                        className={`menu-item ${activeMenu === 'settings' ? 'active' : ''}`}
+                        onClick={() => {
+                          setActiveMenu('settings');
+                          navigate('/formateur/settings');
+                        }}
+                      >
                         <span className="menu-icon"><FaCog /></span>
                         <span className="menu-label">Setting</span>
                       </button>
                     </li>
                     <li>
-                      <button className="menu-item">
+                      <button 
+                        className="menu-item"
+                        onClick={handleLogout}
+                      >
                         <span className="menu-icon"><FaSignOutAlt /></span>
                         <span className="menu-label">Logout</span>
                       </button>
