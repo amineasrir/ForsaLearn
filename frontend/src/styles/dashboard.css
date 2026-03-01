@@ -118,55 +118,6 @@ body {
     flex-shrink: 0;
 }
 
-.sidebar-card {
-    background: white;
-    border-radius: 8px;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-    padding: 24px;
-}
-
-.sidebar-title {
-    font-size: 16px;
-    font-weight: 600;
-    color: #1f2937;
-    margin-bottom: 16px;
-    margin-top: 24px;
-}
-
-.sidebar-title:first-child {
-    margin-top: 0;
-}
-
-.sidebar-nav {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-}
-
-.sidebar-link {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    padding: 10px 12px;
-    border-radius: 8px;
-    color: #6b7280;
-    text-decoration: none;
-    transition: all 0.2s;
-}
-
-.sidebar-link:hover {
-    background-color: #f9fafb;
-}
-
-.sidebar-link.active {
-    background-color: #fce7f3;
-    color: #ec4899;
-}
-
-.sidebar-icon {
-    font-size: 20px;
-}
-
 /* Main Content Area */
 .main {
     flex: 1;
@@ -237,23 +188,27 @@ body {
     border-radius: 8px;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
     padding: 24px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
 }
 
 .stat-header {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    margin-bottom: 12px;
+    gap: 8px;
 }
 
 .stat-label {
-    font-size: 14px;
+    font-size: 25px;
     color: #6b7280;
 }
 
 .stat-icon {
-    width: 40px;
-    height: 40px;
+    width: 25px;
+    height: 25px;
     border-radius: 50%;
     display: flex;
     align-items: center;
@@ -277,8 +232,8 @@ body {
     background: linear-gradient(135deg, #a78bfa, #c084fc);
 }
 
-.stat-value {
-    font-size: 32px;
+.stat-card .stat-value {
+    font-size: 25px;
     font-weight: bold;
     color: #1f2937;
 }

@@ -25,7 +25,10 @@ function App(){
           <Route path="/apprenant/dashboard" element={<ApprenantDashboard />} />
           <Route path="/apprenant/profile" element={<ApprenantProfile />} />
           <Route path="/apprenant/enrolled" element={<ApprenantEnrolled />} />
+<<<<<<< HEAD
           <Route path="/formateur/earnings" element={<FormateurEarnings />} />
+=======
+>>>>>>> f20e18adb328e9efdd7cbc19b406682d8e2f6bcd
         </Routes>
       </div>
   );
