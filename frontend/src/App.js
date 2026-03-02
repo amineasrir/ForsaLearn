@@ -7,6 +7,7 @@ import OTPVerification from "./pages/loginPage/OTPVerification";
 import SetPassword from "./pages/loginPage/SetPassword";
 import WelcomeBack from "./pages/loginPage/WelcomeBack";
 import ApprenantDashboard from "./pages/ApprenantPage/ApprenantDashboard";
+import FormateurEarnings from "./pages/FormateurPage/FormateurEarnings";
 import ApprenantProfile from "./pages/ApprenantPage/ApprenantProfile";
 import ApprenantEnrolled from "./pages/ApprenantPage/ApprenantEnrolled";
 import ApprenantCertificates from "./pages/ApprenantPage/ApprenantCertificates";
