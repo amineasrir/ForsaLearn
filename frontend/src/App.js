@@ -9,10 +9,17 @@ import WelcomeBack from "./pages/loginPage/WelcomeBack";
 import ApprenantDashboard from "./pages/ApprenantPage/ApprenantDashboard";
 import ApprenantProfile from "./pages/ApprenantPage/ApprenantProfile";
 import ApprenantEnrolled from "./pages/ApprenantPage/ApprenantEnrolled";
+import ApprenantCertificates from "./pages/ApprenantPage/ApprenantCertificates";
+import ApprenantQuizzes from "./pages/ApprenantPage/ApprenantQuizzes";
+import ApprenantCourses from "./pages/ApprenantPage/ApprenantCourses";
+import ApprenantWishlist from "./pages/ApprenantPage/ApprenantWishlist";
+import ApprenantMessages from "./pages/ApprenantPage/ApprenantMessages";
+import { WishlistProvider } from './context/WishlistContext';
 
 function App(){
   return (
       <div className="App">
+        <WishlistProvider>
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/signup" element={<SignUp />} />
@@ -24,7 +31,13 @@ function App(){
           <Route path="/apprenant/dashboard" element={<ApprenantDashboard />} />
           <Route path="/apprenant/profile" element={<ApprenantProfile />} />
           <Route path="/apprenant/enrolled" element={<ApprenantEnrolled />} />
+          <Route path="/apprenant/certificates" element={<ApprenantCertificates />} />
+          <Route path="/apprenant/quizzes" element={<ApprenantQuizzes />} />
+          <Route path="/apprenant/courses" element={<ApprenantCourses />} />
+          <Route path="/apprenant/wishlist" element={<ApprenantWishlist />} />
+          <Route path="/apprenant/messages" element={<ApprenantMessages />} />
         </Routes>
+        </WishlistProvider>
       </div>
   );
 }

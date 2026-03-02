@@ -30,6 +30,7 @@ const Sidebar = () => {
             {makeItem('/apprenant/dashboard', <FaHome />, 'Dashboard')}
             {makeItem('/apprenant/profile', <FaUser />, 'My Profile')}
             {makeItem('/apprenant/enrolled', <FaBook />, 'Enrolled Courses')}
+            {makeItem('/apprenant/courses', <FaBook />, 'Courses')}
             {makeItem('/apprenant/certificates', <FaTrophy />, 'My Certificates')}
             {makeItem('/apprenant/wishlist', <FaHeart />, 'Wishlist')}
             {makeItem('/apprenant/quizzes', <FaClipboardList />, 'My Quiz Attempts')}

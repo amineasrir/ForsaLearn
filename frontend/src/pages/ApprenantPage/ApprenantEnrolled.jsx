@@ -87,11 +87,11 @@ const ApprenantEnrolled = () => {
         </div>
 
         <div className="header-center">
-          <h1>Enrolled Courses</h1>
+          <h1>Wishlist</h1>
           <nav className="breadcrumb">
             <Link to="/">Home</Link>
             <span>/</span>
-            <span>Enrolled Courses</span>
+            <span>Wishlist</span>
           </nav>
         </div>
       </header>
