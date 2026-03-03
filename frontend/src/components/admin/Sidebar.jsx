@@ -4,7 +4,7 @@ import {
   FaHome, FaUser, FaBook, FaEnvelope, FaHeadset,
   FaCog, FaSignOutAlt, FaBookReader, FaUserTie 
 } from 'react-icons/fa';
-import '../../pages/ApprenantPage/dashboard.css';
+import '../../styles/sidebar-admin.css';
 
 const Sidebar = () => {
   const location = useLocation();
@@ -26,12 +26,12 @@ const Sidebar = () => {
         <div className="sidebar-content">
           <h3 className="apprenant-menu-title">Main Menu</h3>
           <nav className="apprenant-menu">
-            {makeItem('/admin/dashboard', <FaHome />, 'Dashboard')}
+            {makeItem('/admin/', <FaHome />, 'Dashboard')}
             {makeItem('/admin/profile', <FaUser />, 'My Profile')}
             {makeItem('/admin/courses', <FaBook />, 'Courses')}
             {makeItem('/admin/instructors', <FaUserTie  />, 'Instructors')} 
             {makeItem('/admin/students', <FaBookReader />, 'Students')}
-            {makeItem('/admin/messages', <FaEnvelope />, 'Messages')}
+            {makeItem('/admin/conversations', <FaEnvelope />, 'Conversations')}
             {makeItem('/admin/support', <FaHeadset />, 'Support Tickets')}
           </nav>
 

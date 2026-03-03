@@ -1,0 +1,361 @@
+/* Instructors.css */
+
+/* Instructors Grid */
+.instructors-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+    gap: 24px;
+    padding: 24px;
+  }
+  
+  /* Instructor Card */
+  .instructor-card {
+    background: white;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    transition: all 0.3s;
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .instructor-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+  }
+  
+  /* Instructor Header */
+  .instructor-header {
+    background: linear-gradient(135deg, #6366f1, #8b5cf6);
+    padding: 24px;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .instructor-avatar-wrapper {
+    position: relative;
+    margin-bottom: 12px;
+  }
+  
+  .instructor-avatar {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    border: 4px solid white;
+    object-fit: cover;
+  }
+  
+  .instructor-status-dot {
+    position: absolute;
+    bottom: 4px;
+    right: 4px;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    border: 3px solid white;
+  }
+  
+  .instructor-status-dot.active {
+    background-color: #10b981;
+  }
+  
+  .instructor-status-dot.inactive {
+    background-color: #9ca3af;
+  }
+  
+  .instructor-badges {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  
+  .instructor-badge {
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  
+  .instructor-badge.approved {
+    background: rgba(16, 185, 129, 0.2);
+    color: white;
+  }
+  
+  .instructor-badge.pending {
+    background: rgba(245, 158, 11, 0.2);
+    color: white;
+  }
+  
+  .instructor-badge.language {
+    background: rgba(255, 255, 255, 0.2);
+    color: white;
+  }
+  
+  /* Instructor Body */
+  .instructor-body {
+    padding: 20px;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+  
+  .instructor-name {
+    font-size: 20px;
+    font-weight: 600;
+    color: #1f2937;
+    margin: 0;
+    text-align: center;
+  }
+  
+  .instructor-field {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    font-size: 14px;
+    color: #6366f1;
+    font-weight: 500;
+  }
+  
+  .instructor-bio {
+    font-size: 14px;
+    color: #6b7280;
+    line-height: 1.5;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  
+  /* Skills */
+  .instructor-skills {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid #f3f4f6;
+  }
+  
+  .skill-tag {
+    padding: 4px 10px;
+    background: #ede9fe;
+    color: #6366f1;
+    border-radius: 4px;
+    font-size: 12px;
+    font-weight: 500;
+  }
+  
+  .skill-tag.more {
+    background: #f3f4f6;
+    color: #6b7280;
+  }
+  
+  /* Contact */
+  .instructor-contact {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid #f3f4f6;
+  }
+  
+  .contact-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    color: #6b7280;
+  }
+  
+  .contact-item svg {
+    color: #9ca3af;
+    font-size: 14px;
+    flex-shrink: 0;
+  }
+  
+  .contact-item span {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  
+  /* Stats Row */
+  .instructor-stats-row {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid #f3f4f6;
+  }
+  
+  .instructor-stat {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    text-align: center;
+  }
+  
+  .instructor-stat svg {
+    font-size: 20px;
+    color: #6366f1;
+  }
+  
+  .instructor-stat .stat-number {
+    font-size: 16px;
+    font-weight: bold;
+    color: #1f2937;
+    display: block;
+  }
+  
+  .instructor-stat .stat-text {
+    font-size: 11px;
+    color: #9ca3af;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    display: block;
+  }
+  
+  /* Resources */
+  .instructor-resources {
+    display: flex;
+    justify-content: space-around;
+    gap: 12px;
+  }
+  
+  .resource-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+    color: #6b7280;
+  }
+  
+  .resource-item svg {
+    color: #8b5cf6;
+    font-size: 16px;
+  }
+  
+  /* Footer */
+  .instructor-footer {
+    padding: 16px 20px;
+    background: #f9fafb;
+    display: flex;
+    gap: 8px;
+    border-top: 1px solid #f3f4f6;
+  }
+  
+  .instructor-btn {
+    flex: 1;
+    padding: 10px 16px;
+    border: none;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    transition: all 0.2s;
+  }
+  
+  .instructor-btn.view {
+    background: #dbeafe;
+    color: #3b82f6;
+  }
+  
+  .instructor-btn.view:hover {
+    background: #3b82f6;
+    color: white;
+  }
+  
+  .instructor-btn.approve {
+    background: #d1fae5;
+    color: #10b981;
+  }
+  
+  .instructor-btn.approve:hover {
+    background: #10b981;
+    color: white;
+  }
+  
+  .instructor-btn.reject {
+    background: #fee2e2;
+    color: #ef4444;
+  }
+  
+  .instructor-btn.reject:hover {
+    background: #ef4444;
+    color: white;
+  }
+  
+  /* Stat Subtext */
+  .stat-subtext {
+    font-size: 12px;
+    color: #9ca3af;
+    margin-top: 4px;
+  }
+  
+  /* Responsive Design */
+  @media (max-width: 1024px) {
+    .instructors-grid {
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 20px;
+    }
+  }
+  
+  @media (max-width: 768px) {
+    .instructors-grid {
+      grid-template-columns: 1fr;
+      gap: 16px;
+      padding: 16px;
+    }
+  
+    .instructor-stats-row {
+      grid-template-columns: 1fr;
+      gap: 8px;
+    }
+  
+    .instructor-stat {
+      flex-direction: row;
+      justify-content: flex-start;
+    }
+  
+    .instructor-footer {
+      flex-direction: column;
+    }
+  
+    .instructor-btn {
+      width: 100%;
+    }
+  }
+  
+  @media (max-width: 480px) {
+    .instructor-avatar {
+      width: 80px;
+      height: 80px;
+    }
+  
+    .instructor-body {
+      padding: 16px;
+    }
+  
+    .instructor-name {
+      font-size: 18px;
+    }
+  
+    .instructor-resources {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+  }
