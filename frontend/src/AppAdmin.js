@@ -12,7 +12,7 @@ const AppAdmin = () => {
   return (
     <div>
       <Routes>
-        <Route path="/" element={<Dashboard />} />
+        <Route path="/dashboard" element={<Dashboard />} />
         <Route path='/profile' element={<MyProfile />} />
         <Route path='/courses' element={<Courses />} />
         <Route path='/instructors' element={<Instructors />} />

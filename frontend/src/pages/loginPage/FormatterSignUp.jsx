@@ -5,6 +5,7 @@ import logo_rem from "../../assets/image/home_page/logo_rem.png";
 import signupImage from "../../assets/image/login/image.png";
 import AuthSidebar from '../../components/auth/AuthSidebar';
 import '../../styles/auth.css';
+import { registerFormateur } from '../../services/formateurService';
 
 const FormatterSignUp = () => {
   const { t } = useTranslation();
@@ -19,7 +20,7 @@ const FormatterSignUp = () => {
     confirmPassword: '',
   });
   const [professionalInfo, setProfessionalInfo] = useState({
-    specialty: '',
+    field: '',
     skills: '',
     projectLink: '',
     certification: null,
@@ -80,13 +81,59 @@ const FormatterSignUp = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
-
-    if (!professionalInfo.specialty || !professionalInfo.skills || !professionalInfo.bio) {
-      setError('Please fill in all professional information fields');
-      return;
+    setLoading(true);
+  
+    try {
+  
+      if (!professionalInfo.specialty || !professionalInfo.skills || !professionalInfo.bio) {
+        setError('Please fill in all professional information fields');
+        setLoading(false);
+        return;
+      }
+  
+      // split full name
+      const nameParts = basicInfo.fullName.trim().split(" ");
+      const firstName = nameParts[0];
+      const lastName = nameParts.slice(1).join(" ") || " ";
+  
+      // transform skills to array
+      const skillsArray = professionalInfo.skills
+        .split(',')
+        .map(skill => skill.trim())
+        .filter(skill => skill !== '');
+  
+      const body = {
+        firstName,
+        lastName,
+        email: basicInfo.email,
+        phoneNumber: basicInfo.phone,
+        password: basicInfo.password,
+        field: professionalInfo.field,
+        skills: skillsArray,
+        projects: professionalInfo.projectLink ? [professionalInfo.projectLink] : [],
+        certificates: professionalInfo.certification ? [professionalInfo.certification.name] : [],
+        bio: professionalInfo.bio
+      };
+  
+      const response = await registerFormateur(body);
+      const data = await response.data;
+  
+      if (!response.ok) {
+        setError(data.message || "Registration failed");
+        setLoading(false);
+        return;
+      }
+  
+      // save token
+      localStorage.setItem("token", data.token);
+  
+      navigate("/formateur/dashboard");
+  
+    } catch (err) {
+      setError("Server error");
     }
-
-    navigate('/formateur/dashboard');
+  
+    setLoading(false);
   };
 
   return (

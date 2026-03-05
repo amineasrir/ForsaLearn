@@ -12,6 +12,8 @@ import ForgotPassword from "./pages/loginPage/ForgotPassword";
 import OTPVerification from "./pages/loginPage/OTPVerification";
 import SetPassword from "./pages/loginPage/SetPassword";
 import WelcomeBack from "./pages/loginPage/WelcomeBack";
+import AdminLogin from "./pages/loginPage/AdminLogin";
+import AdminProtectedRoute from "./protectRoutes/AdminProtectedRoute";
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
@@ -19,7 +21,10 @@ root.render(
     <Router>
       <Routes>
         <Route path="/*" element={<App />} />
-        <Route path="/admin/*" element={<AppAdmin />} />
+        <Route path="/admin/login" element={<AdminLogin />} />
+        <Route path="/admin/*" element={<AdminProtectedRoute >
+          <AppAdmin />
+        </AdminProtectedRoute>} />
         <Route path="/formateur/*" element={<AppFormateur />} />
         <Route path="/signin" element={<SignIn />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />

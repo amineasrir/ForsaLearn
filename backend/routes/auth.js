@@ -76,7 +76,8 @@ router.post('/register/formateur',
     body('email').isEmail().normalizeEmail().withMessage('Please provide a valid email'),
     body('phoneNumber').matches(/^[0-9]{10,15}$/).withMessage('Please provide a valid phone number'),
     body('password').isLength({ min: 6 }).withMessage('Password must be at least 6 characters'),
-    body('skills').isArray({ min: 1 }).withMessage('At least one skill is required')
+    body('field').trim().notEmpty().withMessage('Field of expertise is required'),
+    body('skills').isArray({ min: 1 }).withMessage('At least one skill is required'),
   ],
   async (req, res) => {
     try {
@@ -85,7 +86,7 @@ router.post('/register/formateur',
         return res.status(400).json({ errors: errors.array() });
       }
 
-      const { firstName, lastName, email, phoneNumber, password, skills, certificates, projects, bio } = req.body;
+      const { firstName, lastName, email, phoneNumber, password, field,  skills, certificates, projects, bio } = req.body;
 
       // Check if email already exists
       const existingUser = await User.findOne({ email });
@@ -101,6 +102,7 @@ router.post('/register/formateur',
         phoneNumber,
         password,
         role: 'formateur',
+        field,
         skills,
         certificates: certificates || [],
         projects: projects || [],
@@ -144,7 +146,8 @@ router.post('/register/visiteur',
     body('email').isEmail().normalizeEmail().withMessage('Please provide a valid email'),
     body('phoneNumber').matches(/^[0-9]{10,15}$/).withMessage('Please provide a valid phone number'),
     body('password').isLength({ min: 6 }).withMessage('Password must be at least 6 characters'),
-    body('skillsNeeded').isArray().withMessage('Skills needed must be an array')
+    body('skillsNeeded').isArray().withMessage('Skills needed must be an array'),
+    body('interests').isArray().withMessage('Interests must be an array')
   ],
   async (req, res) => {
     try {
@@ -191,7 +194,8 @@ router.post('/register/visiteur',
           lastName: visiteur.lastName,
           email: visiteur.email,
           role: visiteur.role,
-          skillsNeeded: visiteur.skillsNeeded
+          skillsNeeded: visiteur.skillsNeeded,
+          interests: visiteur.interests
         }
       });
     } catch (error) {
@@ -240,8 +244,7 @@ router.post('/login/admin',
       }
 
       // Update last login
-      admin.lastLogin = Date.now();
-      await admin.save();
+      await Admin.findByIdAndUpdate(admin._id, { lastLogin: Date.now() });
 
       // Generate JWT token
       const token = jwt.sign(
