@@ -344,8 +344,8 @@
 
 /* ==================== STATS GRID ==================== */
 .stats-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  display: grid !important;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)) !important;
   gap: 1.5rem;
   margin-bottom: 2rem;
 }
