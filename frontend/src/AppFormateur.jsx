@@ -1,5 +1,7 @@
 import React from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
+import WaitingApproval from './pages/FormateurPage/WaitingApproval';
+import AccountRejected from './pages/FormateurPage/AccountRejected';
 import FormateurDashboard from './pages/FormateurPage/FormateurDashboard';
 import FormateurProfile from './pages/FormateurPage/FormateurProfile';
 import FormateurCourses from './pages/FormateurPage/FormateurCourses';
@@ -17,6 +19,8 @@ const AppFormateur = () => {
   return (
     <div>
       <Routes>
+        <Route path="waiting-approval" element={<WaitingApproval />} />
+        <Route path="account-rejected" element={<AccountRejected />} />
         <Route path="dashboard" element={<FormateurDashboard />} />
         <Route path="profile" element={<FormateurProfile />} />
         <Route path="courses" element={<FormateurCourses />} />

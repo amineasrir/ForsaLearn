@@ -80,13 +80,80 @@ const FormatterSignUp = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
+    setLoading(true);
 
     if (!professionalInfo.specialty || !professionalInfo.skills || !professionalInfo.bio) {
       setError('Please fill in all professional information fields');
+      setLoading(false);
       return;
     }
 
-    navigate('/formateur/dashboard');
+    try {
+      // Parse full name into first and last name
+      const nameParts = basicInfo.fullName.trim().split(' ');
+      const firstName = nameParts[0];
+      const lastName = nameParts.length > 1 ? nameParts.slice(1).join(' ') : nameParts[0];
+
+      // Prepare registration data
+      const registrationData = {
+        firstName,
+        lastName,
+        email: basicInfo.email,
+        phoneNumber: basicInfo.phone,
+        password: basicInfo.password,
+        field: professionalInfo.specialty,
+        skills: professionalInfo.skills.split(',').map(s => s.trim()),
+        bio: professionalInfo.bio
+      };
+
+      // Add projects if projectLink is provided
+      if (professionalInfo.projectLink) {
+        registrationData.projects = [{
+          title: 'Portfolio Project',
+          type: 'link',
+          value: professionalInfo.projectLink
+        }];
+      }
+
+      // Add certificate if file is uploaded
+      if (professionalInfo.certification) {
+        // In a real app, you might want to upload the file separately
+        registrationData.certificates = [{
+          name: professionalInfo.certification.name,
+          type: 'file',
+          value: professionalInfo.certification.name
+        }];
+      }
+
+      // Send registration request
+      const response = await fetch('http://localhost:5000/api/auth/register/formateur', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(registrationData)
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        setError(data.message || 'Registration failed. Please try again.');
+        setLoading(false);
+        return;
+      }
+
+      // Store email for pending verification
+      localStorage.setItem('formateur_pending_email', basicInfo.email);
+
+      // Redirect to waiting approval page
+      navigate('/formateur/waiting-approval', {
+        state: { email: basicInfo.email }
+      });
+    } catch (err) {
+      console.error('Registration error:', err);
+      setError('An error occurred during registration. Please try again.');
+      setLoading(false);
+    }
   };
 
   return (
@@ -272,8 +339,8 @@ const FormatterSignUp = () => {
                   <button type="button" className="btn-secondary" onClick={() => setStep(1)}>
                     {t('previous') || 'Previous'}
                   </button>
-                  <button type="submit" className="btn-signup" disabled={false}>
-                    {(t('continue') || 'Continue')}
+                  <button type="submit" className="btn-signup" disabled={loading}>
+                    {loading ? (t('registering') || 'Registering...') : (t('continue') || 'Continue')}
                   </button>
                 </div>
               </form>

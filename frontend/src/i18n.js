@@ -74,6 +74,38 @@ i18n.use(initReactI18next).init({
         errorOccurred: "An error occurred. Please try again.",
         // FormatterSignUp
         allFieldsRequired: "Please fill in all professional information fields",
+        registering: "Registering...",
+        // Waiting Approval
+        waitingApproval: {
+          title: "Account Under Review",
+          thank: "Thank You for Registering!",
+          description: "Your instructor account application is under review by our admin team.",
+          whatsNext: "We will verify your qualifications and certifications. You'll receive an email notification once your account is approved.",
+          registeredEmail: "Registered Email:",
+          timeline: "Review Timeline",
+          checking: "Checking...",
+          checkStatus: "Check Approval Status",
+          contact: "Contact Support",
+          logout: "Logout",
+          tips: "Tips for Faster Approval",
+          checkAttempts: "Check attempts: {{count}}/5"
+        },
+        // Account Rejected
+        accountRejected: {
+          title: "Application Not Approved",
+          sorry: "Application Not Approved",
+          message: "Unfortunately, your instructor account application could not be approved at this time.",
+          account: "Account Email:",
+          reason: "Reason for Rejection:",
+          appeal: "Appeal Decision",
+          reapply: "Reapply",
+          home: "Return Home",
+          nextSteps: "What You Can Do",
+          email: "Contact our support team to understand the reasons",
+          update: "Update your qualifications and reapply",
+          appeal2: "Appeal the decision if you believe this is a mistake",
+          join: "Join our community as a student"
+        },
         homePage: {
           hero: {
             leader: "The Leader in Online Learning",
@@ -257,6 +289,38 @@ i18n.use(initReactI18next).init({
         errorOccurred: "Une erreur s'est produite. Veuillez réessayer.",
         // FormatterSignUp
         allFieldsRequired: "Veuillez remplir tous les champs d'informations professionnelles",
+        registering: "Inscription en cours...",
+        // Attente d'approbation
+        waitingApproval: {
+          title: "Compte en examen",
+          thank: "Merci de vous être inscrit!",
+          description: "Votre demande de compte instructeur est en cours d'examen par notre équipe d'administration.",
+          whatsNext: "Nous vérifierons vos qualifications et certifications. Vous recevrez une notification par e-mail dès que votre compte sera approuvé.",
+          registeredEmail: "Adresse e-mail enregistrée:",
+          timeline: "Calendrier d'examen",
+          checking: "Vérification...",
+          checkStatus: "Vérifier le statut d'approbation",
+          contact: "Contacter le support",
+          logout: "Déconnexion",
+          tips: "Conseils pour une approbation plus rapide",
+          checkAttempts: "Tentatives de vérification: {{count}}/5"
+        },
+        // Compte rejeté
+        accountRejected: {
+          title: "Candidature non approuvée",
+          sorry: "Candidature non approuvée",
+          message: "Malheureusement, votre demande de compte instructeur ne peut pas être approuvée pour le moment.",
+          account: "Adresse e-mail du compte:",
+          reason: "Raison du rejet:",
+          appeal: "Contester la décision",
+          reapply: "Réappliquer",
+          home: "Retour à l'accueil",
+          nextSteps: "Ce que vous pouvez faire",
+          email: "Contactez notre équipe d'assistance pour comprendre les raisons",
+          update: "Mettez à jour vos qualifications et réappliquez",
+          appeal2: "Contestez la décision si vous pensez que c'est une erreur",
+          join: "Rejoignez notre communauté en tant qu'étudiant"
+        },
         homePage: {
           hero: {
             leader: "Leader de l'apprentissage en ligne",
