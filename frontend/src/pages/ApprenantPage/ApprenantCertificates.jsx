@@ -3,7 +3,10 @@ import { Link } from 'react-router-dom';
 import { FaEye, FaDownload } from 'react-icons/fa';
 import Sidebar from '../../components/apprenant/Sidebar';
 import CardP from '../../components/apprenant/CardP';
+import DashboardNavbar from '../../components/common/DashboardNavbar';
 import './dashboard.css';
+import logo_rem from '../../assets/image/home_page/logo_rem.png';
+
 
 const sampleCertificates = [
   {
@@ -51,29 +54,21 @@ const sampleCertificates = [
 ];
 
 const ApprenantCertificates = () => {
+  const rightContent = (
+    <>
+      <button className="lang-btn">ENG</button>
+      <div className="notification-icon"></div>
+      <div className="cart-icon"></div>
+    </>
+  );
+
   return (
     <div className="apprenant-dashboard">
-      <header className="dashboard-header">
-        <div className="header-container">
-          <div className="header-left">
-            <div className="logo" />
-          </div>
-          <div className="header-right">
-            <button className="lang-btn">ENG</button>
-            <div className="notification-icon"></div>
-            <div className="cart-icon"></div>
-          </div>
-        </div>
-
-        <div className="header-center">
-          <h1>My Certificates</h1>
-          <nav className="breadcrumb">
-            <Link to="/">Home</Link>
-            <span>/</span>
-            <span>My Certificates</span>
-          </nav>
-        </div>
-      </header>
+      <DashboardNavbar
+        title="My Certificates"
+        breadcrumb={[{ to: '/', label: 'Home' }, { label: 'My Certificates' }]}
+        rightContent={rightContent}
+      />
 
       <CardP />
 

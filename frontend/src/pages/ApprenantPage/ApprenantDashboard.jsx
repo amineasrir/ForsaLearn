@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import './dashboard.css';
+import DashboardNavbar from '../../components/common/DashboardNavbar';
 import { FaBook, FaCheckCircle, FaStar, FaFileAlt } from 'react-icons/fa';
 import cours1 from '../../assets/image/cours/cours1.jpg'
 import cours2 from '../../assets/image/cours/cours2.jpg'
@@ -57,30 +58,21 @@ const ApprenantDashboard = () => {
     { id: 5, title: 'Become an app designer', correctAnswers: '12/20', date: '27 Nov 2024', status: 'failed' },
   ];
 
+  const rightContent = (
+    <>
+      <button className="lang-btn">ENG</button>
+      <div className="notification-icon"></div>
+      <div className="cart-icon"></div>
+    </>
+  );
+
   return (
     <div className="apprenant-dashboard">
-      {/* Header */}
-      <header className="dashboard-header">
-        <div className="header-container">
-          <div className="header-left">
-            <div className="logo" />
-          </div>
-          <div className="header-right">
-            <button className="lang-btn">ENG</button>
-            <div className="notification-icon"></div>
-            <div className="cart-icon"></div>
-          </div>
-        </div>
-
-        <div className="header-center">
-          <h1>Dashboard</h1>
-          <nav className="breadcrumb">
-            <a href="/">Home</a>
-            <span>/</span>
-            <span>Dashboard</span>
-          </nav>
-        </div>
-      </header>
+      <DashboardNavbar
+        title="Dashboard"
+        breadcrumb={[{ to: '/', label: 'Home' }, { label: 'Dashboard' }]}
+        rightContent={rightContent}
+      />
  <CardP/>
       <div className="dashboard-container">
         {/* Sidebar */}
