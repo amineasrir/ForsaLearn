@@ -130,9 +130,6 @@ const Formateur = User.discriminator('formateur', new mongoose.Schema({
       type: String,
       required: true
     },
-    description: {
-      type: String
-    },
     type: {
       type: String,
       enum: ['link', 'file'],

@@ -71,8 +71,7 @@ router.post('/register/admin',
 // Register Formateur (Instructor)
 router.post('/register/formateur',
   [
-    body('firstName').trim().isLength({ min: 2 }).withMessage('First name must be at least 2 characters'),
-    body('lastName').trim().isLength({ min: 2 }).withMessage('Last name must be at least 2 characters'),
+    body('fullName').trim().isLength({ min: 2 }).withMessage('Full name must be at least 2 characters'),
     body('email').isEmail().normalizeEmail().withMessage('Please provide a valid email'),
     body('phoneNumber').matches(/^[0-9]{10,15}$/).withMessage('Please provide a valid phone number'),
     body('password').isLength({ min: 6 }).withMessage('Password must be at least 6 characters'),
@@ -83,10 +82,11 @@ router.post('/register/formateur',
     try {
       const errors = validationResult(req);
       if (!errors.isEmpty()) {
+        console.log('Validation errors:', errors.array());
         return res.status(400).json({ errors: errors.array() });
       }
 
-      const { firstName, lastName, email, phoneNumber, password, field,  skills, certificates, projects, bio } = req.body;
+      const { fullName, email, phoneNumber, password, field,  skills, certificates, projects, bio } = req.body;
 
       // Check if email already exists
       const existingUser = await User.findOne({ email });
@@ -96,8 +96,7 @@ router.post('/register/formateur',
 
       // Create new formateur (instructor)
       const formateur = new Formateur({
-        firstName,
-        lastName,
+        fullName,
         email,
         phoneNumber,
         password,
@@ -124,8 +123,7 @@ router.post('/register/formateur',
         token,
         user: {
           id: formateur._id,
-          firstName: formateur.firstName,
-          lastName: formateur.lastName,
+          fullName : formateur.fullName,
           email: formateur.email,
           role: formateur.role,
           isApproved: formateur.isApproved
@@ -141,8 +139,7 @@ router.post('/register/formateur',
 // Register Visiteur (Student/Learner)
 router.post('/register/visiteur',
   [
-    body('firstName').trim().isLength({ min: 2 }).withMessage('First name must be at least 2 characters'),
-    body('lastName').trim().isLength({ min: 2 }).withMessage('Last name must be at least 2 characters'),
+    body('full').trim().isLength({ min: 2 }).withMessage('Full name must be at least 2 characters'),
     body('email').isEmail().normalizeEmail().withMessage('Please provide a valid email'),
     body('phoneNumber').matches(/^[0-9]{10,15}$/).withMessage('Please provide a valid phone number'),
     body('password').isLength({ min: 6 }).withMessage('Password must be at least 6 characters'),

@@ -11,6 +11,28 @@ router.use(authorize('formateur'));
 
 // DASHBOARD STATISTICS
 
+// checkFormateurApproval middleware ensures only approved formateurs can access these routes
+router.get('/check-approval', (req, res) => {
+  try {
+    if (req.user.isApproved) {
+      return res.status(200).json({
+        success: true,
+        isApproved: true,
+        message: 'Your account is approved. You can access the dashboard.'
+      });
+    } else {
+      return res.status(403).json({
+        success: false,
+        isApproved: false,
+        message: 'Your account is not yet approved by admin. Please wait for approval.'
+      });
+    } 
+  } catch (error) {
+    console.error('Check approval error:', error);
+    res.status(500).json({ message: 'Error checking approval status' });
+  }
+});
+
 // Get formateur dashboard statistics
 router.get('/dashboard/stats', checkFormateurApproval, async (req, res) => {
   try {
