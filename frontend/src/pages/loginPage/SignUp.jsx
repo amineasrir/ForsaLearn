@@ -16,6 +16,7 @@ const SignUp = () => {
     phone: '',
     password: '',
     confirmPassword: '',
+    weak_subjects : '', 
   });
   const [agreeTOS, setAgreeTOS] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -127,6 +128,18 @@ const SignUp = () => {
                   id="phone"
                   name="phone"
                   value={formData.phone}
+                  onChange={handleChange}
+                  required
+                />
+              </div>
+              
+               <div className="form-group">
+                <label htmlFor="weak_subjects *">{t('weak subjects *')}</label>
+                <input
+                  type="tel"
+                  id="weak_subjects"
+                  name="weak_subjects"
+                  value={formData.weak_subjects}
                   onChange={handleChange}
                   required
                 />

@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { FaArrowRight } from 'react-icons/fa';
 import Sidebar from '../../components/apprenant/Sidebar';
 import CardP from '../../components/apprenant/CardP';
+import DashboardNavbar from '../../components/common/DashboardNavbar';
 import './dashboard.css';
 
 const sampleQuizzes = [
@@ -39,29 +40,21 @@ const sampleQuizzes = [
 ];
 
 const ApprenantQuizzes = () => {
+  const rightContent = (
+    <>
+      <button className="lang-btn">ENG</button>
+      <div className="notification-icon"></div>
+      <div className="cart-icon"></div>
+    </>
+  );
+
   return (
     <div className="apprenant-dashboard">
-      <header className="dashboard-header">
-        <div className="header-container">
-          <div className="header-left">
-            <div className="logo" />
-          </div>
-          <div className="header-right">
-            <button className="lang-btn">ENG</button>
-            <div className="notification-icon"></div>
-            <div className="cart-icon"></div>
-          </div>
-        </div>
-
-        <div className="header-center">
-          <h1>My Quiz Attempts</h1>
-          <nav className="breadcrumb">
-            <Link to="/">Home</Link>
-            <span>/</span>
-            <span>My Quiz Attempts</span>
-          </nav>
-        </div>
-      </header>
+      <DashboardNavbar
+        title="My Quiz Attempts"
+        breadcrumb={[{ to: '/', label: 'Home' }, { label: 'My Quiz Attempts' }]}
+        rightContent={rightContent}
+      />
 
       <CardP />
 

@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { FaHeart, FaPlayCircle, FaStar, FaThLarge, FaBars } from 'react-icons/fa';
 import Sidebar from '../../components/apprenant/Sidebar';
 import CardP from '../../components/apprenant/CardP';
+import DashboardNavbar from '../../components/common/DashboardNavbar';
 import { useWishlist } from '../../context/WishlistContext';
 import './dashboard.css';
 
@@ -101,28 +102,21 @@ const ApprenantCourses = () => {
 
   const toggleSidebar = () => setSidebarVisible(v => !v);
 
+  const rightContent = (
+    <>
+      <button className="lang-btn">ENG</button>
+      <div className="notification-icon"></div>
+      <div className="cart-icon"></div>
+    </>
+  );
+
   return (
     <div className="apprenant-dashboard">
-      <header className="dashboard-header">
-        <div className="header-container">
-          <div className="header-left">
-            <div className="logo" />
-          </div>
-          <div className="header-right">
-            <button className="lang-btn">ENG</button>
-            <div className="notification-icon"></div>
-            <div className="cart-icon"></div>
-          </div>
-        </div>
-        <div className="header-center">
-          <h1>Course Grid</h1>
-          <nav className="breadcrumb">
-            <Link to="/">Home</Link>
-            <span>/</span>
-            <span>Course Grid</span>
-          </nav>
-        </div>
-      </header>
+      <DashboardNavbar
+        title="Course Grid"
+        breadcrumb={[{ to: '/', label: 'Home' }, { label: 'Course Grid' }]}
+        rightContent={rightContent}
+      />
 
       <CardP />
 

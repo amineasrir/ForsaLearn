@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import Sidebar from '../../components/apprenant/Sidebar';
 import CardP from '../../components/apprenant/CardP';
 import './dashboard.css';
+import DashboardNavbar from '../../components/common/DashboardNavbar';
 
 const userData = {
     fullName: 'Khadija essir',
@@ -34,27 +35,22 @@ const ApprenantProfile = () => {
 
     return (
         <div className="apprenant-dashboard">
-            <header className="dashboard-header">
-                <div className="header-container">
-                    <div className="header-left">
-                        <div className="logo" />
-                    </div>
-                    <div className="header-right">
-                        <button className="lang-btn">ENG</button>
-                        <div className="notification-icon"></div>
-                        <div className="cart-icon"></div>
-                    </div>
-                </div>
-
-                <div className="header-center">
-                    <h1>My Profile</h1>
-                    <nav className="breadcrumb">
-                        <Link to="/">Home</Link>
-                        <span>/</span>
-                        <span>My Profile</span>
-                    </nav>
-                </div>
-            </header>
+      {(() => {
+        const rightContent = (
+          <>
+            <button className="lang-btn">ENG</button>
+            <div className="notification-icon"></div>
+            <div className="cart-icon"></div>
+          </>
+        );
+        return (
+          <DashboardNavbar
+            title="My Profile"
+            breadcrumb={[{ to: '/', label: 'Home' }, { label: 'My Profile' }]}
+            rightContent={rightContent}
+          />
+        );
+      })()}
             <CardP />
             <div className="dashboard-container">
                 <Sidebar />

@@ -2,6 +2,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import Sidebar from '../../components/apprenant/Sidebar';
 import CardP from '../../components/apprenant/CardP';
+import DashboardNavbar from '../../components/common/DashboardNavbar';
 import './dashboard.css';
 import { useWishlist } from '../../context/WishlistContext';
 import { FaHeart, FaPlayCircle, FaStar } from 'react-icons/fa';
@@ -9,29 +10,21 @@ import { FaHeart, FaPlayCircle, FaStar } from 'react-icons/fa';
 const ApprenantWishlist = () => {
   const { items, toggleItem } = useWishlist();
 
+  const rightContent = (
+    <>
+      <button className="lang-btn">ENG</button>
+      <div className="notification-icon"></div>
+      <div className="cart-icon"></div>
+    </>
+  );
+
   return (
     <div className="apprenant-dashboard">
-      <header className="dashboard-header">
-            <div className="header-container">
-              <div className="header-left">
-                <div className="logo" />
-              </div>
-              <div className="header-right">
-                <button className="lang-btn">ENG</button>
-                <div className="notification-icon"></div>
-                <div className="cart-icon"></div>
-              </div>
-            </div>
-    
-            <div className="header-center">
-              <h1>wishlist</h1>
-              <nav className="breadcrumb">
-                <Link to="/">Home</Link>
-                <span>/</span>
-                <span>Wishlist</span>
-              </nav>
-            </div>
-          </header>
+      <DashboardNavbar
+        title="Wishlist"
+        breadcrumb={[{ to: '/', label: 'Home' }, { label: 'Wishlist' }]}
+        rightContent={rightContent}
+      />
       <CardP />
 
       <div className="dashboard-container">
