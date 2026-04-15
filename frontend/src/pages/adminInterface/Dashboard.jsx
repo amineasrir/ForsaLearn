@@ -1,114 +1,80 @@
-import React, { useState } from "react";
-import logo from "../../assets/image/home_page/logo_rem.png";
-import { NavLink } from "react-router-dom";
-import { useTranslation } from "react-i18next";
-import i18nInstance from "../../i18n";
-import "flag-icons/css/flag-icons.min.css"; // Import CSS des drapeaux
+import React, { useEffect, useMemo, useState } from "react";
 import "../../styles/dashboard.css";
 import Sidebar from "../../components/admin/Sidebar";
 import { FaBook, FaBookOpen, FaBookReader, FaUserTie } from "react-icons/fa";
 import { FcMoneyTransfer } from "react-icons/fc";
+import Header from "../../components/admin/Header";
+import ProfileCard from "../../components/admin/ProfileCard";
+import {
+  getAdminDashboardStats,
+  getAdminProfile,
+  getAdminRevenue
+} from "../../services/adminService";
 
 const Dashboard = () => {
-  const [selectedYear, setSelectedYear] = useState(2025);
-  const { t, i18n } = useTranslation();
+  const [stats, setStats] = useState(null);
+  const [revenue, setRevenue] = useState(null);
+  const [profile, setProfile] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
 
-  const changeLanguage = () => {
-    const lang = i18n && i18n.language === "en" ? "fr" : "en";
-    const instance =
-      i18n && typeof i18n.changeLanguage === "function" ? i18n : i18nInstance;
-    if (instance && typeof instance.changeLanguage === "function") {
-      instance.changeLanguage(lang);
-    } else {
-      console.warn("i18n.changeLanguage is not available");
-    }
-  };
+  useEffect(() => {
+    const loadDashboard = async () => {
+      try {
+        setLoading(true);
+        const [statsResponse, revenueResponse, profileResponse] = await Promise.all([
+          getAdminDashboardStats(),
+          getAdminRevenue("year"),
+          getAdminProfile()
+        ]);
 
-  const studentGrowthData = [
-    { month: "Jan", value: 20 },
-    { month: "Feb", value: 35 },
-    { month: "Mar", value: 45 },
-    { month: "Apr", value: 55 },
-    { month: "May", value: 70 },
-    { month: "Jun", value: 85 },
-    { month: "Jul", value: 95 },
-    { month: "Aug", value: 105 },
-    { month: "Sep", value: 110 },
-    { month: "Oct", value: 110 },
-    { month: "Nov", value: 115 },
-    { month: "Dec", value: 120 },
-  ];
+        setStats(statsResponse.data?.data || null);
+        setRevenue(revenueResponse.data?.data || null);
+        setProfile(profileResponse.data?.user || null);
+      } catch (err) {
+        setError(err.response?.data?.message || "Failed to load dashboard data.");
+      } finally {
+        setLoading(false);
+      }
+    };
 
-  const maxValue = 120;
+    loadDashboard();
+  }, []);
 
-  // Fonction pour obtenir le code du drapeau
-  const getFlagClass = (lang) => {
-    switch (lang) {
-      case "en":
-        return "fi fi-gb"; // Royaume-Uni pour anglais
-      case "fr":
-        return "fi fi-fr"; // France pour français
-      default:
-        return "fi fi-gl"; // globe par défaut
-    }
-  };
+  const studentGrowthData = useMemo(() => {
+    const revenueByDate = revenue?.revenueByDate || {};
+    const monthMap = {};
+    const monthLabels = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 
-  // Ensure we have a valid language string before calling string methods
-  const currentLang = i18n && i18n.language ? i18n.language : "en";
+    Object.keys(revenueByDate).forEach((dateKey) => {
+      const date = new Date(dateKey);
+      const monthIndex = date.getMonth();
+      monthMap[monthIndex] = (monthMap[monthIndex] || 0) + Number(revenueByDate[dateKey] || 0);
+    });
+
+    return monthLabels.map((month, index) => ({
+      month,
+      value: monthMap[index] || 0
+    }));
+  }, [revenue]);
+
+  const maxValue = Math.max(...studentGrowthData.map((item) => item.value), 1);
+  const overview = stats?.overview || {};
+  const adminName = profile?.fullName || "Administrator";
 
   return (
     <div className="dashboard">
-      {/* Hero Section */}
-      <div className="hero">
-        <div className="container">
-          <div className="logo">
-            <img src={logo} alt="ForsaLearn Logo" className="logo-icon" />
-          </div>
-
-          <h1 className="hero-title">Dashboard</h1>
-          <div className="nav-actions">
-            <button
-              className="lang-btn"
-              onClick={changeLanguage}
-              style={{ display: "flex", alignItems: "center", gap: "5px" }}
-            >
-              <span
-                className={getFlagClass(currentLang)}
-                style={{ fontSize: "18px" }}
-              ></span>
-              <span>{currentLang.toUpperCase()}</span>
-            </button>
-          </div>
-        </div>
-      </div>
-
-      {/* Main Content */}
+      <Header title='Dashboard'/>
       <div className="container main-content">
         <div className="content-wrapper">
           <aside className="sidebar">
             <Sidebar />
           </aside>
-          {/* Main Dashboard Content */}
           <main className="main">
-            {/* Profile Card */}
-            <div className="profile-card">
-              <div className="profile-content">
-                <div className="profile-avatar-wrapper">
-                  <img
-                    src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100&h=100&fit=crop"
-                    alt="Elrhouat chaima"
-                    className="profile-avatar"
-                  />
-                  <span className="profile-status"></span>
-                </div>
-                <div className="profile-info">
-                  <h2 className="profile-name">Elrhouat chaima ✓</h2>
-                  <p className="profile-role">Administrateur</p>
-                </div>
-              </div>
-            </div>
+            <ProfileCard name={adminName} role="Administrateur" image={profile?.profilePicture} />
 
-            {/* Stats Grid */}
+            {error && <div className="error-message">{error}</div>}
+
             <div className="stats-grid">
               <div className="stat-card">
                 <div className="stat-header">
@@ -117,7 +83,7 @@ const Dashboard = () => {
                   </div>
                   <span className="stat-label">Total instructor</span>
                 </div>
-                <p className="stat-value">13</p>
+                <p className="stat-value">{loading ? "..." : overview.totalFormateurs || 0}</p>
               </div>
 
               <div className="stat-card">
@@ -127,58 +93,57 @@ const Dashboard = () => {
                   </div>
                   <span className="stat-label">Active Courses</span>
                 </div>
-                <p className="stat-value">08</p>
+                <p className="stat-value">{loading ? "..." : overview.publishedCourses || 0}</p>
               </div>
 
               <div className="stat-card">
                 <div className="stat-header">
-                <div className="stat-icon purple"><FaBookReader /></div>
+                  <div className="stat-icon purple"><FaBookReader /></div>
                   <span className="stat-label">Total Students</span>
                 </div>
-                <p className="stat-value">17</p>
+                <p className="stat-value">{loading ? "..." : overview.totalVisiteurs || 0}</p>
               </div>
 
               <div className="stat-card">
                 <div className="stat-header">
-                <div className="stat-icon cyan"><FaBook /></div>
+                  <div className="stat-icon cyan"><FaBook /></div>
                   <span className="stat-label">Total Courses</span>
                 </div>
-                <p className="stat-value">11</p>
+                <p className="stat-value">{loading ? "..." : overview.totalCourses || 0}</p>
               </div>
             </div>
 
-            {/* Total Earnings */}
             <div className="stat-card earnings-card">
               <div className="stat-header">
-              <div className="stat-icon purple-gradient"><FcMoneyTransfer /></div>
+                <div className="stat-icon purple-gradient"><FcMoneyTransfer /></div>
                 <span className="stat-label">Total Earnings</span>
               </div>
-              <p className="stat-value">$486</p>
+              <p className="stat-value">
+                {loading ? "..." : `$${Number(overview.totalRevenue || 0).toLocaleString()}`}
+              </p>
             </div>
 
-            {/* Students Growth Chart */}
             <div className="chart-card">
               <div className="chart-header">
-                <h3 className="chart-title">Students Growth</h3>
+                <h3 className="chart-title">Revenue Growth</h3>
                 <button className="year-selector">
-                  <span>📅</span>
-                  <span>{selectedYear}</span>
+                  <span>Year</span>
                 </button>
               </div>
 
               <div className="chart-container">
                 <div className="chart-y-axis">
-                  <span>120</span>
-                  <span>100</span>
-                  <span>80</span>
-                  <span>60</span>
-                  <span>40</span>
-                  <span>20</span>
+                  <span>{maxValue}</span>
+                  <span>{Math.round(maxValue * 0.8)}</span>
+                  <span>{Math.round(maxValue * 0.6)}</span>
+                  <span>{Math.round(maxValue * 0.4)}</span>
+                  <span>{Math.round(maxValue * 0.2)}</span>
+                  <span>0</span>
                   <span>-</span>
                 </div>
 
                 <div className="chart-area">
-                  {studentGrowthData.map((data, index) => (
+                  {studentGrowthData.map((data) => (
                     <div key={data.month} className="chart-bar-wrapper">
                       <div
                         className="chart-bar"

@@ -5,6 +5,9 @@ import logo_rem from "../../assets/image/home_page/logo_rem.png";
 import loginImage from "../../assets/image/login/image.png";
 import AuthSidebar from '../../components/auth/AuthSidebar';
 import '../../styles/auth.css';
+import { loginApprenant } from '../../services/apprenentService';
+import { loginFormateur } from '../../services/formateurService';
+import { setAuthSession } from '../../utils/authStorage';
 
 const SignIn = () => {
   const { t } = useTranslation();
@@ -19,18 +22,38 @@ const SignIn = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
+    setLoading(true);
 
     if (!email || !password) {
       setError('Please enter both email and password');
+      setLoading(false);
       return;
     }
 
-    // Redirect based on user type
-    if (userType === 'formateur') {
-      navigate('/formateur');
-    } else {
-      // After successful apprenant login, go to the Apprenant dashboard/page
-      navigate('/apprenant');
+    try {
+      const payload = { email, password };
+      const response = userType === 'formateur'
+        ? await loginFormateur(payload)
+        : await loginApprenant(payload);
+
+      const { token, user } = response.data;
+      setAuthSession({ token, user });
+
+      if (user.role === 'formateur') {
+        if (user.isApproved) {
+          navigate('/formateur/dashboard');
+        } else {
+          navigate('/formateur/waiting-approval', { state: { email: user.email } });
+        }
+        return;
+      }
+
+      navigate('/apprenant/dashboard');
+    } catch (err) {
+      const backendMessage = err.response?.data?.message;
+      setError(backendMessage || 'Login failed. Please try again.');
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -103,8 +126,8 @@ const SignIn = () => {
                 <Link to="/forgot-password" className="forgot-password">{t('forgotPassword') || 'Forgot Password?'}</Link>
               </div>
 
-              <button type="submit" className="btn-signin" disabled={false}>
-                {(t('login') || 'Login')}
+              <button type="submit" className="btn-signin" disabled={loading}>
+                {loading ? 'Loading...' : (t('login') || 'Login')}
               </button>
             </form>
 

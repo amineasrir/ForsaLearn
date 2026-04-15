@@ -120,7 +120,7 @@ router.post('/stripe/confirm',
       // Get payment record
       const payment = await Payment.findById(paymentId)
         .populate('course')
-        .populate('formateur', 'email firstName');
+        .populate('formateur', 'email fullName');
       
       if (!payment) {
         return res.status(404).json({ message: 'Payment not found' });
@@ -267,7 +267,7 @@ router.post('/paypal/execute',
       // Get payment record
       const payment = await Payment.findById(paymentId)
         .populate('course')
-        .populate('formateur', 'email firstName');
+        .populate('formateur', 'email fullName');
       
       if (!payment) {
         return res.status(404).json({ message: 'Payment not found' });
@@ -336,9 +336,9 @@ router.get('/:id',
   async (req, res) => {
     try {
       const payment = await Payment.findById(req.params.id)
-        .populate('user', 'firstName lastName email')
+        .populate('user', 'fullName email')
         .populate('course', 'title thumbnail')
-        .populate('formateur', 'firstName lastName email');
+        .populate('formateur', 'fullName email');
       
       if (!payment) {
         return res.status(404).json({ message: 'Payment not found' });
@@ -380,7 +380,7 @@ router.get('/formateur/earnings',
         status: 'completed'
       })
         .populate('course', 'title')
-        .populate('user', 'firstName lastName')
+        .populate('user', 'fullName')
         .sort({ paidAt: -1 });
       
       res.status(200).json({
@@ -418,9 +418,9 @@ router.get('/admin/all',
       }
       
       const payments = await Payment.find(filter)
-        .populate('user', 'firstName lastName email')
+        .populate('user', 'fullName email')
         .populate('course', 'title')
-        .populate('formateur', 'firstName lastName')
+        .populate('formateur', 'fullName')
         .sort({ createdAt: -1 })
         .skip(skip)
         .limit(limit);

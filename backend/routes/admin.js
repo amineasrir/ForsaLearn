@@ -51,13 +51,13 @@ router.get('/dashboard/stats', async (req, res) => {
       .sort({ totalEnrollments: -1 })
       .limit(5)
       .select('title totalEnrollments totalRevenue averageRating')
-      .populate('formateur', 'firstName lastName');
+      .populate('formateur', 'fullName');
     
     // Get top formateurs by revenue
     const topFormateurs = await Formateur.find({ isApproved: true })
       .sort({ totalEarnings: -1 })
       .limit(5)
-      .select('firstName lastName email totalEarnings totalStudents rating');
+      .select('fullName email totalEarnings totalStudents rating');
     
     res.status(200).json({
       success: true,
@@ -156,8 +156,7 @@ router.get('/users', async (req, res) => {
     
     if (req.query.search) {
       filter.$or = [
-        { firstName: { $regex: req.query.search, $options: 'i' } },
-        { lastName: { $regex: req.query.search, $options: 'i' } },
+        { fullName: { $regex: req.query.search, $options: 'i' } },
         { email: { $regex: req.query.search, $options: 'i' } }
       ];
     }
@@ -212,7 +211,7 @@ router.get('/users/:id', async (req, res) => {
         'enrolledStudents.student': user._id 
       })
       .select('title')
-      .populate('formateur', 'firstName lastName');
+      .populate('formateur', 'fullName');
       additionalData.enrolledCourses = enrolledCourses;
     }
     
@@ -399,7 +398,7 @@ router.patch('/formateurs/:id/reject',
 router.get('/courses/pending', async (req, res) => {
   try {
     const pendingCourses = await Course.find({ status: 'pending' })
-      .populate('formateur', 'firstName lastName email')
+      .populate('formateur', 'fullName email')
       .sort({ createdAt: -1 });
     
     res.status(200).json({
@@ -434,7 +433,7 @@ router.get('/courses', async (req, res) => {
     }
     
     const courses = await Course.find(filter)
-      .populate('formateur', 'firstName lastName email')
+      .populate('formateur', 'fullName email')
       .sort({ createdAt: -1 })
       .skip(skip)
       .limit(limit);

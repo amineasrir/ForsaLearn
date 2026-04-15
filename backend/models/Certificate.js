@@ -149,16 +149,16 @@ certificateSchema.methods.recordVerification = async function() {
 certificateSchema.statics.getStudentCertificates = function(studentId) {
   return this.find({ student: studentId, status: 'active' })
     .populate('course', 'title thumbnail category')
-    .populate('instructor', 'firstName lastName')
+    .populate('instructor', 'fullName')
     .sort({ completionDate: -1 });
 };
 
 // Verify certificate by ID
 certificateSchema.statics.verifyCertificateById = async function(certificateId) {
   const certificate = await this.findOne({ certificateId, status: 'active' })
-    .populate('student', 'firstName lastName email')
+    .populate('student', 'fullName email')
     .populate('course', 'title')
-    .populate('instructor', 'firstName lastName');
+    .populate('instructor', 'fullName');
   
   if (certificate) {
     await certificate.recordVerification();
@@ -170,7 +170,7 @@ certificateSchema.statics.verifyCertificateById = async function(certificateId) 
 // Get instructor's issued certificates
 certificateSchema.statics.getInstructorCertificates = function(instructorId) {
   return this.find({ instructor: instructorId, status: 'active' })
-    .populate('student', 'firstName lastName')
+    .populate('student', 'fullName')
     .populate('course', 'title')
     .sort({ completionDate: -1 });
 };
@@ -207,7 +207,7 @@ certificateSchema.pre('save', async function() {
     if (this.student && !this.studentName) {
       const User = mongoose.model('User');
       const student = await User.findById(this.student);
-      this.studentName = `${student.firstName} ${student.lastName}`;
+      this.studentName = student.fullName;
     }
     
     if (this.course && !this.courseName) {
@@ -220,7 +220,7 @@ certificateSchema.pre('save', async function() {
     if (this.instructor && !this.instructorName) {
       const User = mongoose.model('User');
       const instructor = await User.findById(this.instructor);
-      this.instructorName = `${instructor.firstName} ${instructor.lastName}`;
+      this.instructorName = instructor.fullName;
     }
   }
 });

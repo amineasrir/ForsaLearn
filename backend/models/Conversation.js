@@ -92,7 +92,7 @@ conversationSchema.statics.findOrCreateDirect = async function(user1Id, user2Id)
   let conversation = await this.findOne({
     type: 'direct',
     participants: { $all: [user1Id, user2Id], $size: 2 }
-  }).populate('participants', 'firstName lastName email role profilePicture')
+  }).populate('participants', 'fullName email role profilePicture')
     .populate('lastMessage');
 
   if (!conversation) {
@@ -102,7 +102,7 @@ conversationSchema.statics.findOrCreateDirect = async function(user1Id, user2Id)
     });
     
     conversation = await this.findById(conversation._id)
-      .populate('participants', 'firstName lastName email role profilePicture')
+      .populate('participants', 'fullName email role profilePicture')
       .populate('lastMessage');
   }
 
@@ -127,7 +127,7 @@ conversationSchema.statics.getUserConversations = async function(userId, filters
   }
 
   return await this.find(query)
-    .populate('participants', 'firstName lastName email role profilePicture')
+    .populate('participants', 'fullName email role profilePicture')
     .populate('lastMessage')
     .populate('course', 'title thumbnail')
     .sort({ lastMessageAt: -1 })

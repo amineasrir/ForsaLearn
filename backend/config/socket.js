@@ -40,7 +40,7 @@ const initializeSocket = (server) => {
       // Attach user to socket
       socket.userId = user._id.toString();
       socket.userRole = user.role;
-      socket.userName = `${user.firstName} ${user.lastName}`;
+      socket.userName = user.fullName;
       
       next();
     } catch (error) {

@@ -1,59 +1,34 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
+import React, { useEffect, useState } from 'react';
 import { FaEye, FaDownload } from 'react-icons/fa';
 import Sidebar from '../../components/apprenant/Sidebar';
 import CardP from '../../components/apprenant/CardP';
 import DashboardNavbar from '../../components/common/DashboardNavbar';
+import { getApprenantProfile, getMyCertificates } from '../../services/apprenentService';
 import './dashboard.css';
-import logo_rem from '../../assets/image/home_page/logo_rem.png';
-
-
-const sampleCertificates = [
-  {
-    id: '01',
-    course: 'UI/UX Design Certificate',
-    date: '22 Aug 2025',
-    marks: 20,
-    outOf: 20,
-  },
-  {
-    id: '02',
-    course: 'Wordpress Certificate',
-    date: '10 Aug 2025',
-    marks: 18,
-    outOf: 20,
-  },
-  {
-    id: '03',
-    course: 'HTML CSS Certificate',
-    date: '26 Jul 2025',
-    marks: 25,
-    outOf: 30,
-  },
-  {
-    id: '04',
-    course: 'JavaScript Certificate',
-    date: '14 Jul 2025',
-    marks: 15,
-    outOf: 20,
-  },
-  {
-    id: '05',
-    course: 'Photoshop Certificate',
-    date: '19 Jun 2025',
-    marks: 20,
-    outOf: 30,
-  },
-  {
-    id: '06',
-    course: 'Python Certificate',
-    date: '12 Jun 2025',
-    marks: 20,
-    outOf: 20,
-  },
-];
 
 const ApprenantCertificates = () => {
+  const [certificates, setCertificates] = useState([]);
+  const [user, setUser] = useState(null);
+  const [error, setError] = useState('');
+
+  useEffect(() => {
+    const loadData = async () => {
+      try {
+        const [certificatesResponse, userResponse] = await Promise.all([
+          getMyCertificates(),
+          getApprenantProfile()
+        ]);
+
+        setCertificates(certificatesResponse.data?.data || []);
+        setUser(userResponse.data?.user || null);
+      } catch (err) {
+        setError(err.response?.data?.message || 'Failed to load certificates.');
+      }
+    };
+
+    loadData();
+  }, []);
+
   const rightContent = (
     <>
       <button className="lang-btn">ENG</button>
@@ -70,12 +45,13 @@ const ApprenantCertificates = () => {
         rightContent={rightContent}
       />
 
-      <CardP />
+      <CardP user={user} />
 
       <div className="dashboard-container">
         <Sidebar />
 
         <main className="main-content">
+          {error && <div className="error-message">{error}</div>}
           <section className="certificates-section">
             <h2>My Certificates</h2>
             <div className="certificates-table-container" style={{marginTop:"20px"}}>
@@ -85,26 +61,32 @@ const ApprenantCertificates = () => {
                     <th>ID</th>
                     <th>Course Name</th>
                     <th>Date</th>
-                    <th>Marks</th>
-                    <th>Out of</th>
+                    <th>Instructor</th>
+                    <th>Status</th>
                     <th>Actions</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {sampleCertificates.map(cert => (
-                    <tr key={cert.id}>
-                      <td>{cert.id}</td>
-                      <td>{cert.course}</td>
-                      <td>{cert.date}</td>
-                      <td>{cert.marks}</td>
-                      <td>{cert.outOf}</td>
+                  {certificates.map(cert => (
+                    <tr key={cert._id}>
+                      <td>{cert.certificateId}</td>
+                      <td>{cert.course?.title || cert.courseName}</td>
+                      <td>{cert.completionDate ? new Date(cert.completionDate).toLocaleDateString() : 'N/A'}</td>
+                      <td>{cert.instructor?.fullName || cert.instructorName}</td>
+                      <td>{cert.status || 'active'}</td>
                       <td>
-                        {/* static icons only */}
                         <FaEye title="View" style={{cursor: 'pointer', marginRight: '0.5rem'}} />
                         <FaDownload title="Download" style={{cursor: 'pointer'}} />
                       </td>
                     </tr>
                   ))}
+                  {certificates.length === 0 && (
+                    <tr>
+                      <td colSpan="6" style={{ textAlign: 'center', padding: '1rem' }}>
+                        No certificates found.
+                      </td>
+                    </tr>
+                  )}
                 </tbody>
               </table>
             </div>

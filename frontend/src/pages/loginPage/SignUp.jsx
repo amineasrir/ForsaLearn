@@ -1,10 +1,12 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import logo_rem from "../../assets/image/home_page/logo_rem.png";
 import signupImage from "../../assets/image/login/image.png";
 import AuthSidebar from '../../components/auth/AuthSidebar';
 import '../../styles/auth.css';
+import { registerApprenant } from '../../services/apprenentService';
+import { setAuthSession } from '../../utils/authStorage';
 
 const SignUp = () => {
   const { t } = useTranslation();
@@ -13,10 +15,11 @@ const SignUp = () => {
   const [formData, setFormData] = useState({
     fullName: '',
     email: '',
-    phone: '',
+    phoneNumber: '',
     password: '',
     confirmPassword: '',
-    weak_subjects : '', 
+    weak_subjects: '',
+    interests: '',
   });
   const [agreeTOS, setAgreeTOS] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -47,12 +50,37 @@ const SignUp = () => {
       return;
     }
 
-    // Redirect based on user type
     if (userType === 'formateur') {
       navigate('/formateur/signup');
-    } else {
-      // Redirect student to apprenant dashboard
+      return;
+    }
+
+    try {
+      setLoading(true);
+      const response = await registerApprenant({
+        fullName: formData.fullName,
+        email: formData.email,
+        phoneNumber: formData.phoneNumber,
+        password: formData.password,
+        skillsNeeded: formData.weak_subjects
+          .split(',')
+          .map((item) => item.trim())
+          .filter(Boolean),
+        interests: formData.interests
+          .split(',')
+          .map((item) => item.trim())
+          .filter(Boolean)
+      });
+      const data = response.data;
+
+      setAuthSession({ token: data.token, user: data.user });
       navigate('/apprenant/dashboard');
+
+    } catch (err) {
+      console.error(err);
+      setError(err.response?.data?.message || 'An error occurred during registration');
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -126,20 +154,32 @@ const SignUp = () => {
                 <input
                   type="tel"
                   id="phone"
-                  name="phone"
-                  value={formData.phone}
+                  name="phoneNumber"
+                  value={formData.phoneNumber}
                   onChange={handleChange}
                   required
                 />
               </div>
               
                <div className="form-group">
-                <label htmlFor="weak_subjects *">{t('weak subjects *')}</label>
+                <label htmlFor="weak_subjects">{t('weak_subjects') || 'Weak subjects'}</label>
                 <input
-                  type="tel"
+                  type="text"
                   id="weak_subjects"
                   name="weak_subjects"
                   value={formData.weak_subjects}
+                  onChange={handleChange}
+                  required
+                />
+              </div>
+
+                <div className="form-group">
+                <label htmlFor="interests">{t('interests') || 'Interests'}</label>
+                <input
+                  type="text"
+                  id="interests"
+                  name="interests"
+                  value={formData.interests}
                   onChange={handleChange}
                   required
                 />
@@ -176,13 +216,13 @@ const SignUp = () => {
                     checked={agreeTOS}
                     onChange={(e) => setAgreeTOS(e.target.checked)}
                   />
-                  <span>{t('agreeTerms') || 'I agree with'} <a href="#">{t('termsOfService') || 'Terms of Service'}</a> {t('and')} <a href="#">{t('privacyPolicy') || 'Privacy Policy'}</a></span>
+                  <span>{t('agreeTerms') || 'I agree with'} <button type="button" className="link-button">{t('termsOfService') || 'Terms of Service'}</button> {t('and')} <button type="button" className="link-button">{t('privacyPolicy') || 'Privacy Policy'}</button></span>
                 </label>
               </div>
 
-        <button type="submit" className="btn-signup">
-  {t("signUp")}
-</button>
+              <button type="submit" className="btn-signup" disabled={loading}>
+                {loading ? 'Registering...' : t("signUp")}
+              </button>
 
             </form>
             <div className="auth-footer">

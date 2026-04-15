@@ -177,8 +177,9 @@ body {
 
 /* Stats Grid */
 .stats-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    display: grid !important;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)) !important; 
+    justify-content: center !important;
     gap: 24px;
     margin-bottom: 24px;
 }

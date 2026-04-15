@@ -1,76 +1,78 @@
-import React, { useState, useEffect } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
-import { useTranslation } from 'react-i18next';
+import React, { useState, useEffect } from "react";
+import { useNavigate, Link } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import logo_rem from "../../assets/image/home_page/logo_rem.png";
 import signupImage from "../../assets/image/login/image.png";
-import AuthSidebar from '../../components/auth/AuthSidebar';
-import '../../styles/auth.css';
+import AuthSidebar from "../../components/auth/AuthSidebar";
+import "../../styles/auth.css";
+import { registerFormateur } from "../../services/formateurService";
+import { setAuthSession } from "../../utils/authStorage";
 
 const FormatterSignUp = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const [userType, setUserType] = useState('formateur'); // Default to formateur
+  const [userType, setUserType] = useState("formateur"); // Default to formateur
   const [step, setStep] = useState(1);
   const [basicInfo, setBasicInfo] = useState({
-    fullName: '',
-    email: '',
-    phone: '',
-    password: '',
-    confirmPassword: '',
+    fullName: "",
+    email: "",
+    phone: "",
+    password: "",
+    confirmPassword: "",
   });
   const [professionalInfo, setProfessionalInfo] = useState({
-    specialty: '',
-    skills: '',
-    projectLink: '',
-    certification: null,
-    bio: '',
+    field: "",
+    skills: "",
+    projectLink: "",
+    certification: "",
+    bio: "",
   });
   const [agreeTOS, setAgreeTOS] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
+  const [error, setError] = useState("");
 
   // Redirect to SignUp if apprenant is selected
   useEffect(() => {
-    if (userType === 'apprenant') {
-      navigate('/signup');
+    if (userType === "apprenant") {
+      navigate("/signup");
     }
   }, [userType, navigate]);
 
   const handleBasicChange = (e) => {
     const { name, value } = e.target;
-    setBasicInfo(prev => ({
+    setBasicInfo((prev) => ({
       ...prev,
-      [name]: value
+      [name]: value,
     }));
   };
 
   const handleProfessionalChange = (e) => {
     const { name, value } = e.target;
-    setProfessionalInfo(prev => ({
+    setProfessionalInfo((prev) => ({
       ...prev,
-      [name]: value
+      [name]: value,
     }));
   };
 
   const handleCertificationChange = (e) => {
     const file = e.target.files[0];
-    setProfessionalInfo(prev => ({
+    setProfessionalInfo((prev) => ({
       ...prev,
-      certification: file
+      certification: file,
     }));
   };
 
   const handleNextStep = (e) => {
     e.preventDefault();
-    setError('');
+    setError("");
 
     if (basicInfo.password !== basicInfo.confirmPassword) {
-      setError('Passwords do not match');
+      setError("Passwords do not match");
       return;
     }
 
     if (!agreeTOS) {
-      setError('Please agree to Terms of Service and Privacy Policy');
+      setError("Please agree to Terms of Service and Privacy Policy");
       return;
     }
 
@@ -79,14 +81,68 @@ const FormatterSignUp = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError('');
+    setError("");
+    setLoading(true);
 
-    if (!professionalInfo.specialty || !professionalInfo.skills || !professionalInfo.bio) {
-      setError('Please fill in all professional information fields');
-      return;
+    try {
+      if (
+        !professionalInfo.field ||
+        !professionalInfo.skills ||
+        !professionalInfo.bio
+      ) {
+        setError("Please fill in all professional information fields");
+        setLoading(false);
+        return;
+      }
+
+      // transform skills to array
+      const skillsArray = professionalInfo.skills
+        .split(",")
+        .map((skill) => skill.trim())
+        .filter((skill) => skill !== "");
+
+      const body = {
+        fullName: basicInfo.fullName,
+        email: basicInfo.email,
+        phoneNumber: basicInfo.phone,
+        password: basicInfo.password,
+        field: professionalInfo.field,
+        skills: skillsArray,
+        projects: professionalInfo.projectLink
+          ? [
+              {
+                title: "Project Link",
+                type: "link",
+                value: professionalInfo.projectLink,
+              },
+            ]
+          : [],
+        certificates: professionalInfo.certification
+          ? [
+              { 
+                name: professionalInfo.certification.name,
+                type: "file",
+                value: professionalInfo.certification.name }]
+          : [],
+        bio: professionalInfo.bio,
+      };
+
+      const response = await registerFormateur(body);
+      const data = response.data;
+
+      setAuthSession({ token: data.token, user: data.user });
+
+      if (data.user.role === "formateur" && !data.user.isApproved) {
+        navigate("/formateur/waiting-approval", { state: { email: data.user.email } });
+        return;
+      }
+
+      navigate("/formateur/dashboard");
+    } catch (err) {
+      setError(err.response?.data?.message || "Server error");
+    } finally {
+      setLoading(false);
     }
-
-    navigate('/formateur/dashboard');
   };
 
   return (
@@ -97,34 +153,48 @@ const FormatterSignUp = () => {
         <div className="auth-right">
           <div className="auth-header">
             <img src={logo_rem} alt="ForsaLearn" className="auth-logo" />
-            <Link to="/" className="back-link">{t('backToHome')}</Link>
+            <Link to="/" className="back-link">
+              {t("backToHome")}
+            </Link>
           </div>
 
           <div className="auth-form-container">
-            <h2>{step === 1 ? (t('signUpTitle') || 'Sign Up') : (t('professionalInfo') || 'Professional Information')}</h2>
+            <h2>
+              {step === 1
+                ? t("signUpTitle") || "Sign Up"
+                : t("professionalInfo") || "Professional Information"}
+            </h2>
 
             {/* Role Selector */}
             {step === 1 && (
               <div className="role-selector">
-                <label className={`role-option ${userType === 'apprenant' ? 'active' : ''}`}>
+                <label
+                  className={`role-option ${
+                    userType === "apprenant" ? "active" : ""
+                  }`}
+                >
                   <input
                     type="radio"
                     name="userType"
                     value="apprenant"
-                    checked={userType === 'apprenant'}
+                    checked={userType === "apprenant"}
                     onChange={(e) => setUserType(e.target.value)}
                   />
-                  <span>{t('student') || 'Student'}</span>
+                  <span>{t("student") || "Student"}</span>
                 </label>
-                <label className={`role-option ${userType === 'formateur' ? 'active' : ''}`}>
+                <label
+                  className={`role-option ${
+                    userType === "formateur" ? "active" : ""
+                  }`}
+                >
                   <input
                     type="radio"
                     name="userType"
                     value="formateur"
-                    checked={userType === 'formateur'}
+                    checked={userType === "formateur"}
                     onChange={(e) => setUserType(e.target.value)}
                   />
-                  <span>{t('instructor') || 'Instructor'}</span>
+                  <span>{t("instructor") || "Instructor"}</span>
                 </label>
               </div>
             )}
@@ -134,7 +204,7 @@ const FormatterSignUp = () => {
             {step === 1 ? (
               <form onSubmit={handleNextStep}>
                 <div className="form-group">
-                  <label htmlFor="fullName">{t('fullName')}</label>
+                  <label htmlFor="fullName">{t("fullName")}</label>
                   <input
                     type="text"
                     id="fullName"
@@ -146,7 +216,7 @@ const FormatterSignUp = () => {
                 </div>
 
                 <div className="form-group">
-                  <label htmlFor="email">{t('email')}</label>
+                  <label htmlFor="email">{t("email")}</label>
                   <input
                     type="email"
                     id="email"
@@ -158,7 +228,7 @@ const FormatterSignUp = () => {
                 </div>
 
                 <div className="form-group">
-                  <label htmlFor="phone">{t('phone')}</label>
+                  <label htmlFor="phone">{t("phone")}</label>
                   <input
                     type="tel"
                     id="phone"
@@ -170,7 +240,7 @@ const FormatterSignUp = () => {
                 </div>
 
                 <div className="form-group">
-                  <label htmlFor="password">{t('password')}</label>
+                  <label htmlFor="password">{t("password")}</label>
                   <input
                     type="password"
                     id="password"
@@ -182,7 +252,9 @@ const FormatterSignUp = () => {
                 </div>
 
                 <div className="form-group">
-                  <label htmlFor="confirmPassword">{t('confirmPassword')}</label>
+                  <label htmlFor="confirmPassword">
+                    {t("confirmPassword")}
+                  </label>
                   <input
                     type="password"
                     id="confirmPassword"
@@ -200,30 +272,39 @@ const FormatterSignUp = () => {
                       checked={agreeTOS}
                       onChange={(e) => setAgreeTOS(e.target.checked)}
                     />
-                    <span>{t('agreeTerms') || 'I agree with'} <a href="#">{t('termsOfService') || 'Terms of Service'}</a> {t('and')} <a href="#">{t('privacyPolicy') || 'Privacy Policy'}</a></span>
+                    <span>
+                      {t("agreeTerms") || "I agree with"}{" "}
+                      <button type="button" className="link-button">
+                        {t("termsOfService") || "Terms of Service"}
+                      </button>{" "}
+                      {t("and")}{" "}
+                      <button type="button" className="link-button">{t("privacyPolicy") || "Privacy Policy"}</button>
+                    </span>
                   </label>
                 </div>
 
                 <button type="submit" className="btn-signup" disabled={loading}>
-                  {t('continue') || 'Continue'}
+                  {t("continue") || "Continue"}
                 </button>
               </form>
             ) : (
               <form onSubmit={handleSubmit}>
                 <div className="form-group">
-                  <label htmlFor="specialty">{t('specialty') || 'Specialty'}</label>
+                  <label htmlFor="specialty">
+                    {t("specialty") || "Specialty"}
+                  </label>
                   <input
                     type="text"
                     id="specialty"
-                    name="specialty"
-                    value={professionalInfo.specialty}
+                    name="field"
+                    value={professionalInfo.field}
                     onChange={handleProfessionalChange}
                     required
                   />
                 </div>
 
                 <div className="form-group">
-                  <label htmlFor="skills">{t('skills') || 'Skills'}</label>
+                  <label htmlFor="skills">{t("skills") || "Skills"}</label>
                   <input
                     type="text"
                     id="skills"
@@ -235,7 +316,9 @@ const FormatterSignUp = () => {
                 </div>
 
                 <div className="form-group">
-                  <label htmlFor="projectLink">{t('projectLink') || 'Project Link'}</label>
+                  <label htmlFor="projectLink">
+                    {t("projectLink") || "Project Link"}
+                  </label>
                   <input
                     type="url"
                     id="projectLink"
@@ -246,7 +329,9 @@ const FormatterSignUp = () => {
                 </div>
 
                 <div className="form-group">
-                  <label htmlFor="certification">{t('uploadCertification') || 'Upload Certification'}</label>
+                  <label htmlFor="certification">
+                    {t("uploadCertification") || "Upload Certification"}
+                  </label>
                   <input
                     type="file"
                     id="certification"
@@ -257,7 +342,7 @@ const FormatterSignUp = () => {
                 </div>
 
                 <div className="form-group">
-                  <label htmlFor="bio">{t('bio') || 'Bio'}</label>
+                  <label htmlFor="bio">{t("bio") || "Bio"}</label>
                   <textarea
                     id="bio"
                     name="bio"
@@ -269,20 +354,30 @@ const FormatterSignUp = () => {
                 </div>
 
                 <div className="form-buttons">
-                  <button type="button" className="btn-secondary" onClick={() => setStep(1)}>
-                    {t('previous') || 'Previous'}
+                  <button
+                    type="button"
+                    className="btn-secondary"
+                    onClick={() => setStep(1)}
+                  >
+                    {t("previous") || "Previous"}
                   </button>
-                  <button type="submit" className="btn-signup" disabled={false}>
-                    {(t('continue') || 'Continue')}
+                  <button
+                    type="submit"
+                    className="btn-signup"
+                    disabled={loading}
+                  >
+                    {loading
+                      ? t("registering") || "Registering..."
+                      : t("signUp") || "Sign Up"}
                   </button>
                 </div>
               </form>
             )}
-          
+
             <div className="auth-footer">
               <p>
-                {t('haveAccount', 'Already have an account?')}{' '}
-                <Link to="/signin">{t('signIn')}</Link>
+                {t("haveAccount", "Already have an account?")}{" "}
+                <Link to="/signin">{t("signIn")}</Link>
               </p>
             </div>
           </div>

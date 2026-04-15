@@ -11,6 +11,28 @@ router.use(authorize('formateur'));
 
 // DASHBOARD STATISTICS
 
+// checkFormateurApproval middleware ensures only approved formateurs can access these routes
+router.get('/check-approval', (req, res) => {
+  try {
+    if (req.user.isApproved) {
+      return res.status(200).json({
+        success: true,
+        isApproved: true,
+        message: 'Your account is approved. You can access the dashboard.'
+      });
+    } else {
+      return res.status(403).json({
+        success: false,
+        isApproved: false,
+        message: 'Your account is not yet approved by admin. Please wait for approval.'
+      });
+    } 
+  } catch (error) {
+    console.error('Check approval error:', error);
+    res.status(500).json({ message: 'Error checking approval status' });
+  }
+});
+
 // Get formateur dashboard statistics
 router.get('/dashboard/stats', checkFormateurApproval, async (req, res) => {
   try {
@@ -181,8 +203,8 @@ router.get('/courses/:id', async (req, res) => {
       _id: req.params.id,
       formateur: req.user.id
     })
-    .populate('enrolledStudents.student', 'firstName lastName email')
-    .populate('reviews.user', 'firstName lastName');
+    .populate('enrolledStudents.student', 'fullName email')
+    .populate('reviews.user', 'fullName');
     
     if (!course) {
       return res.status(404).json({ message: 'Course not found' });
@@ -341,7 +363,7 @@ router.get('/courses/:id/students', async (req, res) => {
       _id: req.params.id,
       formateur: req.user.id
     })
-    .populate('enrolledStudents.student', 'firstName lastName email phoneNumber');
+    .populate('enrolledStudents.student', 'fullName email phoneNumber');
     
     if (!course) {
       return res.status(404).json({ message: 'Course not found' });
@@ -371,7 +393,7 @@ router.get('/courses/:id/students', async (req, res) => {
 router.get('/students', async (req, res) => {
   try {
     const courses = await Course.find({ formateur: req.user.id })
-      .populate('enrolledStudents.student', 'firstName lastName email');
+      .populate('enrolledStudents.student', 'fullName email');
     
     // Collect unique students
     const studentsMap = new Map();
@@ -422,7 +444,7 @@ router.get('/students', async (req, res) => {
 router.get('/reviews', async (req, res) => {
   try {
     const courses = await Course.find({ formateur: req.user.id })
-      .populate('reviews.user', 'firstName lastName')
+      .populate('reviews.user', 'fullName')
       .select('title reviews');
     
     // Collect all reviews with course info
@@ -461,7 +483,7 @@ router.get('/courses/:id/reviews', async (req, res) => {
       _id: req.params.id,
       formateur: req.user.id
     })
-    .populate('reviews.user', 'firstName lastName')
+    .populate('reviews.user', 'fullName')
     .select('title reviews averageRating totalReviews');
     
     if (!course) {
