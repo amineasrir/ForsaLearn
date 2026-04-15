@@ -1,62 +1,57 @@
-import React, { useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import './dashboard.css';
 import DashboardNavbar from '../../components/common/DashboardNavbar';
 import { FaBook, FaCheckCircle, FaStar, FaFileAlt } from 'react-icons/fa';
-import cours1 from '../../assets/image/cours/cours1.jpg'
-import cours2 from '../../assets/image/cours/cours2.jpg'
-import cours3 from '../../assets/image/cours/cours3.jpg'
 import CardP from '../../components/apprenant/CardP';
 import Sidebar from '../../components/apprenant/Sidebar';
+import {
+  getApprenantProfile,
+  getEnrolledCourses,
+  getMyPayments
+} from '../../services/apprenentService';
+
 const ApprenantDashboard = () => {
- 
+  const [user, setUser] = useState(null);
+  const [courses, setCourses] = useState([]);
+  const [payments, setPayments] = useState([]);
+  const [error, setError] = useState('');
 
-  const enrolledCourses = [
-    {
-      id: 1,
-      title: 'Information About UI/UX Design Degree',
-      instructor: 'David Benitez',
-      category: 'Design',
-      rating: 4.9,
-      reviews: 200,
-      price: '$120',
-      image: cours1
-    },
-    {
-      id: 2,
-      title: 'Wordpress for Beginners - Master Wordpress Quickly',
-      instructor: 'Ana Reyes',
-      category: 'Wordpress',
-      rating: 4.4,
-      reviews: 160,
-      price: '$140',
-      image: cours2
-    },
-    {
-      id: 3,
-      title: 'Sketch from A to Z (2024): Become an app designer',
-      instructor: 'Andrew Pirtie',
-      category: 'Design',
-      rating: 4.6,
-      reviews: 170,
-      price: '$160',
-      image: cours3
-    },
-  ];
+  useEffect(() => {
+    const loadDashboard = async () => {
+      try {
+        const [userResponse, coursesResponse, paymentsResponse] = await Promise.all([
+          getApprenantProfile(),
+          getEnrolledCourses(),
+          getMyPayments()
+        ]);
 
-  const recentInvoices = [
-    { id: '#INV001', title: 'Build Responsive Real World Websites..', amount: '$200', status: 'paid' },
-    { id: '#INV002', title: 'Wordpress for Beginners', amount: '$310', status: 'paid' },
-    { id: '#INV003', title: 'Information About UI/UI Design Degree', amount: '$270', status: 'paid' },
-    { id: '#INV004', title: 'Sketch from A to Z (2024)', amount: '$180', status: 'paid' },
-    { id: '#INV005', title: 'Become an app designer', amount: '$220', status: 'paid' },
-  ];
+        setUser(userResponse.data?.user || null);
+        setCourses(coursesResponse.data?.data || []);
+        setPayments(paymentsResponse.data?.data || []);
+      } catch (err) {
+        setError(err.response?.data?.message || 'Failed to load dashboard.');
+      }
+    };
 
-  const latestQuizzes = [
-    { id: 1, title: 'Sketch from A to Z (2024)', correctAnswers: '15/22', date: '15 Jan 2025', status: 'passed' },
-    { id: 2, title: 'Build Responsive Real World', correctAnswers: '18/22', date: '04 Jan 2025', status: 'passed' },
-    { id: 4, title: 'Build Responsive Real World', correctAnswers: '15/20', date: '10 Dec 2024', status: 'passed' },
-    { id: 5, title: 'Become an app designer', correctAnswers: '12/20', date: '27 Nov 2024', status: 'failed' },
-  ];
+    loadDashboard();
+  }, []);
+
+  const enrolledCourses = useMemo(() => courses.slice(0, 3), [courses]);
+  const completedCount = useMemo(
+    () => courses.filter((course) => Number(course.myProgress || 0) >= 100).length,
+    [courses]
+  );
+  const activeCount = useMemo(
+    () => courses.filter((course) => Number(course.myProgress || 0) > 0 && Number(course.myProgress || 0) < 100).length,
+    [courses]
+  );
+  const latestQuizzes = [];
+  const recentInvoices = payments.slice(0, 5).map((payment, index) => ({
+    id: payment._id || `#INV${index + 1}`,
+    title: payment.course?.title || 'Course Payment',
+    amount: `$${Number(payment.amount?.final || 0).toFixed(2)}`,
+    status: payment.status || 'paid'
+  }));
 
   const rightContent = (
     <>
@@ -73,26 +68,21 @@ const ApprenantDashboard = () => {
         breadcrumb={[{ to: '/', label: 'Home' }, { label: 'Dashboard' }]}
         rightContent={rightContent}
       />
- <CardP/>
+      <CardP user={user} />
       <div className="dashboard-container">
-        {/* Sidebar */}
-          <Sidebar/>
-        
-        {/* Main Content */}
-        <main className="main-content">
-          {/* Profile Section */}
-        
+        <Sidebar />
 
-          {/* Quiz Section */}
+        <main className="main-content">
+          {error && <div className="error-message">{error}</div>}
+
           <div className="apprenant-quiz-section">
             <div className="apprenant-quiz-content">
-              <h3>Quiz : Build Responsive Real World</h3>
-              <p>Answered : 15/22</p>
+              <h3>Learning Progress</h3>
+              <p>You are enrolled in {courses.length} course(s)</p>
             </div>
-            <button className="apprenant-continue-button">Continue Quiz</button>
+            <button className="apprenant-continue-button">Keep Learning</button>
           </div>
 
-          {/* Stats Cards */}
           <div className="apprenant-stats-cards">
             <div className="apprenant-stat-card">
               <div className="stat-icon enrolled">
@@ -100,7 +90,7 @@ const ApprenantDashboard = () => {
               </div>
               <div className="stat-content">
                 <p>Enrolled Courses</p>
-                <h3>12</h3>
+                <h3>{courses.length}</h3>
               </div>
             </div>
             <div className="apprenant-stat-card">
@@ -109,7 +99,7 @@ const ApprenantDashboard = () => {
               </div>
               <div className="stat-content">
                 <p>Active Courses</p>
-                <h3>03</h3>
+                <h3>{activeCount}</h3>
               </div>
             </div>
             <div className="apprenant-stat-card">
@@ -118,31 +108,30 @@ const ApprenantDashboard = () => {
               </div>
               <div className="stat-content">
                 <p>Completed Courses</p>
-                <h3>10</h3>
+                <h3>{completedCount}</h3>
               </div>
             </div>
           </div>
 
-          {/* Recently Enrolled Courses */}
           <section className="enrolled-courses">
             <h2>Recently Enrolled Courses</h2>
             <div className="courses-container">
               {enrolledCourses.map(course => (
-                <div key={course.id} className="course-card">
-                  <img src={course.image} alt={course.title} className="course-image" />
+                <div key={course._id} className="course-card">
+                  <img src={course.thumbnail || require('../../assets/image/cours/cours1.jpg')} alt={course.title} className="course-image" />
                   <div className="course-info">
                     <p className="course-category">{course.category}</p>
                     <h3>{course.title}</h3>
-                    <p className="instructor">{course.instructor}</p>
+                    <p className="instructor">{course.formateur?.fullName || 'Instructor'}</p>
                     <div className="course-footer">
                       <div className="rating">
                         <FaStar className="star" />
-                        <span>{course.rating} ({course.reviews} Reviews)</span>
+                        <span>{Number(course.averageRating || 0).toFixed(1)} ({course.totalReviews || 0} Reviews)</span>
                       </div>
                     </div>
                     <div className="course-action">
-                      <span className="price">{course.price}</span>
-                      <button className="view-course-btn">View Course →</button>
+                      <span className="price">{course.priceType === 'free' ? 'Free' : `$${Number(course.price || 0).toFixed(2)}`}</span>
+                      <button className="view-course-btn">Progress {course.myProgress || 0}%</button>
                     </div>
                   </div>
                 </div>
@@ -150,22 +139,25 @@ const ApprenantDashboard = () => {
             </div>
           </section>
 
-          {/* Two Column Section */}
           <div className="two-column-section">
-            {/* Recent Invoices */}
             <section className="invoices-section">
-              <h2>Recent Invoices</h2>
+              <h2>Recent Payments</h2>
               <div className="invoices-list">
-                {recentInvoices.map(invoice => (
+                {recentInvoices.length === 0 ? (
+                  <div className="invoice-item">
+                    <div className="invoice-info">
+                      <p className="invoice-title">No payments yet</p>
+                    </div>
+                  </div>
+                ) : recentInvoices.map(invoice => (
                   <div key={invoice.id} className="invoice-item">
                     <div className="invoice-info">
-
                       <p className="invoice-title">{invoice.title}</p>
                       <p className="invoice-id">{invoice.id}</p>
                     </div>
                     <div className="invoice-amount">
                       <span>{invoice.amount}</span>
-                      <span className={`status ${invoice.status}`} style={{ marginRight: "6px" }}>✓ Paid</span>
+                      <span className={`status ${invoice.status}`} style={{ marginRight: "6px" }}>{invoice.status}</span>
                     </div>
                     <FaFileAlt className="invoice-icon" />
                   </div>
@@ -173,15 +165,21 @@ const ApprenantDashboard = () => {
               </div>
             </section>
 
-            {/* Latest Quizzes */}
             <section className="quizzes-section">
               <h2>Latest Quizzes</h2>
               <div className="quizzes-list">
-                {latestQuizzes.map(quiz => (
+                {latestQuizzes.length === 0 ? (
+                  <div className="quiz-item">
+                    <div className="quiz-info">
+                      <h4>No quiz attempts yet</h4>
+                      <p className="quiz-date">Your quiz history will appear here.</p>
+                    </div>
+                  </div>
+                ) : latestQuizzes.map(quiz => (
                   <div key={quiz.id} className="quiz-item">
                     <div className="quiz-status">
                       <span className={`badge ${quiz.status}`}>
-                        {quiz.status === 'passed' ? '✓' : '✗'}
+                        {quiz.status === 'passed' ? '✓' : '✕'}
                       </span>
                     </div>
                     <div className="quiz-info">
@@ -196,7 +194,6 @@ const ApprenantDashboard = () => {
           </div>
         </main>
       </div>
-
     </div>
   );
 };

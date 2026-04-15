@@ -26,7 +26,7 @@ const Sidebar = () => {
         <div className="sidebar-content">
           <h3 className="apprenant-menu-title">Main Menu</h3>
           <nav className="apprenant-menu">
-            {makeItem('/admin/', <FaHome />, 'Dashboard')}
+            {makeItem('/admin/dashboard', <FaHome />, 'Dashboard')}
             {makeItem('/admin/profile', <FaUser />, 'My Profile')}
             {makeItem('/admin/courses', <FaBook />, 'Courses')}
             {makeItem('/admin/instructors', <FaUserTie  />, 'Instructors')} 

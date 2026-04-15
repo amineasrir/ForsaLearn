@@ -1,10 +1,28 @@
 const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
 
+const splitFullName = (fullName = '') => {
+  const parts = fullName.trim().split(/\s+/).filter(Boolean);
+  if (parts.length === 0) {
+    return { firstName: '', lastName: '' };
+  }
+
+  if (parts.length === 1) {
+    return { firstName: parts[0], lastName: '' };
+  }
+
+  return {
+    firstName: parts[0],
+    lastName: parts.slice(1).join(' ')
+  };
+};
+
 // Base User Schema - Common fields for all users
 const baseOptions = {
   discriminatorKey: 'role', 
-  timestamps: true, 
+  timestamps: true,
+  toJSON: { virtuals: true },
+  toObject: { virtuals: true }
 };
 
 // Main User Schema
@@ -78,6 +96,24 @@ userSchema.pre('save', async function(next) {
 userSchema.methods.comparePassword = async function(candidatePassword) {
   return await bcrypt.compare(candidatePassword, this.password);
 };
+
+userSchema.virtual('firstName')
+  .get(function() {
+    return splitFullName(this.fullName).firstName;
+  })
+  .set(function(value) {
+    const { lastName } = splitFullName(this.fullName);
+    this.fullName = [value, lastName].filter(Boolean).join(' ').trim();
+  });
+
+userSchema.virtual('lastName')
+  .get(function() {
+    return splitFullName(this.fullName).lastName;
+  })
+  .set(function(value) {
+    const { firstName } = splitFullName(this.fullName);
+    this.fullName = [firstName, value].filter(Boolean).join(' ').trim();
+  });
 
 // Create base User model
 const User = mongoose.model('User', userSchema);

@@ -1,6 +1,9 @@
 const { sendEmail } = require('../config/email');
 const { getTranslations } = require('../config/emailTemplates');
 
+const getFullName = (user = {}) => user.fullName || [user.firstName, user.lastName].filter(Boolean).join(' ').trim();
+const getFirstName = (user = {}) => user.firstName || getFullName(user).split(' ')[0] || 'there';
+
 // Base email template
 const baseTemplate = (content, language = 'en') => `
 <!DOCTYPE html>
@@ -35,7 +38,7 @@ const sendWelcomeEmail = async (user, language = 'en') => {
           <h1>🎓 ForsaLearn</h1>
         </div>
         <div class="content">
-          <h2>${t.greeting(user.firstName)}</h2>
+          <h2>${t.greeting(getFirstName(user))}</h2>
           <p>${t.intro}</p>
           <ul>${t.features.map(f => `<li>${f}</li>`).join('')}</ul>
           <p style="text-align: center;">
@@ -69,7 +72,7 @@ const sendFormateurApprovalEmail = async (formateur, language = 'en') => {
           <h1>🎉 ${t.title}</h1>
         </div>
         <div class="content">
-          <h2>${t.greeting(formateur.firstName)}</h2>
+          <h2>${t.greeting(getFirstName(formateur))}</h2>
           <p>${t.intro}</p>
           <ul>${t.features.map(f => `<li>${f}</li>`).join('')}</ul>
           <p style="text-align: center;">
@@ -184,11 +187,11 @@ const sendEnrollmentConfirmationEmail = async (student, course, formateur, langu
           <h1>🎓 ${t.title}</h1>
         </div>
         <div class="content">
-          <h2>${t.greeting(student.firstName)}</h2>
+          <h2>${t.greeting(getFirstName(student))}</h2>
           <p>${t.intro}</p>
           <div style="background-color: #e7f3ff; border-left: 4px solid #0056b3; padding: 15px; margin: 20px 0; border-radius: 5px;">
             <strong>${t.courseLabel}</strong> ${course.title}<br>
-            <strong>${t.instructorLabel}</strong> ${formateur.firstName} ${formateur.lastName}
+            <strong>${t.instructorLabel}</strong> ${getFullName(formateur)}
           </div>
           <p>${t.message}</p>
           <p style="text-align: center;">
@@ -219,7 +222,7 @@ const sendNewStudentNotification = async (formateur, student, course, language =
         <div class="content">
           <p>${t.intro}</p>
           <div style="background-color: #e7f3ff; border-left: 4px solid #0056b3; padding: 15px; margin: 20px 0; border-radius: 5px;">
-            <strong>${t.studentLabel}</strong> ${student.firstName} ${student.lastName}<br>
+            <strong>${t.studentLabel}</strong> ${getFullName(student)}<br>
             <strong>${t.courseLabel}</strong> ${course.title}
           </div>
           <p>${t.totalLabel(course.totalEnrollments)}</p>
@@ -252,7 +255,7 @@ const sendCourseCompletionEmail = async (student, course, language = 'en') => {
         </div>
         <div class="content" style="text-align: center;">
           <div style="font-size: 80px; margin: 20px 0;">🏆</div>
-          <h2>${t.greeting(student.firstName)}</h2>
+          <h2>${t.greeting(getFirstName(student))}</h2>
           <p style="font-size: 18px;">${t.intro}</p>
           <h3 style="color: #28a745;">${course.title}</h3>
           <p>${t.message}</p>

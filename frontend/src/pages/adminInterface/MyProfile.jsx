@@ -1,23 +1,61 @@
-import React, { useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import '../../styles/dashboard.css';
 import '../../styles/myprofile-admin.css';
 import Header from '../../components/admin/Header';
 import Sidebar from '../../components/admin/Sidebar';
 import { FaCamera, FaEdit } from 'react-icons/fa';
+import { getAdminProfile } from '../../services/adminService';
+
+const splitFullName = (fullName = '') => {
+  const parts = fullName.trim().split(/\s+/).filter(Boolean);
+  return {
+    firstName: parts[0] || '',
+    lastName: parts.slice(1).join(' ')
+  };
+};
 
 const MyProfile = () => {
   const [formData, setFormData] = useState({
-    firstName: 'Elrhouat',
-    lastName: 'Chaima',
-    email: 'elrhouat.chaima@example.com',
-    phone: '+212 6XX XXX XXX',
+    firstName: '',
+    lastName: '',
+    email: '',
+    phone: '',
     address: 'Marrakesh, Morocco',
     bio: 'Administrator and educator passionate about online learning.',
     role: 'Administrateur',
-    joinDate: 'January 2020'
+    joinDate: ''
   });
-
+  const [profilePicture, setProfilePicture] = useState('https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100&h=100&fit=crop');
   const [isEditing, setIsEditing] = useState(false);
+  const [error, setError] = useState('');
+
+  useEffect(() => {
+    const loadProfile = async () => {
+      try {
+        const response = await getAdminProfile();
+        const user = response.data?.user;
+        const { firstName, lastName } = splitFullName(user?.fullName);
+
+        setFormData({
+          firstName,
+          lastName,
+          email: user?.email || '',
+          phone: user?.phoneNumber || '',
+          address: 'Marrakesh, Morocco',
+          bio: 'Administrator and educator passionate about online learning.',
+          role: 'Administrateur',
+          joinDate: user?.createdAt
+            ? new Date(user.createdAt).toLocaleDateString('en-US', { month: 'long', year: 'numeric' })
+            : ''
+        });
+        setProfilePicture(user?.profilePicture || 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100&h=100&fit=crop');
+      } catch (err) {
+        setError(err.response?.data?.message || 'Failed to load admin profile.');
+      }
+    };
+
+    loadProfile();
+  }, []);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -30,30 +68,30 @@ const MyProfile = () => {
   const handleSubmit = (e) => {
     e.preventDefault();
     setIsEditing(false);
-    console.log('Profile updated:', formData);
   };
+
+  const fullName = useMemo(() => (
+    [formData.firstName, formData.lastName].filter(Boolean).join(' ').trim() || 'Administrator'
+  ), [formData.firstName, formData.lastName]);
 
   return (
     <div className="dashboard">
-      {/* Hero Section */}
       <Header title='Profile'/>
-      
-      {/* Main Content */}
       <div className="container main-content">
         <div className="content-wrapper">
           <aside className="sidebar">
             <Sidebar />
           </aside>
 
-          {/* Main Profile Content */}
           <main className="main">
-            {/* Profile Card */}
+            {error && <div className="error-message">{error}</div>}
+
             <div className="profile-card">
               <div className="profile-content">
                 <div className="profile-avatar-wrapper">
                   <img
-                    src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100&h=100&fit=crop"
-                    alt="Elrhouat chaima"
+                    src={profilePicture}
+                    alt={fullName}
                     className="profile-avatar"
                   />
                   <span className="profile-status"></span>
@@ -62,11 +100,11 @@ const MyProfile = () => {
                   </button>
                 </div>
                 <div className="profile-info">
-                  <h2 className="profile-name">Elrhouat chaima ✓</h2>
-                  <p className="profile-role">Administrateur</p>
-                  <p className="profile-member-since">Member since {formData.joinDate}</p>
+                  <h2 className="profile-name">{fullName}</h2>
+                  <p className="profile-role">{formData.role}</p>
+                  <p className="profile-member-since">Member since {formData.joinDate || 'Recently'}</p>
                 </div>
-                <button 
+                <button
                   className="edit-profile-btn"
                   onClick={() => setIsEditing(!isEditing)}
                 >
@@ -74,12 +112,12 @@ const MyProfile = () => {
                 </button>
               </div>
             </div>
-            {/* Profile Information Form */}
+
             <div className="chart-card">
               <div className="chart-header">
                 <h3 className="chart-title">Personal Information</h3>
               </div>
-              
+
               <form onSubmit={handleSubmit} className="profile-form">
                 <div className="form-grid">
                   <div className="form-group">
@@ -113,7 +151,7 @@ const MyProfile = () => {
                       name="email"
                       value={formData.email}
                       onChange={handleChange}
-                      disabled={!isEditing}
+                      disabled
                       className="form-input"
                     />
                   </div>
@@ -157,9 +195,9 @@ const MyProfile = () => {
 
                 {isEditing && (
                   <div className="form-actions">
-                    <button 
-                      type="button" 
-                      className="year-selector" 
+                    <button
+                      type="button"
+                      className="year-selector"
                       onClick={() => setIsEditing(false)}
                     >
                       Cancel
@@ -172,12 +210,11 @@ const MyProfile = () => {
               </form>
             </div>
 
-            {/* Security Settings */}
             <div className="chart-card">
               <div className="chart-header">
                 <h3 className="chart-title">Security Settings</h3>
               </div>
-              
+
               <div className="security-section">
                 <div className="security-item">
                   <div className="security-info">
@@ -201,47 +238,6 @@ const MyProfile = () => {
                     <p className="security-desc">Manage your active sessions across devices</p>
                   </div>
                   <button className="year-selector">View Sessions</button>
-                </div>
-              </div>
-            </div>
-
-            {/* Activity Log */}
-            <div className="chart-card">
-              <div className="chart-header">
-                <h3 className="chart-title">Recent Activity</h3>
-              </div>
-              
-              <div className="activity-list">
-                <div className="activity-item">
-                  <div className="activity-icon">📝</div>
-                  <div className="activity-content">
-                    <p className="activity-title">Updated course materials</p>
-                    <p className="activity-time">2 hours ago</p>
-                  </div>
-                </div>
-
-                <div className="activity-item">
-                  <div className="activity-icon">👥</div>
-                  <div className="activity-content">
-                    <p className="activity-title">New student enrolled</p>
-                    <p className="activity-time">5 hours ago</p>
-                  </div>
-                </div>
-
-                <div className="activity-item">
-                  <div className="activity-icon">💬</div>
-                  <div className="activity-content">
-                    <p className="activity-title">Replied to support ticket</p>
-                    <p className="activity-time">1 day ago</p>
-                  </div>
-                </div>
-
-                <div className="activity-item">
-                  <div className="activity-icon">📊</div>
-                  <div className="activity-content">
-                    <p className="activity-title">Generated monthly report</p>
-                    <p className="activity-time">2 days ago</p>
-                  </div>
                 </div>
               </div>
             </div>

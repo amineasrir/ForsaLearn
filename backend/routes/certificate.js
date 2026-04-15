@@ -32,7 +32,7 @@ router.get('/verify/:certificateId', async (req, res) => {
       valid: true,
       data: {
         certificateId: certificate.certificateId,
-        studentName: certificate.student.firstName + ' ' + certificate.student.lastName,
+        studentName: certificate.student.fullName,
         courseName: certificate.courseName,
         instructorName: certificate.instructorName,
         completionDate: certificate.completionDate,
@@ -99,7 +99,7 @@ router.post('/generate/:courseId',
       const { courseId } = req.params;
       
       // Get course and check if student completed it
-      const course = await Course.findById(courseId).populate('formateur', 'firstName lastName');
+      const course = await Course.findById(courseId).populate('formateur', 'fullName');
       
       if (!course) {
         return res.status(404).json({ message: 'Course not found' });
@@ -141,9 +141,9 @@ router.post('/generate/:courseId',
       
       // Generate PDF
       const pdfResult = await generateCertificate({
-        studentName: `${req.user.firstName} ${req.user.lastName}`,
+        studentName: req.user.fullName,
         courseName: course.title,
-        instructorName: `${course.formateur.firstName} ${course.formateur.lastName}`,
+        instructorName: course.formateur.fullName,
         completionDate: enrollment.completedAt || Date.now(),
         certificateId,
         courseDuration: Math.round(course.totalDuration / 60) // Convert to hours
@@ -197,9 +197,9 @@ router.get('/:id',
   async (req, res) => {
     try {
       const certificate = await Certificate.findById(req.params.id)
-        .populate('student', 'firstName lastName email')
+        .populate('student', 'fullName email')
         .populate('course', 'title thumbnail')
-        .populate('instructor', 'firstName lastName');
+        .populate('instructor', 'fullName');
       
       if (!certificate) {
         return res.status(404).json({ message: 'Certificate not found' });
@@ -266,9 +266,9 @@ router.get('/admin/all',
       }
       
       const certificates = await Certificate.find(filter)
-        .populate('student', 'firstName lastName email')
+        .populate('student', 'fullName email')
         .populate('course', 'title')
-        .populate('instructor', 'firstName lastName')
+        .populate('instructor', 'fullName')
         .sort({ createdAt: -1 })
         .skip(skip)
         .limit(limit);
@@ -359,7 +359,7 @@ router.post('/admin/bulk-generate/:courseId',
     try {
       const { courseId } = req.params;
       
-      const course = await Course.findById(courseId).populate('formateur', 'firstName lastName');
+      const course = await Course.findById(courseId).populate('formateur', 'fullName');
       
       if (!course) {
         return res.status(404).json({ message: 'Course not found' });
@@ -387,9 +387,9 @@ router.post('/admin/bulk-generate/:courseId',
           const certificateId = generateCertificateId();
           
           const pdfResult = await generateCertificate({
-            studentName: `${student.firstName} ${student.lastName}`,
+            studentName: student.fullName,
             courseName: course.title,
-            instructorName: `${course.formateur.firstName} ${course.formateur.lastName}`,
+            instructorName: course.formateur.fullName,
             completionDate: enrollment.completedAt || Date.now(),
             certificateId,
             courseDuration: Math.round(course.totalDuration / 60)

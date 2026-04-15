@@ -1,77 +1,50 @@
-import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import React, { useEffect, useMemo, useState } from 'react';
 import Sidebar from '../../components/apprenant/Sidebar';
 import CardP from '../../components/apprenant/CardP';
 import DashboardNavbar from '../../components/common/DashboardNavbar';
 import { FaStar } from 'react-icons/fa';
+import { getApprenantProfile, getEnrolledCourses } from '../../services/apprenentService';
 import './dashboard.css';
-
-const sampleCourses = [
-  {
-    id: 1,
-    title: 'Information About UI/UX Design Degree',
-    instructor: 'David Benitez',
-    category: 'Design',
-    rating: 4.9,
-    reviews: 200,
-    price: '$120',
-    image: require('../../assets/image/cours/cours1.jpg'),
-  },
-  {
-    id: 2,
-    title: 'Wordpress for Beginners - Master Wordpress Quickly',
-    instructor: 'Ana Reyes',
-    category: 'Wordpress',
-    rating: 4.4,
-    reviews: 160,
-    price: '$140',
-    image: require('../../assets/image/cours/cours2.jpg'),
-  },
-  {
-    id: 3,
-    title: 'Sketch from A to Z (2024): Become an app designer',
-    instructor: 'Andrew Pirtie',
-    category: 'Design',
-    rating: 4.6,
-    reviews: 170,
-    price: '$160',
-    image: require('../../assets/image/cours/cours3.jpg'),
-  },
-  {
-    id: 3,
-    title: 'Sketch from A to Z (2024): Become an app designer',
-    instructor: 'Andrew Pirtie',
-    category: 'Design',
-    rating: 4.6,
-    reviews: 170,
-    price: '$160',
-    image: require('../../assets/image/cours/cours3.jpg'),
-  },
-  {
-    id: 3,
-    title: 'Sketch from A to Z (2024): Become an app designer',
-    instructor: 'Andrew Pirtie',
-    category: 'Design',
-    rating: 4.6,
-    reviews: 170,
-    price: '$160',
-    image: require('../../assets/image/cours/cours3.jpg'),
-  },
-  {
-    id: 3,
-    title: 'Sketch from A to Z (2024): Become an app designer',
-    instructor: 'Andrew Pirtie',
-    category: 'Design',
-    rating: 4.6,
-    reviews: 170,
-    price: '$160',
-    image: require('../../assets/image/cours/cours3.jpg'),
-  },
-];
 
 const ApprenantEnrolled = () => {
   const [tab, setTab] = useState('enrolled');
-  const counts = { enrolled: 9, active: 6, completed: 3 };
+  const [courses, setCourses] = useState([]);
+  const [user, setUser] = useState(null);
+  const [error, setError] = useState('');
+
+  useEffect(() => {
+    const loadData = async () => {
+      try {
+        const [coursesResponse, userResponse] = await Promise.all([
+          getEnrolledCourses(),
+          getApprenantProfile()
+        ]);
+
+        setCourses(coursesResponse.data?.data || []);
+        setUser(userResponse.data?.user || null);
+      } catch (err) {
+        setError(err.response?.data?.message || 'Failed to load enrolled courses.');
+      }
+    };
+
+    loadData();
+  }, []);
+
+  const filteredCourses = useMemo(() => {
+    if (tab === 'active') {
+      return courses.filter((course) => Number(course.myProgress || 0) > 0 && Number(course.myProgress || 0) < 100);
+    }
+    if (tab === 'completed') {
+      return courses.filter((course) => Number(course.myProgress || 0) >= 100);
+    }
+    return courses;
+  }, [courses, tab]);
+
+  const counts = {
+    enrolled: courses.length,
+    active: courses.filter((course) => Number(course.myProgress || 0) > 0 && Number(course.myProgress || 0) < 100).length,
+    completed: courses.filter((course) => Number(course.myProgress || 0) >= 100).length
+  };
 
   const rightContent = (
     <>
@@ -89,61 +62,61 @@ const ApprenantEnrolled = () => {
         rightContent={rightContent}
       />
 
-      {/* profile banner */}
-      <CardP />
+      <CardP user={user} />
 
       <div className="dashboard-container">
         <Sidebar />
 
         <main className="main-content">
+          {error && <div className="error-message">{error}</div>}
           <section className="enrolled-courses">
             <div className="courses-header-row">
-            <h2>Enrolled Courses</h2>
-            <div className="courses-tabs">
-              <button
-                className={tab === 'enrolled' ? 'active' : ''}
-                onClick={() => setTab('enrolled')}
-              >
-                Enrolled ({counts.enrolled})
-              </button>
-              <button
-                className={tab === 'active' ? 'active' : ''}
-                onClick={() => setTab('active')}
-              >
-                Active ({counts.active})
-              </button>
-              <button
-                className={tab === 'completed' ? 'active' : ''}
-                onClick={() => setTab('completed')}
-              >
-                Completed ({counts.completed})
-              </button>
+              <h2>Enrolled Courses</h2>
+              <div className="courses-tabs">
+                <button
+                  className={tab === 'enrolled' ? 'active' : ''}
+                  onClick={() => setTab('enrolled')}
+                >
+                  Enrolled ({counts.enrolled})
+                </button>
+                <button
+                  className={tab === 'active' ? 'active' : ''}
+                  onClick={() => setTab('active')}
+                >
+                  Active ({counts.active})
+                </button>
+                <button
+                  className={tab === 'completed' ? 'active' : ''}
+                  onClick={() => setTab('completed')}
+                >
+                  Completed ({counts.completed})
+                </button>
+              </div>
             </div>
-          </div>
 
             <div className="courses-container">
-              {sampleCourses.map(course => (
-                <div key={course.id} className="course-card">
+              {filteredCourses.map(course => (
+                <div key={course._id} className="course-card">
                   <img
-                    src={course.image}
+                    src={course.thumbnail || require('../../assets/image/cours/cours1.jpg')}
                     alt={course.title}
                     className="course-image"
                   />
                   <div className="course-info">
                     <p className="course-category">{course.category}</p>
                     <h3>{course.title}</h3>
-                    <p className="instructor">{course.instructor}</p>
+                    <p className="instructor">{course.formateur?.fullName || 'Instructor'}</p>
                     <div className="course-footer">
                       <div className="rating">
                         <FaStar className="star" />
                         <span>
-                          {course.rating} ({course.reviews} Reviews)
+                          {Number(course.averageRating || 0).toFixed(1)} ({course.totalReviews || 0} Reviews)
                         </span>
                       </div>
                     </div>
                     <div className="course-action">
-                      <span className="price">{course.price}</span>
-                      <button className="view-course-btn">View Course →</button>
+                      <span className="price">{course.priceType === 'free' ? 'Free' : `$${Number(course.price || 0).toFixed(2)}`}</span>
+                      <button className="view-course-btn">Progress {course.myProgress || 0}%</button>
                     </div>
                   </div>
                 </div>

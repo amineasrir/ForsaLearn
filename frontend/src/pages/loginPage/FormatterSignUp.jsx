@@ -6,6 +6,7 @@ import signupImage from "../../assets/image/login/image.png";
 import AuthSidebar from "../../components/auth/AuthSidebar";
 import "../../styles/auth.css";
 import { registerFormateur } from "../../services/formateurService";
+import { setAuthSession } from "../../utils/authStorage";
 
 const FormatterSignUp = () => {
   const { t } = useTranslation();
@@ -127,23 +128,21 @@ const FormatterSignUp = () => {
       };
 
       const response = await registerFormateur(body);
-      const data = await response.data;
+      const data = response.data;
 
-      // save token
-      localStorage.setItem("token", data.token);
-      localStorage.setItem("user", JSON.stringify(data.user));
+      setAuthSession({ token: data.token, user: data.user });
 
       if (data.user.role === "formateur" && !data.user.isApproved) {
-        navigate("/formateur/awaiting-approval");
+        navigate("/formateur/waiting-approval", { state: { email: data.user.email } });
         return;
       }
 
       navigate("/formateur/dashboard");
     } catch (err) {
-      setError("Server error");
+      setError(err.response?.data?.message || "Server error");
+    } finally {
+      setLoading(false);
     }
-
-    setLoading(false);
   };
 
   return (
@@ -275,11 +274,11 @@ const FormatterSignUp = () => {
                     />
                     <span>
                       {t("agreeTerms") || "I agree with"}{" "}
-                      <a href="#">
+                      <button type="button" className="link-button">
                         {t("termsOfService") || "Terms of Service"}
-                      </a>{" "}
+                      </button>{" "}
                       {t("and")}{" "}
-                      <a href="#">{t("privacyPolicy") || "Privacy Policy"}</a>
+                      <button type="button" className="link-button">{t("privacyPolicy") || "Privacy Policy"}</button>
                     </span>
                   </label>
                 </div>
@@ -369,7 +368,7 @@ const FormatterSignUp = () => {
                   >
                     {loading
                       ? t("registering") || "Registering..."
-                      : t("continue") || "Continue"}
+                      : t("signUp") || "Sign Up"}
                   </button>
                 </div>
               </form>

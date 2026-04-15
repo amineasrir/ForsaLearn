@@ -203,8 +203,8 @@ router.get('/courses/:id', async (req, res) => {
       _id: req.params.id,
       formateur: req.user.id
     })
-    .populate('enrolledStudents.student', 'firstName lastName email')
-    .populate('reviews.user', 'firstName lastName');
+    .populate('enrolledStudents.student', 'fullName email')
+    .populate('reviews.user', 'fullName');
     
     if (!course) {
       return res.status(404).json({ message: 'Course not found' });
@@ -363,7 +363,7 @@ router.get('/courses/:id/students', async (req, res) => {
       _id: req.params.id,
       formateur: req.user.id
     })
-    .populate('enrolledStudents.student', 'firstName lastName email phoneNumber');
+    .populate('enrolledStudents.student', 'fullName email phoneNumber');
     
     if (!course) {
       return res.status(404).json({ message: 'Course not found' });
@@ -393,7 +393,7 @@ router.get('/courses/:id/students', async (req, res) => {
 router.get('/students', async (req, res) => {
   try {
     const courses = await Course.find({ formateur: req.user.id })
-      .populate('enrolledStudents.student', 'firstName lastName email');
+      .populate('enrolledStudents.student', 'fullName email');
     
     // Collect unique students
     const studentsMap = new Map();
@@ -444,7 +444,7 @@ router.get('/students', async (req, res) => {
 router.get('/reviews', async (req, res) => {
   try {
     const courses = await Course.find({ formateur: req.user.id })
-      .populate('reviews.user', 'firstName lastName')
+      .populate('reviews.user', 'fullName')
       .select('title reviews');
     
     // Collect all reviews with course info
@@ -483,7 +483,7 @@ router.get('/courses/:id/reviews', async (req, res) => {
       _id: req.params.id,
       formateur: req.user.id
     })
-    .populate('reviews.user', 'firstName lastName')
+    .populate('reviews.user', 'fullName')
     .select('title reviews averageRating totalReviews');
     
     if (!course) {

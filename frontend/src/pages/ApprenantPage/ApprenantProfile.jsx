@@ -1,151 +1,101 @@
-import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import React, { useEffect, useState } from 'react';
 import Sidebar from '../../components/apprenant/Sidebar';
 import CardP from '../../components/apprenant/CardP';
 import './dashboard.css';
 import DashboardNavbar from '../../components/common/DashboardNavbar';
-
-const userData = {
-    fullName: 'Khadija essir',
-    phone: '90154‑91036',
-    gender: 'Male',
-    bio: "Hello! I'm Ronald Richard. I'm passionate about developing innovative software solutions, analyzing classic literature. I aspire to become a software developer, work as an editor. In my free time, I enjoy coding, reading, hiking etc.",
-    registrationDate: '16 Jan 2024, 11:15 AM',
-    email: 'studentdemo@example.com',
-};
+import { getApprenantProfile } from '../../services/apprenentService';
 
 const ApprenantProfile = () => {
-    const [user, setUser] = useState(userData);
-    const [editMode, setEditMode] = useState(false);
+  const [user, setUser] = useState(null);
+  const [editMode, setEditMode] = useState(false);
+  const [error, setError] = useState('');
 
-    const handleChange = (e) => {
-        const { name, value } = e.target;
-        setUser(prev => ({ ...prev, [name]: value }));
+  useEffect(() => {
+    const loadProfile = async () => {
+      try {
+        const response = await getApprenantProfile();
+        setUser(response.data?.user || null);
+      } catch (err) {
+        setError(err.response?.data?.message || 'Failed to load profile.');
+      }
     };
 
-    const saveChanges = () => {
-        // here you would send user to backend
-        setEditMode(false);
-    };
+    loadProfile();
+  }, []);
 
-    const cancelEdit = () => {
-        setUser(userData);
-        setEditMode(false);
-    };
+  const profileData = {
+    fullName: user?.fullName || 'Student',
+    phone: user?.phoneNumber || 'N/A',
+    gender: 'Not specified',
+    bio: user?.bio || 'No bio available.',
+    registrationDate: user?.createdAt ? new Date(user.createdAt).toLocaleString() : 'N/A',
+    email: user?.email || 'N/A',
+  };
 
-    return (
-        <div className="apprenant-dashboard">
-      {(() => {
-        const rightContent = (
+  return (
+    <div className="apprenant-dashboard">
+      <DashboardNavbar
+        title="My Profile"
+        breadcrumb={[{ to: '/', label: 'Home' }, { label: 'My Profile' }]}
+        rightContent={
           <>
             <button className="lang-btn">ENG</button>
             <div className="notification-icon"></div>
             <div className="cart-icon"></div>
           </>
-        );
-        return (
-          <DashboardNavbar
-            title="My Profile"
-            breadcrumb={[{ to: '/', label: 'Home' }, { label: 'My Profile' }]}
-            rightContent={rightContent}
-          />
-        );
-      })()}
-            <CardP />
-            <div className="dashboard-container">
-                <Sidebar />
+        }
+      />
+      <CardP user={user} />
+      <div className="dashboard-container">
+        <Sidebar />
 
-                <main className="main-content">
-                    <div className="profile-page-content">
-                        <h2 className="profile-title">
-                            My Profile
-                            <button
-                                className="title-edit-btn"
-                                onClick={() => setEditMode(v => !v)}
-                                title={editMode ? 'Cancel editing' : 'Edit profile'}
-                            >✎</button>
-                        </h2>
-                        <div className="profile-details">
-                            <div>
-                                <label>Full Name</label>
-                                {editMode ? (
-                                    <input
-                                        name="fullName"
-                                        value={user.fullName}
-                                        onChange={handleChange}
-                                    />
-                                ) : (
-                                    <p className="value">{user.fullName}</p>
-                                )}
-                            </div>
-                            <div>
-                                <label>Registration Date</label>
-                                <p className="value">{user.registrationDate}</p>
-                            </div>
-                            <div>
-                                <label>Phone Number</label>
-                                {editMode ? (
-                                    <input
-                                        name="phone"
-                                        value={user.phone}
-                                        onChange={handleChange}
-                                    />
-                                ) : (
-                                    <p className="value">{user.phone}</p>
-                                )}
-                            </div>
-                            <div>
-                                <label>Email</label>
-                                {editMode ? (
-                                    <input
-                                        name="email"
-                                        value={user.email}
-                                        onChange={handleChange}
-                                    />
-                                ) : (
-                                    <p className="value">{user.email}</p>
-                                )}
-                            </div>
-                            <div>
-                                <label>Gender</label>
-                                {editMode ? (
-                                    <select
-                                        name="gender"
-                                        value={user.gender}
-                                        onChange={handleChange}
-                                    >
-                                        <option>Male</option>
-                                        <option>Female</option>
-                                        <option>Other</option>
-                                    </select>
-                                ) : (
-                                    <p className="value">{user.gender}</p>
-                                )}
-                            </div>
-                            <div>
-                                <label>Bio</label>
-                                {editMode ? (
-                                    <textarea
-                                        name="bio"
-                                        value={user.bio}
-                                        onChange={handleChange}
-                                    />
-                                ) : (
-                                    <p className="value">{user.bio}</p>
-                                )}
-                            </div>
-                        </div>
-                        {editMode && (
-                            <div className="profile-actions">
-                                <button className="save-btn" onClick={saveChanges}>Save</button>
-                                <button className="cancel-btn" onClick={cancelEdit}>Cancel</button>
-                            </div>
-                        )}
-                    </div>
-                </main>
+        <main className="main-content">
+          {error && <div className="error-message">{error}</div>}
+          <div className="profile-page-content">
+            <h2 className="profile-title">
+              My Profile
+              <button
+                className="title-edit-btn"
+                onClick={() => setEditMode(v => !v)}
+                title={editMode ? 'Cancel editing' : 'Edit profile'}
+              >✎</button>
+            </h2>
+            <div className="profile-details">
+              <div>
+                <label>Full Name</label>
+                <p className="value">{profileData.fullName}</p>
+              </div>
+              <div>
+                <label>Registration Date</label>
+                <p className="value">{profileData.registrationDate}</p>
+              </div>
+              <div>
+                <label>Phone Number</label>
+                <p className="value">{profileData.phone}</p>
+              </div>
+              <div>
+                <label>Email</label>
+                <p className="value">{profileData.email}</p>
+              </div>
+              <div>
+                <label>Gender</label>
+                <p className="value">{profileData.gender}</p>
+              </div>
+              <div>
+                <label>Bio</label>
+                <p className="value">{profileData.bio}</p>
+              </div>
             </div>
-        </div>
-    );
+            {editMode && (
+              <div className="profile-actions">
+                <button className="cancel-btn" onClick={() => setEditMode(false)}>Close</button>
+              </div>
+            )}
+          </div>
+        </main>
+      </div>
+    </div>
+  );
 };
 
 export default ApprenantProfile;

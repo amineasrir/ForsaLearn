@@ -1,6 +1,6 @@
 import React from 'react'
 import Dashboard from './pages/adminInterface/Dashboard';
-import { Routes, Route } from 'react-router-dom';
+import { Routes, Route, Navigate } from 'react-router-dom';
 import MyProfile from './pages/adminInterface/MyProfile';
 import Courses from './pages/adminInterface/Courses';
 import Instructors from './pages/adminInterface/Instructors';
@@ -12,6 +12,7 @@ const AppAdmin = () => {
   return (
     <div>
       <Routes>
+        <Route path="/" element={<Navigate to="/admin/dashboard" replace />} />
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path='/profile' element={<MyProfile />} />
         <Route path='/courses' element={<Courses />} />

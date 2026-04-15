@@ -38,7 +38,7 @@ const getConversations = asyncHandler(async (req, res) => {
 // @access  Private
 const getConversation = asyncHandler(async (req, res) => {
   const conversation = await Conversation.findById(req.params.conversationId)
-    .populate('participants', 'firstName lastName email role profilePicture')
+    .populate('participants', 'fullName email role profilePicture')
     .populate('lastMessage')
     .populate('course', 'title thumbnail');
 
@@ -112,7 +112,7 @@ const createConversation = asyncHandler(async (req, res) => {
   const conversation = await Conversation.create(conversationData);
 
   const populatedConversation = await Conversation.findById(conversation._id)
-    .populate('participants', 'firstName lastName email role profilePicture')
+    .populate('participants', 'fullName email role profilePicture')
     .populate('course', 'title thumbnail');
 
   // Notify all participants
@@ -194,7 +194,7 @@ const getMessages = asyncHandler(async (req, res) => {
     conversation: conversationId,
     isDeleted: false
   })
-    .populate('sender', 'firstName lastName profilePicture role')
+    .populate('sender', 'fullName profilePicture role')
     .sort({ createdAt: -1 })
     .skip(skip)
     .limit(parseInt(limit));
@@ -253,7 +253,7 @@ const sendMessage = asyncHandler(async (req, res) => {
   await conversation.save();
 
   const populatedMessage = await Message.findById(message._id)
-    .populate('sender', 'firstName lastName profilePicture role');
+    .populate('sender', 'fullName profilePicture role');
 
   // Emit to all participants in conversation
   emitToConversation(conversationId, 'new-message', {
@@ -267,7 +267,7 @@ const sendMessage = asyncHandler(async (req, res) => {
         type: 'message',
         conversationId,
         senderId: req.user._id,
-        senderName: `${req.user.firstName} ${req.user.lastName}`,
+        senderName: req.user.fullName,
         content: content.substring(0, 100)
       });
     }
@@ -326,7 +326,7 @@ const sendFileMessage = asyncHandler(async (req, res) => {
   await conversation.save();
 
   const populatedMessage = await Message.findById(message._id)
-    .populate('sender', 'firstName lastName profilePicture role');
+    .populate('sender', 'fullName profilePicture role');
 
   emitToConversation(conversationId, 'new-message', {
     message: populatedMessage
@@ -370,7 +370,7 @@ const editMessage = asyncHandler(async (req, res) => {
   await message.save();
 
   const populatedMessage = await Message.findById(message._id)
-    .populate('sender', 'firstName lastName profilePicture role');
+    .populate('sender', 'fullName profilePicture role');
 
   emitToConversation(message.conversation.toString(), 'message-edited', {
     message: populatedMessage
@@ -645,7 +645,7 @@ const searchMessages = asyncHandler(async (req, res) => {
   }
 
   const messages = await Message.find(searchQuery)
-    .populate('sender', 'firstName lastName profilePicture')
+    .populate('sender', 'fullName profilePicture')
     .populate('conversation')
     .sort({ createdAt: -1 })
     .limit(50);

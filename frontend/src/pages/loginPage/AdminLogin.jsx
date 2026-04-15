@@ -4,6 +4,7 @@ import { FaEye, FaEyeSlash, FaShieldAlt } from 'react-icons/fa';
 import { Link, useNavigate } from 'react-router-dom';
 import { adminLogin } from '../../services/adminService.js';
 import logo from '../../assets/image/home_page/logo_rem.png';
+import { AUTH_KEYS } from '../../utils/authStorage.js';
 
 const AdminLogin = () => {
   const [formData, setFormData] = useState({
@@ -25,19 +26,21 @@ const AdminLogin = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setIsLoading(true);
 
     try {
       const res = await adminLogin(formData);
 
-      localStorage.setItem("adminToken", res.data.token);
-
-      localStorage.setItem("adminUser", JSON.stringify(res.data.user));
+      localStorage.setItem(AUTH_KEYS.adminToken, res.data.token);
+      localStorage.setItem(AUTH_KEYS.adminUser, JSON.stringify(res.data.user));
 
       navigate("/admin/dashboard");
 
     } catch (error) {
       console.log(error.response.data);
       alert(error.response.data.message);
+    } finally {
+      setIsLoading(false);
     }
   };
 

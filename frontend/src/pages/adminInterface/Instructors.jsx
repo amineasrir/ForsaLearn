@@ -1,10 +1,9 @@
-import React, { useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import '../../styles/dashboard.css';
 import '../../styles/instructors-admin.css';
-import { 
-  FaSearch, 
-  FaFilter, 
-  FaUserPlus, 
+import {
+  FaSearch,
+  FaFilter,
   FaEye,
   FaCheckCircle,
   FaTimesCircle,
@@ -21,223 +20,126 @@ import {
 import Header from '../../components/admin/Header';
 import Sidebar from '../../components/admin/Sidebar';
 import ProfileCard from '../../components/admin/ProfileCard';
+import {
+  approveFormateur,
+  getAdminProfile,
+  getAdminUsers,
+  getPendingFormateurs,
+  rejectFormateur
+} from '../../services/adminService';
+
+const fields = [
+  'Web Development',
+  'Mobile Development',
+  'Data Science',
+  'Machine Learning',
+  'Design',
+  'Marketing',
+  'Business',
+  'Photography',
+  'Music',
+  'Language Learning',
+  'Other'
+];
+
+const statusOptions = [
+  { value: 'all', label: 'All Status' },
+  { value: 'approved', label: 'Approved' },
+  { value: 'pending', label: 'Pending Approval' },
+  { value: 'active', label: 'Active' },
+  { value: 'inactive', label: 'Inactive' }
+];
 
 const Instructors = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [filterStatus, setFilterStatus] = useState('all');
   const [filterField, setFilterField] = useState('all');
+  const [instructorsData, setInstructorsData] = useState([]);
+  const [profile, setProfile] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
 
-  // Sample instructors data based on the schema
-  const instructorsData = [
-    {
-      _id: '1',
-      fullName: 'Dr. Ahmed Hassan',
-      email: 'ahmed.hassan@example.com',
-      phoneNumber: '1234567890',
-      profilePicture: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=200',
-      language: 'en',
-      field: 'Web Development',
-      skills: ['JavaScript', 'React', 'Node.js', 'MongoDB', 'TypeScript'],
-      bio: 'Experienced full-stack developer with 10+ years in the industry. Passionate about teaching and helping students achieve their goals.',
-      isApproved: true,
-      isActive: true,
-      totalEarnings: 15420,
-      totalStudents: 342,
-      rating: 4.8,
-      totalReviews: 156,
-      certificates: [
-        { name: 'AWS Certified Developer', type: 'link' },
-        { name: 'React Certification', type: 'file' }
-      ],
-      projects: [
-        { title: 'E-commerce Platform', type: 'link' },
-        { title: 'Social Media App', type: 'link' }
-      ],
-      approvedAt: new Date('2024-01-15')
-    },
-    {
-      _id: '2',
-      fullName: 'Sarah Johnson',
-      email: 'sarah.johnson@example.com',
-      phoneNumber: '9876543210',
-      profilePicture: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=200',
-      language: 'en',
-      field: 'Data Science',
-      skills: ['Python', 'Machine Learning', 'TensorFlow', 'SQL', 'Data Analysis'],
-      bio: 'Data scientist specializing in machine learning and AI. Former researcher with multiple publications.',
-      isApproved: true,
-      isActive: true,
-      totalEarnings: 22150,
-      totalStudents: 289,
-      rating: 4.9,
-      totalReviews: 132,
-      certificates: [
-        { name: 'Google Data Analytics', type: 'link' },
-        { name: 'IBM Data Science', type: 'file' }
-      ],
-      projects: [
-        { title: 'Predictive Analytics System', type: 'link' },
-        { title: 'Customer Segmentation Tool', type: 'file' }
-      ],
-      approvedAt: new Date('2024-02-10')
-    },
-    {
-      _id: '3',
-      fullName: 'Mohammed Ali',
-      email: 'mohammed.ali@example.com',
-      phoneNumber: '5551234567',
-      profilePicture: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200',
-      language: 'fr',
-      field: 'Design',
-      skills: ['UI/UX Design', 'Figma', 'Adobe XD', 'Photoshop', 'Illustrator'],
-      bio: 'Creative designer with a passion for creating beautiful and functional user experiences.',
-      isApproved: false,
-      isActive: true,
-      totalEarnings: 0,
-      totalStudents: 0,
-      rating: 0,
-      totalReviews: 0,
-      certificates: [
-        { name: 'Google UX Design', type: 'link' }
-      ],
-      projects: [
-        { title: 'Mobile App Redesign', type: 'link' },
-        { title: 'Brand Identity System', type: 'file' }
-      ],
-      approvedAt: null
-    },
-    {
-      _id: '4',
-      fullName: 'Emily Chen',
-      email: 'emily.chen@example.com',
-      phoneNumber: '4445556666',
-      profilePicture: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=200',
-      language: 'en',
-      field: 'Marketing',
-      skills: ['Digital Marketing', 'SEO', 'Content Strategy', 'Social Media', 'Analytics'],
-      bio: 'Marketing expert with proven track record in growing online businesses and brands.',
-      isApproved: true,
-      isActive: true,
-      totalEarnings: 18900,
-      totalStudents: 425,
-      rating: 4.7,
-      totalReviews: 201,
-      certificates: [
-        { name: 'Google Ads Certification', type: 'link' },
-        { name: 'HubSpot Inbound Marketing', type: 'link' }
-      ],
-      projects: [
-        { title: 'Marketing Campaign Case Study', type: 'file' }
-      ],
-      approvedAt: new Date('2024-01-20')
-    },
-    {
-      _id: '5',
-      fullName: 'David Martinez',
-      email: 'david.martinez@example.com',
-      phoneNumber: '7778889999',
-      profilePicture: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=200',
-      language: 'en',
-      field: 'Mobile Development',
-      skills: ['React Native', 'Flutter', 'iOS', 'Android', 'Swift'],
-      bio: 'Mobile app developer specializing in cross-platform development and native apps.',
-      isApproved: true,
-      isActive: false,
-      totalEarnings: 12300,
-      totalStudents: 178,
-      rating: 4.6,
-      totalReviews: 89,
-      certificates: [
-        { name: 'Apple Developer Certification', type: 'file' }
-      ],
-      projects: [
-        { title: 'Fitness Tracking App', type: 'link' },
-        { title: 'Food Delivery App', type: 'link' }
-      ],
-      approvedAt: new Date('2023-12-05')
-    },
-    {
-      _id: '6',
-      fullName: 'Fatima Zahra',
-      email: 'fatima.zahra@example.com',
-      phoneNumber: '2223334444',
-      profilePicture: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=200',
-      language: 'fr',
-      field: 'Business',
-      skills: ['Entrepreneurship', 'Business Strategy', 'Finance', 'Leadership', 'Management'],
-      bio: 'Business consultant and entrepreneur with experience in startups and corporate strategy.',
-      isApproved: false,
-      isActive: true,
-      totalEarnings: 0,
-      totalStudents: 0,
-      rating: 0,
-      totalReviews: 0,
-      certificates: [
-        { name: 'MBA Certificate', type: 'file' },
-        { name: 'Project Management Professional', type: 'link' }
-      ],
-      projects: [
-        { title: 'Business Plan Template', type: 'file' }
-      ],
-      approvedAt: null,
-      rejectionReason: null
-    }
-  ];
+  useEffect(() => {
+    const loadInstructors = async () => {
+      try {
+        setLoading(true);
+        const [usersResponse, pendingResponse, profileResponse] = await Promise.all([
+          getAdminUsers({ role: 'formateur', search: searchTerm || undefined }),
+          getPendingFormateurs(),
+          getAdminProfile()
+        ]);
 
-  const fields = [
-    'Web Development',
-    'Mobile Development',
-    'Data Science',
-    'Machine Learning',
-    'Design',
-    'Marketing',
-    'Business',
-    'Photography',
-    'Music',
-    'Language Learning',
-    'Other'
-  ];
+        const pendingMap = new Map((pendingResponse.data?.data || []).map((item) => [item._id, item]));
+        const mergedInstructors = (usersResponse.data?.data || []).map((instructor) => ({
+          ...instructor,
+          ...pendingMap.get(instructor._id)
+        }));
 
-  const statusOptions = [
-    { value: 'all', label: 'All Status' },
-    { value: 'approved', label: 'Approved' },
-    { value: 'pending', label: 'Pending Approval' },
-    { value: 'active', label: 'Active' },
-    { value: 'inactive', label: 'Inactive' }
-  ];
+        setInstructorsData(mergedInstructors);
+        setProfile(profileResponse.data?.user || null);
+      } catch (err) {
+        setError(err.response?.data?.message || 'Failed to load instructors.');
+      } finally {
+        setLoading(false);
+      }
+    };
 
-  // Filter instructors
-  const filteredInstructors = instructorsData.filter(instructor => {
-    const matchesSearch = instructor.fullName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         instructor.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         instructor.field.toLowerCase().includes(searchTerm.toLowerCase());
-    
-    let matchesStatus = true;
-    if (filterStatus === 'approved') matchesStatus = instructor.isApproved;
-    else if (filterStatus === 'pending') matchesStatus = !instructor.isApproved;
-    else if (filterStatus === 'active') matchesStatus = instructor.isActive;
-    else if (filterStatus === 'inactive') matchesStatus = !instructor.isActive;
-    
-    const matchesField = filterField === 'all' || instructor.field === filterField;
-    
-    return matchesSearch && matchesStatus && matchesField;
-  });
+    loadInstructors();
+  }, [searchTerm]);
 
-  // Calculate statistics
+  const filteredInstructors = useMemo(() => {
+    return instructorsData.filter((instructor) => {
+      let matchesStatus = true;
+      if (filterStatus === 'approved') matchesStatus = instructor.isApproved;
+      else if (filterStatus === 'pending') matchesStatus = !instructor.isApproved;
+      else if (filterStatus === 'active') matchesStatus = instructor.isActive;
+      else if (filterStatus === 'inactive') matchesStatus = !instructor.isActive;
+
+      const matchesField = filterField === 'all' || instructor.field === filterField;
+      return matchesStatus && matchesField;
+    });
+  }, [filterField, filterStatus, instructorsData]);
+
   const stats = {
-    total: instructorsData.length,
-    approved: instructorsData.filter(i => i.isApproved).length,
-    pending: instructorsData.filter(i => !i.isApproved).length,
-    active: instructorsData.filter(i => i.isActive).length,
-    totalStudents: instructorsData.reduce((sum, i) => sum + i.totalStudents, 0),
-    totalEarnings: instructorsData.reduce((sum, i) => sum + i.totalEarnings, 0),
-    averageRating: (instructorsData.reduce((sum, i) => sum + i.rating, 0) / instructorsData.filter(i => i.rating > 0).length).toFixed(1)
+    total: filteredInstructors.length,
+    approved: filteredInstructors.filter(i => i.isApproved).length,
+    pending: filteredInstructors.filter(i => !i.isApproved).length,
+    active: filteredInstructors.filter(i => i.isActive).length,
+    totalStudents: filteredInstructors.reduce((sum, i) => sum + Number(i.totalStudents || 0), 0),
+    totalEarnings: filteredInstructors.reduce((sum, i) => sum + Number(i.totalEarnings || 0), 0),
+    averageRating: filteredInstructors.filter(i => Number(i.rating) > 0).length
+      ? (filteredInstructors.reduce((sum, i) => sum + Number(i.rating || 0), 0) / filteredInstructors.filter(i => Number(i.rating) > 0).length).toFixed(1)
+      : '0.0'
+  };
+
+  const handleApprove = async (id) => {
+    try {
+      await approveFormateur(id);
+      setInstructorsData((prev) => prev.map((item) => (
+        item._id === id ? { ...item, isApproved: true } : item
+      )));
+    } catch (err) {
+      setError(err.response?.data?.message || 'Failed to approve instructor.');
+    }
+  };
+
+  const handleReject = async (id) => {
+    const reason = window.prompt('Enter a rejection reason');
+    if (!reason) return;
+
+    try {
+      await rejectFormateur(id, reason);
+      setInstructorsData((prev) => prev.map((item) => (
+        item._id === id ? { ...item, isApproved: false, rejectionReason: reason } : item
+      )));
+    } catch (err) {
+      setError(err.response?.data?.message || 'Failed to reject instructor.');
+    }
   };
 
   return (
     <div className="dashboard">
       <Header title='Instructors'/>
-      
       <div className="container main-content">
         <div className="content-wrapper">
           <aside className="sidebar">
@@ -245,9 +147,10 @@ const Instructors = () => {
           </aside>
 
           <main className="main">
-            {/* Page Header */}
-            <ProfileCard />
-            {/* Stats Grid */}
+            <ProfileCard name={profile?.fullName || 'Administrator'} role="Administrateur" image={profile?.profilePicture} />
+
+            {error && <div className="error-message">{error}</div>}
+
             <div className="stats-grid">
               <div className="stat-card">
                 <div className="stat-header">
@@ -256,7 +159,7 @@ const Instructors = () => {
                   </div>
                   <span className="stat-label">Total Instructors</span>
                 </div>
-                <p className="stat-value">{stats.total}</p>
+                <p className="stat-value">{loading ? '...' : stats.total}</p>
                 <p className="stat-subtext">
                   {stats.approved} Approved • {stats.pending} Pending
                 </p>
@@ -269,7 +172,7 @@ const Instructors = () => {
                   </div>
                   <span className="stat-label">Total Students</span>
                 </div>
-                <p className="stat-value">{stats.totalStudents}</p>
+                <p className="stat-value">{loading ? '...' : stats.totalStudents}</p>
                 <p className="stat-subtext">Across all instructors</p>
               </div>
 
@@ -280,7 +183,7 @@ const Instructors = () => {
                   </div>
                   <span className="stat-label">Average Rating</span>
                 </div>
-                <p className="stat-value">{stats.averageRating}</p>
+                <p className="stat-value">{loading ? '...' : stats.averageRating}</p>
                 <p className="stat-subtext">Based on reviews</p>
               </div>
 
@@ -291,12 +194,11 @@ const Instructors = () => {
                   </div>
                   <span className="stat-label">Total Earnings</span>
                 </div>
-                <p className="stat-value">${stats.totalEarnings.toLocaleString()}</p>
-                <p className="stat-subtext">Platform revenue</p>
+                <p className="stat-value">{loading ? '...' : `$${stats.totalEarnings.toLocaleString()}`}</p>
+                <p className="stat-subtext">Instructor earnings</p>
               </div>
             </div>
 
-            {/* Filters and Search */}
             <div className="chart-card">
               <div className="courses-filters">
                 <div className="search-box">
@@ -344,7 +246,6 @@ const Instructors = () => {
               </div>
             </div>
 
-            {/* Instructors Grid */}
             <div className="chart-card">
               <div className="chart-header">
                 <h3 className="chart-title">
@@ -357,8 +258,8 @@ const Instructors = () => {
                   <div key={instructor._id} className="instructor-card">
                     <div className="instructor-header">
                       <div className="instructor-avatar-wrapper">
-                        <img 
-                          src={instructor.profilePicture} 
+                        <img
+                          src={instructor.profilePicture || 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=200'}
                           alt={instructor.fullName}
                           className="instructor-avatar"
                         />
@@ -376,7 +277,7 @@ const Instructors = () => {
                           </span>
                         )}
                         <span className="instructor-badge language">
-                          {instructor.language.toUpperCase()}
+                          {(instructor.language || 'en').toUpperCase()}
                         </span>
                       </div>
                     </div>
@@ -384,16 +285,16 @@ const Instructors = () => {
                     <div className="instructor-body">
                       <h3 className="instructor-name">{instructor.fullName}</h3>
                       <p className="instructor-field">
-                        <FaBookOpen /> {instructor.field}
+                        <FaBookOpen /> {instructor.field || 'Other'}
                       </p>
-                      
-                      <p className="instructor-bio">{instructor.bio}</p>
+
+                      <p className="instructor-bio">{instructor.bio || 'No bio available.'}</p>
 
                       <div className="instructor-skills">
-                        {instructor.skills.slice(0, 3).map((skill, index) => (
+                        {(instructor.skills || []).slice(0, 3).map((skill, index) => (
                           <span key={index} className="skill-tag">{skill}</span>
                         ))}
-                        {instructor.skills.length > 3 && (
+                        {(instructor.skills || []).length > 3 && (
                           <span className="skill-tag more">+{instructor.skills.length - 3}</span>
                         )}
                       </div>
@@ -413,7 +314,7 @@ const Instructors = () => {
                         <div className="instructor-stat">
                           <FaUsers />
                           <div>
-                            <span className="stat-number">{instructor.totalStudents}</span>
+                            <span className="stat-number">{instructor.totalStudents || 0}</span>
                             <span className="stat-text">Students</span>
                           </div>
                         </div>
@@ -421,7 +322,7 @@ const Instructors = () => {
                           <FaStar />
                           <div>
                             <span className="stat-number">
-                              {instructor.rating > 0 ? instructor.rating.toFixed(1) : 'N/A'}
+                              {Number(instructor.rating || 0) > 0 ? Number(instructor.rating).toFixed(1) : 'N/A'}
                             </span>
                             <span className="stat-text">Rating</span>
                           </div>
@@ -429,7 +330,7 @@ const Instructors = () => {
                         <div className="instructor-stat">
                           <FaMoneyBillWave />
                           <div>
-                            <span className="stat-number">${instructor.totalEarnings.toLocaleString()}</span>
+                            <span className="stat-number">${Number(instructor.totalEarnings || 0).toLocaleString()}</span>
                             <span className="stat-text">Earnings</span>
                           </div>
                         </div>
@@ -438,11 +339,11 @@ const Instructors = () => {
                       <div className="instructor-resources">
                         <div className="resource-item">
                           <FaCertificate />
-                          <span>{instructor.certificates.length} Certificates</span>
+                          <span>{(instructor.certificates || []).length} Certificates</span>
                         </div>
                         <div className="resource-item">
                           <FaProjectDiagram />
-                          <span>{instructor.projects.length} Projects</span>
+                          <span>{(instructor.projects || []).length} Projects</span>
                         </div>
                       </div>
                     </div>
@@ -453,10 +354,10 @@ const Instructors = () => {
                       </button>
                       {!instructor.isApproved && (
                         <>
-                          <button className="instructor-btn approve">
+                          <button className="instructor-btn approve" onClick={() => handleApprove(instructor._id)}>
                             <FaCheckCircle /> Approve
                           </button>
-                          <button className="instructor-btn reject">
+                          <button className="instructor-btn reject" onClick={() => handleReject(instructor._id)}>
                             <FaTimesCircle /> Reject
                           </button>
                         </>
@@ -466,7 +367,7 @@ const Instructors = () => {
                 ))}
               </div>
 
-              {filteredInstructors.length === 0 && (
+              {!loading && filteredInstructors.length === 0 && (
                 <div className="empty-state">
                   <FaGraduationCap className="empty-icon" />
                   <h3>No instructors found</h3>

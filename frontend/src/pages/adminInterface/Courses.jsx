@@ -1,12 +1,9 @@
-import React, { useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import '../../styles/dashboard.css';
 import '../../styles/courses-admin.css';
-import { 
-  FaSearch, 
-  FaFilter, 
-  FaPlus, 
-  FaEye, 
-  FaEdit, 
+import {
+  FaFilter,
+  FaEye,
   FaTrash,
   FaStar,
   FaUsers,
@@ -17,192 +14,85 @@ import {
 import Header from '../../components/admin/Header';
 import Sidebar from '../../components/admin/Sidebar';
 import ProfileCard from '../../components/admin/ProfileCard';
+import { deleteAdminCourse, getAdminCourses, getAdminProfile } from '../../services/adminService';
+
+const categories = [
+  'Web Development',
+  'Mobile Development',
+  'Data Science',
+  'Machine Learning',
+  'Design',
+  'Marketing',
+  'Business',
+  'Photography',
+  'Music',
+  'Language Learning',
+  'Other'
+];
+
+const statusOptions = [
+  { value: 'all', label: 'All Status' },
+  { value: 'draft', label: 'Draft' },
+  { value: 'pending', label: 'Pending' },
+  { value: 'published', label: 'Published' },
+  { value: 'rejected', label: 'Rejected' },
+  { value: 'archived', label: 'Archived' }
+];
 
 const Courses = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [filterStatus, setFilterStatus] = useState('all');
   const [filterCategory, setFilterCategory] = useState('all');
+  const [coursesData, setCoursesData] = useState([]);
+  const [profile, setProfile] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
 
-  // Sample courses data based on the schema
-  const coursesData = [
-    {
-      _id: '1',
-      title: 'Complete Web Development Bootcamp',
-      shortDescription: 'Learn HTML, CSS, JavaScript, React, Node.js and more',
-      category: 'Web Development',
-      level: 'Beginner',
-      language: 'English',
-      price: 99.99,
-      priceType: 'paid',
-      discount: { percentage: 20 },
-      thumbnail: 'https://images.unsplash.com/photo-1498050108023-c5249f4df085?w=400',
-      status: 'published',
-      totalEnrollments: 234,
-      averageRating: 4.5,
-      totalReviews: 89,
-      totalDuration: 4800,
-      formateur: { name: 'John Doe' },
-      sections: Array(12).fill({}),
-      isPublished: true,
-      isFeatured: true
-    },
-    {
-      _id: '2',
-      title: 'Data Science with Python',
-      shortDescription: 'Master data analysis, visualization and machine learning',
-      category: 'Data Science',
-      level: 'Intermediate',
-      language: 'English',
-      price: 149.99,
-      priceType: 'paid',
-      discount: { percentage: 0 },
-      thumbnail: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=400',
-      status: 'published',
-      totalEnrollments: 156,
-      averageRating: 4.8,
-      totalReviews: 62,
-      totalDuration: 3600,
-      formateur: { name: 'Jane Smith' },
-      sections: Array(10).fill({}),
-      isPublished: true,
-      isFeatured: false
-    },
-    {
-      _id: '3',
-      title: 'UI/UX Design Masterclass',
-      shortDescription: 'Learn Figma, Adobe XD and design principles',
-      category: 'Design',
-      level: 'All Levels',
-      language: 'Arabic',
-      price: 79.99,
-      priceType: 'paid',
-      discount: { percentage: 30 },
-      thumbnail: 'https://images.unsplash.com/photo-1561070791-2526d30994b5?w=400',
-      status: 'published',
-      totalEnrollments: 189,
-      averageRating: 4.7,
-      totalReviews: 45,
-      totalDuration: 2400,
-      formateur: { name: 'Ahmed Ali' },
-      sections: Array(8).fill({}),
-      isPublished: true,
-      isFeatured: true
-    },
-    {
-      _id: '4',
-      title: 'Mobile App Development with React Native',
-      shortDescription: 'Build iOS and Android apps with JavaScript',
-      category: 'Mobile Development',
-      level: 'Intermediate',
-      language: 'English',
-      price: 0,
-      priceType: 'free',
-      discount: { percentage: 0 },
-      thumbnail: 'https://images.unsplash.com/photo-1512941937669-90a1b58e7e9c?w=400',
-      status: 'published',
-      totalEnrollments: 421,
-      averageRating: 4.6,
-      totalReviews: 123,
-      totalDuration: 3000,
-      formateur: { name: 'Sarah Johnson' },
-      sections: Array(15).fill({}),
-      isPublished: true,
-      isFeatured: false
-    },
-    {
-      _id: '5',
-      title: 'Digital Marketing Complete Course',
-      shortDescription: 'SEO, Social Media, Content Marketing and more',
-      category: 'Marketing',
-      level: 'Beginner',
-      language: 'French',
-      price: 59.99,
-      priceType: 'semi-free',
-      discount: { percentage: 50 },
-      thumbnail: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=400',
-      status: 'draft',
-      totalEnrollments: 87,
-      averageRating: 4.3,
-      totalReviews: 28,
-      totalDuration: 1800,
-      formateur: { name: 'Marie Dupont' },
-      sections: Array(6).fill({}),
-      isPublished: false,
-      isFeatured: false
-    },
-    {
-      _id: '6',
-      title: 'Machine Learning A-Z',
-      shortDescription: 'Complete guide to ML algorithms and applications',
-      category: 'Machine Learning',
-      level: 'Advanced',
-      language: 'English',
-      price: 199.99,
-      priceType: 'paid',
-      discount: { percentage: 15 },
-      thumbnail: 'https://images.unsplash.com/photo-1555949963-aa79dcee981c?w=400',
-      status: 'pending',
-      totalEnrollments: 92,
-      averageRating: 4.9,
-      totalReviews: 41,
-      totalDuration: 5400,
-      formateur: { name: 'Dr. Smith' },
-      sections: Array(18).fill({}),
-      isPublished: false,
-      isFeatured: false
-    }
-  ];
+  useEffect(() => {
+    const loadCourses = async () => {
+      try {
+        setLoading(true);
+        const [coursesResponse, profileResponse] = await Promise.all([
+          getAdminCourses({
+            search: searchTerm || undefined,
+            status: filterStatus !== 'all' ? filterStatus : undefined
+          }),
+          getAdminProfile()
+        ]);
 
-  const categories = [
-    'Web Development',
-    'Mobile Development',
-    'Data Science',
-    'Machine Learning',
-    'Design',
-    'Marketing',
-    'Business',
-    'Photography',
-    'Music',
-    'Language Learning',
-    'Other'
-  ];
+        setCoursesData(coursesResponse.data?.data || []);
+        setProfile(profileResponse.data?.user || null);
+      } catch (err) {
+        setError(err.response?.data?.message || 'Failed to load courses.');
+      } finally {
+        setLoading(false);
+      }
+    };
 
-  const statusOptions = [
-    { value: 'all', label: 'All Status' },
-    { value: 'draft', label: 'Draft' },
-    { value: 'pending', label: 'Pending' },
-    { value: 'published', label: 'Published' },
-    { value: 'rejected', label: 'Rejected' },
-    { value: 'archived', label: 'Archived' }
-  ];
+    loadCourses();
+  }, [searchTerm, filterStatus]);
 
-  // Filter courses
-  const filteredCourses = coursesData.filter(course => {
-    const matchesSearch = course.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         course.shortDescription.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesStatus = filterStatus === 'all' || course.status === filterStatus;
-    const matchesCategory = filterCategory === 'all' || course.category === filterCategory;
-    
-    return matchesSearch && matchesStatus && matchesCategory;
-  });
+  const filteredCourses = useMemo(() => {
+    return coursesData.filter((course) => (
+      filterCategory === 'all' || course.category === filterCategory
+    ));
+  }, [coursesData, filterCategory]);
 
-  // Calculate price after discount
   const getFinalPrice = (course) => {
+    const discountPercentage = course.discount?.percentage || 0;
     if (course.priceType === 'free') return 0;
-    if (course.discount.percentage > 0) {
-      return course.price - (course.price * course.discount.percentage / 100);
+    if (discountPercentage > 0) {
+      return course.price - (course.price * discountPercentage / 100);
     }
-    return course.price;
+    return course.price || 0;
   };
 
-  // Format duration
-  const formatDuration = (seconds) => {
-    const hours = Math.floor(seconds / 3600);
-    const minutes = Math.floor((seconds % 3600) / 60);
-    return `${hours}h ${minutes}m`;
+  const formatDuration = (minutes = 0) => {
+    const hours = Math.floor(minutes / 60);
+    const remainingMinutes = minutes % 60;
+    return `${hours}h ${remainingMinutes}m`;
   };
 
-  // Get status badge class
   const getStatusClass = (status) => {
     const classes = {
       draft: 'status-draft',
@@ -214,10 +104,24 @@ const Courses = () => {
     return classes[status] || 'status-draft';
   };
 
+  const handleDelete = async (courseId) => {
+    try {
+      await deleteAdminCourse(courseId);
+      setCoursesData((prev) => prev.filter((course) => course._id !== courseId));
+    } catch (err) {
+      setError(err.response?.data?.message || 'Failed to delete course.');
+    }
+  };
+
+  const totalStudents = filteredCourses.reduce((sum, course) => sum + (course.totalEnrollments || 0), 0);
+  const averageRating = filteredCourses.length
+    ? (filteredCourses.reduce((sum, course) => sum + Number(course.averageRating || 0), 0) / filteredCourses.length).toFixed(1)
+    : '0.0';
+  const totalRevenue = filteredCourses.reduce((sum, course) => sum + Number(course.totalRevenue || 0), 0);
+
   return (
     <div className="dashboard">
       <Header title='Courses'/>
-      
       <div className="container main-content">
         <div className="content-wrapper">
           <aside className="sidebar">
@@ -225,9 +129,10 @@ const Courses = () => {
           </aside>
 
           <main className="main">
-            {/* Page Header */}
-            <ProfileCard />
-            {/* Filters and Search */}
+            <ProfileCard name={profile?.fullName || 'Administrator'} role="Administrateur" image={profile?.profilePicture} />
+
+            {error && <div className="error-message">{error}</div>}
+
             <div className="chart-card">
               <div className="courses-filters">
                 <div className="search-box">
@@ -274,7 +179,6 @@ const Courses = () => {
               </div>
             </div>
 
-            {/* Stats Grid */}
             <div className="stats-grid">
               <div className="stat-card">
                 <div className="stat-header">
@@ -283,7 +187,7 @@ const Courses = () => {
                   </div>
                   <span className="stat-label">Total Courses</span>
                 </div>
-                <p className="stat-value">{coursesData.length}</p>
+                <p className="stat-value">{loading ? '...' : filteredCourses.length}</p>
               </div>
 
               <div className="stat-card">
@@ -293,9 +197,7 @@ const Courses = () => {
                   </div>
                   <span className="stat-label">Total Students</span>
                 </div>
-                <p className="stat-value">
-                  {coursesData.reduce((sum, course) => sum + course.totalEnrollments, 0)}
-                </p>
+                <p className="stat-value">{loading ? '...' : totalStudents}</p>
               </div>
 
               <div className="stat-card">
@@ -305,9 +207,7 @@ const Courses = () => {
                   </div>
                   <span className="stat-label">Average Rating</span>
                 </div>
-                <p className="stat-value">
-                  {(coursesData.reduce((sum, course) => sum + course.averageRating, 0) / coursesData.length).toFixed(1)}
-                </p>
+                <p className="stat-value">{loading ? '...' : averageRating}</p>
               </div>
 
               <div className="stat-card">
@@ -317,11 +217,10 @@ const Courses = () => {
                   </div>
                   <span className="stat-label">Total Revenue</span>
                 </div>
-                <p className="stat-value">$12,450</p>
+                <p className="stat-value">{loading ? '...' : `$${totalRevenue.toLocaleString()}`}</p>
               </div>
             </div>
 
-            {/* Courses Grid */}
             <div className="chart-card">
               <div className="chart-header">
                 <h3 className="chart-title">
@@ -333,8 +232,8 @@ const Courses = () => {
                 {filteredCourses.map(course => (
                   <div key={course._id} className="course-card">
                     <div className="course-image-wrapper">
-                      <img 
-                        src={course.thumbnail} 
+                      <img
+                        src={course.thumbnail || 'https://images.unsplash.com/photo-1498050108023-c5249f4df085?w=400'}
                         alt={course.title}
                         className="course-image"
                       />
@@ -344,7 +243,7 @@ const Courses = () => {
                       <span className={`course-badge ${getStatusClass(course.status)}`}>
                         {course.status}
                       </span>
-                      {course.discount.percentage > 0 && (
+                      {(course.discount?.percentage || 0) > 0 && (
                         <span className="course-badge discount">
                           -{course.discount.percentage}%
                         </span>
@@ -358,28 +257,28 @@ const Courses = () => {
                       </div>
 
                       <h3 className="course-title">{course.title}</h3>
-                      <p className="course-description">{course.shortDescription}</p>
+                      <p className="course-description">{course.shortDescription || course.description}</p>
 
                       <div className="course-instructor">
-                        <span>By {course.formateur.name}</span>
+                        <span>By {course.formateur?.fullName || 'Unknown Instructor'}</span>
                       </div>
 
                       <div className="course-stats">
                         <div className="course-stat-item">
                           <FaUsers />
-                          <span>{course.totalEnrollments}</span>
+                          <span>{course.totalEnrollments || 0}</span>
                         </div>
                         <div className="course-stat-item">
                           <FaStar />
-                          <span>{course.averageRating} ({course.totalReviews})</span>
+                          <span>{Number(course.averageRating || 0).toFixed(1)} ({course.totalReviews || 0})</span>
                         </div>
                         <div className="course-stat-item">
                           <FaClock />
-                          <span>{formatDuration(course.totalDuration)}</span>
+                          <span>{formatDuration(course.totalDuration || 0)}</span>
                         </div>
                         <div className="course-stat-item">
                           <FaBookOpen />
-                          <span>{course.sections.length} sections</span>
+                          <span>{course.sections?.length || 0} sections</span>
                         </div>
                       </div>
 
@@ -389,8 +288,8 @@ const Courses = () => {
                             <span className="price-free">Free</span>
                           ) : (
                             <>
-                              {course.discount.percentage > 0 && (
-                                <span className="price-original">${course.price}</span>
+                              {(course.discount?.percentage || 0) > 0 && (
+                                <span className="price-original">${Number(course.price || 0).toFixed(2)}</span>
                               )}
                               <span className="price-current">${getFinalPrice(course).toFixed(2)}</span>
                             </>
@@ -401,10 +300,7 @@ const Courses = () => {
                           <button className="action-btn view" title="View">
                             <FaEye />
                           </button>
-                          <button className="action-btn edit" title="Edit">
-                            <FaEdit />
-                          </button>
-                          <button className="action-btn delete" title="Delete">
+                          <button className="action-btn delete" title="Delete" onClick={() => handleDelete(course._id)}>
                             <FaTrash />
                           </button>
                         </div>
@@ -414,7 +310,7 @@ const Courses = () => {
                 ))}
               </div>
 
-              {filteredCourses.length === 0 && (
+              {!loading && filteredCourses.length === 0 && (
                 <div className="empty-state">
                   <FaBookOpen className="empty-icon" />
                   <h3>No courses found</h3>

@@ -1,4 +1,4 @@
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { Routes, Route } from 'react-router-dom';
 import Home from "./pages/Home";
 import SignUp from "./pages/loginPage/SignUp";
 import ForgotPassword from "./pages/loginPage/ForgotPassword";
@@ -15,6 +15,7 @@ import ApprenantWishlist from "./pages/ApprenantPage/ApprenantWishlist";
 import ApprenantMessages from "./pages/ApprenantPage/ApprenantMessages";
 import ApprenantSettings from "./pages/ApprenantPage/ApprenantSettings";
 import { WishlistProvider } from './context/WishlistContext';
+import ApprenantProtectedRoute from './protectRoutes/ApprenantProtectedRoute';
 
 function App(){
   return (
@@ -27,15 +28,15 @@ function App(){
           <Route path="/otp-verification" element={<OTPVerification />} />
           <Route path="/set-password" element={<SetPassword />} />
           <Route path="/welcome-back" element={<WelcomeBack />} />
-          <Route path="/apprenant/dashboard" element={<ApprenantDashboard />} />
-          <Route path="/apprenant/profile" element={<ApprenantProfile />} />
-          <Route path="/apprenant/enrolled" element={<ApprenantEnrolled />} />
-          <Route path="/apprenant/certificates" element={<ApprenantCertificates />} />
-          <Route path="/apprenant/quizzes" element={<ApprenantQuizzes />} />
-          <Route path="/apprenant/courses" element={<ApprenantCourses />} />
-          <Route path="/apprenant/wishlist" element={<ApprenantWishlist />} />
-          <Route path="/apprenant/messages" element={<ApprenantMessages />} />
-          <Route path="/apprenant/settings" element={<ApprenantSettings />} />
+          <Route path="/apprenant/dashboard" element={<ApprenantProtectedRoute><ApprenantDashboard /></ApprenantProtectedRoute>} />
+          <Route path="/apprenant/profile" element={<ApprenantProtectedRoute><ApprenantProfile /></ApprenantProtectedRoute>} />
+          <Route path="/apprenant/enrolled" element={<ApprenantProtectedRoute><ApprenantEnrolled /></ApprenantProtectedRoute>} />
+          <Route path="/apprenant/certificates" element={<ApprenantProtectedRoute><ApprenantCertificates /></ApprenantProtectedRoute>} />
+          <Route path="/apprenant/quizzes" element={<ApprenantProtectedRoute><ApprenantQuizzes /></ApprenantProtectedRoute>} />
+          <Route path="/apprenant/courses" element={<ApprenantProtectedRoute><ApprenantCourses /></ApprenantProtectedRoute>} />
+          <Route path="/apprenant/wishlist" element={<ApprenantProtectedRoute><ApprenantWishlist /></ApprenantProtectedRoute>} />
+          <Route path="/apprenant/messages" element={<ApprenantProtectedRoute><ApprenantMessages /></ApprenantProtectedRoute>} />
+          <Route path="/apprenant/settings" element={<ApprenantProtectedRoute><ApprenantSettings /></ApprenantProtectedRoute>} />
         </Routes>
         </WishlistProvider>
       </div>

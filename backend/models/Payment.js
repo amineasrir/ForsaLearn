@@ -93,6 +93,7 @@ const paymentSchema = new mongoose.Schema({
   formateurEarnings: {
     type: Number,
     required: true,
+    default: 0,
     min: 0
   },
   
@@ -239,7 +240,7 @@ paymentSchema.methods.processRefund = async function(refundAmount, reason, refun
 paymentSchema.statics.getUserPayments = function(userId) {
   return this.find({ user: userId })
     .populate('course', 'title thumbnail')
-    .populate('formateur', 'firstName lastName')
+    .populate('formateur', 'fullName')
     .sort({ createdAt: -1 });
 };
 

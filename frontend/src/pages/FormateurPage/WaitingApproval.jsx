@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import logo_rem from "../../assets/image/home_page/logo_rem.png";
 import '../../styles/auth.css';
 import { checkFormateurApproval } from '../../services/formateurService';
+import { clearUserSession, getStoredUser } from '../../utils/authStorage';
 
 const WaitingApproval = () => {
   const { t } = useTranslation();
@@ -21,9 +22,9 @@ const WaitingApproval = () => {
     if (state && state.email) {
       setEmail(state.email);
     } else {
-      const storedEmail = localStorage.getItem('user');
-      if (storedEmail) {
-        setEmail(storedEmail);
+      const storedUser = getStoredUser();
+      if (storedUser?.email) {
+        setEmail(storedUser.email);
       }
     }
   }, [location.state]);
@@ -33,8 +34,9 @@ const WaitingApproval = () => {
     setError('');
 
     try {
+      setRetryAttempts((prev) => prev + 1);
       const response = await checkFormateurApproval();
-      if (response.data.isApproved) {
+      if (response.data?.success && response.data?.isApproved) {
         // If approved, redirect to dashboard
         navigate('/formateur/dashboard');
       } else {
@@ -50,8 +52,7 @@ const WaitingApproval = () => {
 
 
   const handleLogout = () => {
-    localStorage.removeItem('user');
-    localStorage.removeItem('token');
+    clearUserSession();
     navigate('/signin');
   };
 

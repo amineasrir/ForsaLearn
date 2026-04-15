@@ -3,11 +3,14 @@ const router = express.Router();
 const { body, validationResult } = require('express-validator');
 const jwt = require('jsonwebtoken');
 const { Admin, Formateur, Visiteur, User } = require('../models/User');
+const { protect, authorize } = require('../middleware/auth');
 
 // REGISTER ROUTES
 
 // Register Admin (should be protected - only existing admin can create new admin)
 router.post('/register/admin',
+  protect,
+  authorize('admin'),
   [
     body('firstName').trim().isLength({ min: 2 }).withMessage('First name must be at least 2 characters'),
     body('lastName').trim().isLength({ min: 2 }).withMessage('Last name must be at least 2 characters'),
@@ -55,8 +58,7 @@ router.post('/register/admin',
         token,
         user: {
           id: admin._id,
-          firstName: admin.firstName,
-          lastName: admin.lastName,
+          fullName: admin.fullName,
           email: admin.email,
           role: admin.role
         }
@@ -139,7 +141,7 @@ router.post('/register/formateur',
 // Register Visiteur (Student/Learner)
 router.post('/register/visiteur',
   [
-    body('full').trim().isLength({ min: 2 }).withMessage('Full name must be at least 2 characters'),
+    body('fullName').trim().isLength({ min: 2 }).withMessage('Full name must be at least 2 characters'),
     body('email').isEmail().normalizeEmail().withMessage('Please provide a valid email'),
     body('phoneNumber').matches(/^[0-9]{10,15}$/).withMessage('Please provide a valid phone number'),
     body('password').isLength({ min: 6 }).withMessage('Password must be at least 6 characters'),
@@ -153,7 +155,7 @@ router.post('/register/visiteur',
         return res.status(400).json({ errors: errors.array() });
       }
 
-      const { firstName, lastName, email, phoneNumber, password, skillsNeeded, interests } = req.body;
+      const { fullName, email, phoneNumber, password, skillsNeeded, interests } = req.body;
 
       // Check if email already exists
       const existingUser = await User.findOne({ email });
@@ -163,8 +165,7 @@ router.post('/register/visiteur',
 
       // Create new visiteur (student)
       const visiteur = new Visiteur({
-        firstName,
-        lastName,
+        fullName,
         email,
         phoneNumber,
         password,
@@ -187,8 +188,7 @@ router.post('/register/visiteur',
         token,
         user: {
           id: visiteur._id,
-          firstName: visiteur.firstName,
-          lastName: visiteur.lastName,
+          fullName: visiteur.fullName,
           email: visiteur.email,
           role: visiteur.role,
           skillsNeeded: visiteur.skillsNeeded,
@@ -255,8 +255,7 @@ router.post('/login/admin',
         token,
         user: {
           id: admin._id,
-          firstName: admin.firstName,
-          lastName: admin.lastName,
+          fullName: admin.fullName,
           email: admin.email,
           phoneNumber: admin.phoneNumber,
           role: admin.role,
@@ -326,8 +325,7 @@ router.post('/login',
       // Return user data based on role
       let userData = {
         id: user._id,
-        firstName: user.firstName,
-        lastName: user.lastName,
+        fullName: user.fullName,
         email: user.email,
         phoneNumber: user.phoneNumber,
         role: user.role
@@ -361,7 +359,7 @@ router.post('/login',
 
 // GET CURRENT USER (Protected route)
 
-router.get('/me', async (req, res) => {
+router.get('/me', protect, async (req, res) => {
   try {
     const user = await User.findById(req.user.id).select('-password');
     

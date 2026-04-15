@@ -66,7 +66,7 @@ router.get('/', async (req, res) => {
     
     // Get courses with pagination
     const courses = await Course.find(filter)
-      .populate('formateur', 'firstName lastName email rating')
+      .populate('formateur', 'fullName email rating')
       .select('-enrolledStudents -reviews')
       .sort(sort)
       .skip(skip)
@@ -99,7 +99,7 @@ router.get('/search', async (req, res) => {
     }
     
     const courses = await Course.searchCourses(q)
-      .populate('formateur', 'firstName lastName email rating')
+      .populate('formateur', 'fullName email rating')
       .select('-enrolledStudents -reviews')
       .limit(20);
     
@@ -118,7 +118,7 @@ router.get('/search', async (req, res) => {
 router.get('/featured', async (req, res) => {
   try {
     const courses = await Course.findFeatured()
-      .populate('formateur', 'firstName lastName email rating');
+      .populate('formateur', 'fullName email rating');
     
     res.status(200).json({
       success: true,
@@ -136,7 +136,7 @@ router.get('/popular', async (req, res) => {
   try {
     const limit = parseInt(req.query.limit) || 10;
     const courses = await Course.findPopular(limit)
-      .populate('formateur', 'firstName lastName email rating');
+      .populate('formateur', 'fullName email rating');
     
     res.status(200).json({
       success: true,
@@ -146,41 +146,6 @@ router.get('/popular', async (req, res) => {
   } catch (error) {
     console.error('Get popular courses error:', error);
     res.status(500).json({ message: 'Error fetching popular courses' });
-  }
-});
-
-// Get single course by ID or slug
-router.get('/:id', async (req, res) => {
-  try {
-    let course;
-    
-    // Check if ID is a valid MongoDB ObjectId or a slug
-    if (req.params.id.match(/^[0-9a-fA-F]{24}$/)) {
-      course = await Course.findById(req.params.id)
-        .populate('formateur', 'firstName lastName email bio rating totalStudents')
-        .populate('reviews.user', 'firstName lastName');
-    } else {
-      course = await Course.findOne({ slug: req.params.id })
-        .populate('formateur', 'firstName lastName email bio rating totalStudents')
-        .populate('reviews.user', 'firstName lastName');
-    }
-    
-    if (!course) {
-      return res.status(404).json({ message: 'Course not found' });
-    }
-    
-    // Only show published courses to public
-    if (!course.isPublished && (!req.user || req.user.role !== 'admin')) {
-      return res.status(403).json({ message: 'Course not available' });
-    }
-    
-    res.status(200).json({
-      success: true,
-      data: course
-    });
-  } catch (error) {
-    console.error('Get course error:', error);
-    res.status(500).json({ message: 'Error fetching course' });
   }
 });
 
@@ -372,7 +337,7 @@ router.get('/student/my-courses', protect, authorize('visiteur'), async (req, re
     const courses = await Course.find({
       'enrolledStudents.student': req.user.id
     })
-    .populate('formateur', 'firstName lastName')
+    .populate('formateur', 'fullName')
     .select('-reviews');
     
     // Add enrollment details to each course
@@ -485,5 +450,40 @@ router.post('/:id/reviews',
     }
   }
 );
+
+// Get single course by ID or slug
+router.get('/:id', async (req, res) => {
+  try {
+    let course;
+    
+    // Check if ID is a valid MongoDB ObjectId or a slug
+    if (req.params.id.match(/^[0-9a-fA-F]{24}$/)) {
+      course = await Course.findById(req.params.id)
+        .populate('formateur', 'fullName email bio rating totalStudents')
+        .populate('reviews.user', 'fullName');
+    } else {
+      course = await Course.findOne({ slug: req.params.id })
+        .populate('formateur', 'fullName email bio rating totalStudents')
+        .populate('reviews.user', 'fullName');
+    }
+    
+    if (!course) {
+      return res.status(404).json({ message: 'Course not found' });
+    }
+    
+    // Only show published courses to public
+    if (!course.isPublished && (!req.user || req.user.role !== 'admin')) {
+      return res.status(403).json({ message: 'Course not available' });
+    }
+    
+    res.status(200).json({
+      success: true,
+      data: course
+    });
+  } catch (error) {
+    console.error('Get course error:', error);
+    res.status(500).json({ message: 'Error fetching course' });
+  }
+});
 
 module.exports = router;
