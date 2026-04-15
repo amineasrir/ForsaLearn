@@ -385,4 +385,47 @@ router.post('/logout', (req, res) => {
   });
 });
 
+// FORGOT PASSWORD ROUTE
+router.post('/forgot-password',
+  [
+    body('email').isEmail().normalizeEmail().withMessage('Please provide a valid email')
+  ],
+  async (req, res) => {
+    try {
+      const errors = validationResult(req);
+      if (!errors.isEmpty()) {
+        return res.status(400).json({ errors: errors.array() });
+      }
+
+      const { email } = req.body;
+
+      // Find user by email
+      const user = await User.findOne({ email });
+      
+      if (!user) {
+        return res.status(404).json({ message: 'Email not found in our system' });
+      }
+
+      // Generate OTP (6 digit code)
+      const otp = Math.floor(100000 + Math.random() * 900000).toString();
+      
+      // Save OTP and expiry to user (OTP valid for 10 minutes)
+      user.resetOTP = otp;
+      user.resetOTPExpiry = new Date(Date.now() + 10 * 60 * 1000);
+      await user.save();
+
+      // TODO: Send OTP via email using emailService
+      console.log(`OTP for ${email}: ${otp}`); // For testing
+
+      res.status(200).json({ 
+        message: 'OTP sent to your email',
+        email: email // Return email for OTP verification page
+      });
+    } catch (error) {
+      console.error('Forgot password error:', error);
+      res.status(500).json({ message: 'Server error during password reset' });
+    }
+  }
+);
+
 module.exports = router;

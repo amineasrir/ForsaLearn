@@ -58,6 +58,8 @@ const userSchema = new mongoose.Schema({
   emailVerificationExpires: Date,
   resetPasswordToken: String,
   resetPasswordExpires: Date,
+  resetOTP: String,
+  resetOTPExpiry: Date,
   isActive: {
     type: Boolean,
     default: true
