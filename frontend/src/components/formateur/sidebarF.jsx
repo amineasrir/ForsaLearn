@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import { FaChartBar, FaUser, FaBook, FaUsers, FaQuestionCircle, FaClipboardList, FaTrophy, FaDollarSign, FaEnvelope, FaHeadset, FaCog, FaSignOutAlt } from 'react-icons/fa';
 import { useNavigate, useLocation } from 'react-router-dom';
+import { clearUserSession } from '../../utils/authStorage';
 import '../../styles/formateur.css';  
 
 const SidebarF = ({ activeMenu: propActive, setActiveMenu: propSetActive }) => {
@@ -9,10 +10,7 @@ const SidebarF = ({ activeMenu: propActive, setActiveMenu: propSetActive }) => {
   const [internalActive, setInternalActive] = useState('dashboard');
 
   const handleLogout = () => {
-    // Clear authentication token and user data
-    localStorage.removeItem('token');
-    localStorage.removeItem('user');
-    // Redirect to sign in page
+    clearUserSession();
     navigate('/signin');
   };
 

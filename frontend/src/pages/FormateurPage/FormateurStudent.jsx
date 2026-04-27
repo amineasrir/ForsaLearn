@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import SidebarF from '../../components/formateur/sidebarF';
 import ProfilSection from '../../components/formateur/profilSection';
 import '../../styles/formateur.css';
@@ -6,27 +6,39 @@ import logo_rem from '../../assets/image/home_page/logo_rem.png';
 import i18nInstance from '../../i18n';
 import { useTranslation } from 'react-i18next';
 import 'flag-icons/css/flag-icons.min.css';
-import { useNavigate, useLocation } from 'react-router-dom';
-import { FaCog, FaSignOutAlt } from 'react-icons/fa';
+import {
+  getFormateurProfile,
+  getFormateurStudents
+} from '../../services/formateurService';
 
 const FormateurStudent = () => {
   const { i18n } = useTranslation();
-  const [activeMenu, setActiveMenu] = useState('students');
-  const navigate = useNavigate();
-  const location = useLocation();
+  const [profile, setProfile] = useState(null);
+  const [students, setStudents] = useState([]);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
 
-  // sync active menu based on path
   useEffect(() => {
-    if (location.pathname.includes('/profile')) {
-      setActiveMenu('profile');
-    } else if (location.pathname.includes('/dashboard')) {
-      setActiveMenu('dashboard');
-    } else if (location.pathname.includes('/courses')) {
-      setActiveMenu('mycourses');
-    } else if (location.pathname.includes('/students')) {
-      setActiveMenu('students');
-    }
-  }, [location.pathname]);
+    const loadStudents = async () => {
+      try {
+        setLoading(true);
+        const [profileResponse, studentsResponse] = await Promise.all([
+          getFormateurProfile(),
+          getFormateurStudents()
+        ]);
+
+        setProfile(profileResponse.data?.data || null);
+        setStudents(studentsResponse.data?.data || []);
+      } catch (err) {
+        setError(err.response?.data?.message || 'Failed to load students.');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadStudents();
+  }, []);
 
   const changeLanguage = () => {
     const lang = (i18n && i18n.language === 'en') ? 'fr' : 'en';
@@ -49,18 +61,19 @@ const FormateurStudent = () => {
 
   const currentLang = (i18n && i18n.language) ? i18n.language : 'en';
 
-  const students = [
-    { id: 1, name: 'Ronald Richard', avatar: 'https://via.placeholder.com/120', join: '22 Aug 2025', courses: 10 },
-    { id: 2, name: 'Mona Nancy', avatar: 'https://via.placeholder.com/120', join: '15 Jul 2025', courses: 8 },
-    { id: 3, name: 'Patrick Alleman', avatar: 'https://via.placeholder.com/120', join: '18 Jan 2025', courses: 12 },
-    { id: 4, name: 'Olive Paxson', avatar: 'https://via.placeholder.com/120', join: '03 May 2025', courses: 7 },
-    { id: 5, name: 'Chris Thomas', avatar: 'https://via.placeholder.com/120', join: '14 Apr 2025', courses: 4 },
-    { id: 6, name: 'Joyce Perron', avatar: 'https://via.placeholder.com/120', join: '17 Mar 2025', courses: 11 },
-  ];
+  const filteredStudents = useMemo(() => {
+    const normalized = searchTerm.trim().toLowerCase();
+    if (!normalized) return students;
+
+    return students.filter((entry) => {
+      const name = entry.student?.fullName || '';
+      const email = entry.student?.email || '';
+      return `${name} ${email}`.toLowerCase().includes(normalized);
+    });
+  }, [searchTerm, students]);
 
   return (
     <div className="formateur-page">
-      {/* Navbar */}
       <nav className="navbar-dashboard">
         <div className="navbar-dashboard-content">
           <div className="navbar-dashboard-left">
@@ -83,27 +96,53 @@ const FormateurStudent = () => {
       </nav>
 
       <div className="formateur-container">
-        {/* Sidebar */}
-        <SidebarF activeMenu={activeMenu} setActiveMenu={setActiveMenu} />
+        <SidebarF />
 
-        {/* Main Content */}
         <main className="formateur-main">
-          <ProfilSection />
+          <ProfilSection
+            formateur={{
+              avatar: profile?.profilePicture || 'https://via.placeholder.com/60',
+              name: profile?.fullName || 'Instructor'
+            }}
+            actionLabel="My Courses"
+          />
+
+          {error && <div className="alert alert-error">{error}</div>}
 
           <div className="students-toolbar">
-            <input type="text" placeholder="Search" className="search-input" />
-            {/* view toggle buttons could go here */}
+            <input
+              type="text"
+              placeholder="Search student"
+              className="search-input"
+              value={searchTerm}
+              onChange={(event) => setSearchTerm(event.target.value)}
+            />
           </div>
 
           <div className="students-grid">
-            {students.map((st) => (
-              <div key={st.id} className="student-card">
-                <img src={st.avatar} alt={st.name} />
+            {loading ? (
+              <div className="student-card">
+                <h3>Loading students...</h3>
+              </div>
+            ) : filteredStudents.length === 0 ? (
+              <div className="student-card">
+                <h3>No students found</h3>
+                <p className="join-date">Students will appear here after enrollment.</p>
+              </div>
+            ) : filteredStudents.map((entry) => (
+              <div key={entry.student?._id} className="student-card">
+                <img
+                  src={entry.student?.profilePicture || 'https://via.placeholder.com/120'}
+                  alt={entry.student?.fullName || 'Student'}
+                />
                 <div className="student-role">Active Student</div>
-                <h3>{st.name}</h3>
-                <p className="join-date">Joined {st.join}</p>
+                <h3>{entry.student?.fullName || 'Unknown Student'}</h3>
+                <p className="join-date">
+                  Joined {entry.enrolledAt ? new Date(entry.enrolledAt).toLocaleDateString() : 'N/A'}
+                </p>
+                <p>{entry.student?.email || 'No email available'}</p>
                 <div className="courses-info">
-                  📚 {st.courses} Courses
+                  {entry.coursesEnrolled?.length || 0} Courses • {entry.averageProgress || 0}% Avg Progress
                 </div>
               </div>
             ))}

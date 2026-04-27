@@ -1,24 +1,72 @@
-import React from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import '../../styles/formateur.css';
 import logo_rem from '../../assets/image/home_page/logo_rem.png';
 import SidebarF from '../../components/formateur/sidebarF';
 import ProfilSection from '../../components/formateur/profilSection';
 import { FaDollarSign, FaStar, FaUsers } from 'react-icons/fa';
+import {
+  getFormateurDashboardStats,
+  getFormateurEarnings,
+  getFormateurProfile
+} from '../../services/formateurService';
+
+const formatCurrency = (value) => new Intl.NumberFormat('en-US', {
+  style: 'currency',
+  currency: 'USD',
+  maximumFractionDigits: 0
+}).format(value || 0);
 
 const FormateurEarnings = () => {
-  const stats = [
-    { icon: <FaDollarSign />, label: 'Revenue', value: '$8420', sub: 'Earning this month', color: '#10B981' },
-    { icon: <FaStar />, label: 'Course Ratings', value: '4.8', sub: 'Rating from students', color: '#FFB020' },
-    { icon: <FaUsers />, label: 'Students Enrolled', value: '12000', sub: 'New this month', color: '#4F46E5' },
-  ];
+  const [profile, setProfile] = useState(null);
+  const [summary, setSummary] = useState(null);
+  const [payments, setPayments] = useState([]);
+  const [dashboardStats, setDashboardStats] = useState(null);
+  const [error, setError] = useState('');
 
-  const earnings = [
-    { id: 'ORD001', date: '28 Jan 2025', course: 'Information about UI/UX Design Degree', amount: '$160' },
-    { id: 'ORD002', date: '28 Jan 2025', course: 'Wordpress for Beginners - Master Wordpress Quickly', amount: '$190' },
-    { id: 'ORD003', date: '17 Jan 2025', course: 'Sketch from A to Z (2024): Become an app designer', amount: '$200' },
-    { id: 'ORD004', date: '09 Jan 2025', course: 'Learn Angular Fundamental From beginning to advance', amount: '$170' },
-    { id: 'ORD005', date: '03 Jan 2025', course: 'C# Developers Double Your Coding Speed', amount: '$120' },
-  ];
+  useEffect(() => {
+    const loadEarnings = async () => {
+      try {
+        const [profileResponse, earningsResponse, statsResponse] = await Promise.all([
+          getFormateurProfile(),
+          getFormateurEarnings(),
+          getFormateurDashboardStats()
+        ]);
+
+        setProfile(profileResponse.data?.data || null);
+        setSummary(earningsResponse.data?.summary || null);
+        setPayments(earningsResponse.data?.payments || []);
+        setDashboardStats(statsResponse.data?.data || null);
+      } catch (err) {
+        setError(err.response?.data?.message || 'Failed to load earnings.');
+      }
+    };
+
+    loadEarnings();
+  }, []);
+
+  const stats = useMemo(() => ([
+    {
+      icon: <FaDollarSign />,
+      label: 'Revenue',
+      value: formatCurrency(summary?.totalEarnings),
+      sub: `${summary?.totalTransactions || 0} completed transactions`,
+      color: '#10B981'
+    },
+    {
+      icon: <FaStar />,
+      label: 'Course Ratings',
+      value: dashboardStats?.overview?.averageRating || 0,
+      sub: 'Average rating from students',
+      color: '#FFB020'
+    },
+    {
+      icon: <FaUsers />,
+      label: 'Students Enrolled',
+      value: dashboardStats?.overview?.totalEnrollments || 0,
+      sub: 'Across all active courses',
+      color: '#4F46E5'
+    }
+  ]), [dashboardStats?.overview?.averageRating, dashboardStats?.overview?.totalEnrollments, summary?.totalEarnings, summary?.totalTransactions]);
 
   return (
     <div className="formateur-page">
@@ -39,7 +87,15 @@ const FormateurEarnings = () => {
       <div className="formateur-container">
         <SidebarF />
         <main className="formateur-main">
-          <ProfilSection formateur={{ name: 'Elnhouat chaima', avatar: 'https://via.placeholder.com/80' }} />
+          <ProfilSection
+            formateur={{
+              avatar: profile?.profilePicture || 'https://via.placeholder.com/80',
+              name: profile?.fullName || 'Instructor'
+            }}
+            actionLabel="View Certificates"
+          />
+
+          {error && <div className="alert alert-error">{error}</div>}
 
           <div className="earnings-section">
             <div style={{ marginBottom: '1rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -47,13 +103,13 @@ const FormateurEarnings = () => {
             </div>
 
             <div className="stats-grid">
-              {stats.map((s, i) => (
-                <div key={i} className="stat-card" style={{ borderLeftColor: s.color }}>
-                  <div className="stat-icon" style={{ color: s.color, fontSize: '1.8rem' }}>{s.icon}</div>
+              {stats.map((item) => (
+                <div key={item.label} className="stat-card" style={{ borderLeftColor: item.color }}>
+                  <div className="stat-icon" style={{ color: item.color, fontSize: '1.8rem' }}>{item.icon}</div>
                   <div className="stat-info">
-                    <p className="stat-label">{s.label}</p>
-                    <h3 className="stat-value">{s.value}</h3>
-                    <p style={{ margin: 0, color: '#6b7280', fontSize: '0.9rem' }}>{s.sub}</p>
+                    <p className="stat-label">{item.label}</p>
+                    <h3 className="stat-value">{item.value}</h3>
+                    <p style={{ margin: 0, color: '#6b7280', fontSize: '0.9rem' }}>{item.sub}</p>
                   </div>
                 </div>
               ))}
@@ -62,22 +118,29 @@ const FormateurEarnings = () => {
             <div style={{ marginTop: '1.5rem' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
                 <h3>Orders</h3>
-                <div style={{ color: '#6b7280', fontSize: '0.9rem' }}>01 Jan 2025 - 31 Jan 2025</div>
+                <div style={{ color: '#6b7280', fontSize: '0.9rem' }}>{payments.length} transactions</div>
               </div>
 
               <div className="courses-table" style={{ background: '#fff', borderRadius: 8, padding: '1rem' }}>
-                <div className="table-header" style={{ display: 'flex', fontWeight: 700, padding: '0.75rem 1rem', borderBottom: '1px solid #eef2f7' }}>
-                  <div style={{ flex: 1 }}>Order ID</div>
-                  <div style={{ width: 140 }}>Date</div>
-                  <div style={{ flex: 3 }}>Course</div>
-                  <div style={{ width: 100, textAlign: 'right' }}>Amount</div>
+                <div className="table-header formateur-earnings-header" style={{ fontWeight: 700, padding: '0.75rem 1rem', borderBottom: '1px solid #eef2f7' }}>
+                  <div>Transaction ID</div>
+                  <div>Date</div>
+                  <div>Course</div>
+                  <div style={{ textAlign: 'right' }}>Amount</div>
                 </div>
-                {earnings.map((row) => (
-                  <div key={row.id} className="table-row" style={{ display: 'flex', alignItems: 'center', padding: '0.75rem 1rem', borderBottom: '1px solid #f3f4f6' }}>
-                    <div style={{ flex: 1 }}>{row.id}</div>
-                    <div style={{ width: 140 }}>{row.date}</div>
-                    <div style={{ flex: 3 }}>{row.course}</div>
-                    <div style={{ width: 100, textAlign: 'right' }}>{row.amount}</div>
+                {payments.length === 0 ? (
+                  <div className="table-row formateur-earnings-row" style={{ padding: '0.75rem 1rem' }}>
+                    <div>No completed payouts yet.</div>
+                    <div>-</div>
+                    <div>-</div>
+                    <div style={{ textAlign: 'right' }}>$0</div>
+                  </div>
+                ) : payments.map((payment) => (
+                  <div key={payment._id} className="table-row formateur-earnings-row" style={{ alignItems: 'center', padding: '0.75rem 1rem', borderBottom: '1px solid #f3f4f6' }}>
+                    <div>{payment.paymentProvider?.transactionId || payment._id}</div>
+                    <div>{payment.paidAt ? new Date(payment.paidAt).toLocaleDateString() : 'Pending'}</div>
+                    <div>{payment.course?.title || 'Course'}</div>
+                    <div style={{ textAlign: 'right' }}>{formatCurrency(payment.formateurEarnings)}</div>
                   </div>
                 ))}
               </div>

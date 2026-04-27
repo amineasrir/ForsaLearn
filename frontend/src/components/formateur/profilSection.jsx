@@ -1,7 +1,23 @@
-import React from 'react'
+import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import '../../styles/formateur.css';
 
-const ProfilSection = ({ formateur = { avatar: 'https://via.placeholder.com/60', name: 'Instructor Name' } }) => {
+const ProfilSection = ({
+  formateur = { avatar: 'https://via.placeholder.com/60', name: 'Instructor Name' },
+  actionLabel = 'Add New Course',
+  onAction
+}) => {
+  const navigate = useNavigate();
+
+  const handleAction = () => {
+    if (onAction) {
+      onAction();
+      return;
+    }
+
+    navigate('/formateur/courses');
+  };
+
   return (
     <div>
       <div className="profile-section" style={{marginTop:"20px"}}>
@@ -13,7 +29,7 @@ const ProfilSection = ({ formateur = { avatar: 'https://via.placeholder.com/60',
               </div>
             </div>
             <div className="profile-actions">
-              <button className="add-course-btn">Add New Course</button>
+              <button className="add-course-btn" onClick={handleAction}>{actionLabel}</button>
             </div>
           </div>
     </div>

@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const { body, validationResult } = require('express-validator');
 const Course = require('../models/Course');
-const { Visiteur } = require('../models/User');
+const { Formateur } = require('../models/User');
 const { protect, authorize, checkFormateurApproval } = require('../middleware/auth');
 
 // All formateur routes require authentication and formateur role
@@ -540,7 +540,7 @@ router.get('/courses/:id/analytics', async (req, res) => {
       enrollmentsByMonth[month] = (enrollmentsByMonth[month] || 0) + 1;
     });
     
-    res.status(200).json({
+    res.status(200).json({ 
       success: true,
       data: {
         overview: {
@@ -558,6 +558,51 @@ router.get('/courses/:id/analytics', async (req, res) => {
   } catch (error) {
     console.error('Get analytics error:', error);
     res.status(500).json({ message: 'Error fetching analytics' });
+  }
+});
+
+// Get profile of formateur
+router.get('/profile', async (req, res) => {
+  try {
+    const formateur = await Formateur.findById(req.user.id).select('-password');
+    if (!formateur) {
+      return res.status(404).json({ success: false, message: 'Formateur not found' });
+    }
+    res.json({ success: true, data: formateur });
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).json({ success: false, message: 'Server Error' });
+  }
+});
+
+// Update formateur profile
+router.put('/profile', async (req, res) => {
+  const { fullName, email, phoneNumber, bio, field, skills, profilePicture, language } = req.body;
+  
+  try {
+    let formateur = await Formateur.findById(req.user.id);
+    if (!formateur) {
+      return res.status(404).json({ success: false, message: 'Formateur not found' });
+    }
+    
+    formateur.fullName = fullName || formateur.fullName;
+    formateur.email = email || formateur.email;
+    formateur.phoneNumber = phoneNumber || formateur.phoneNumber;
+    formateur.bio = bio !== undefined ? bio : formateur.bio;
+    formateur.field = field || formateur.field;
+    formateur.profilePicture = profilePicture || formateur.profilePicture;
+    formateur.language = language || formateur.language;
+
+    if (Array.isArray(skills)) {
+      formateur.skills = skills;
+    }
+
+    await formateur.save();
+    
+    res.json({ success: true, data: formateur });
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).json({ success: false, message: 'Server Error' });
   }
 });
 

@@ -1,4 +1,10 @@
 const mongoose = require('mongoose');
+const slugify = (value = '') => value
+  .toString()
+  .trim()
+  .toLowerCase()
+  .replace(/[^a-z0-9]+/g, '-')
+  .replace(/(^-|-$)/g, '');
 
 const courseSchema = new mongoose.Schema({
   title: {
@@ -186,6 +192,16 @@ const courseSchema = new mongoose.Schema({
     completedLessons: [{
       type: mongoose.Schema.Types.ObjectId
     }],
+    completedAt: {
+      type: Date
+    },
+    certificateIssued: {
+      type: Boolean,
+      default: false
+    },
+    certificateUrl: {
+      type: String
+    },
     lastAccessedAt: {
       type: Date,
       default: Date.now
@@ -283,6 +299,136 @@ const courseSchema = new mongoose.Schema({
   toJSON: { virtuals: true },
   toObject: { virtuals: true }
 });
+
+courseSchema.pre('save', function(next) {
+  if ((this.isModified('title') || !this.slug) && this.title) {
+    this.slug = slugify(this.title);
+  }
+
+  if (this.isModified('sections')) {
+    const lessons = (this.sections || []).flatMap((section) => section.lessons || []);
+    this.totalDuration = lessons.reduce((sum, lesson) => sum + Number(lesson.duration || 0), 0);
+  }
+
+  next();
+});
+
+courseSchema.methods.enrollStudent = async function(studentId) {
+  const alreadyEnrolled = this.enrolledStudents.some(
+    (enrollment) => enrollment.student.toString() === studentId.toString()
+  );
+
+  if (alreadyEnrolled) {
+    throw new Error('Student already enrolled in this course');
+  }
+
+  this.enrolledStudents.push({
+    student: studentId,
+    enrolledAt: new Date(),
+    progress: 0,
+    completedLessons: [],
+    lastAccessedAt: new Date()
+  });
+
+  this.totalEnrollments = this.enrolledStudents.length;
+
+  if (Number(this.price || 0) > 0) {
+    this.totalRevenue += Number(this.finalPrice || this.price || 0);
+  }
+
+  await this.save();
+  return this;
+};
+
+courseSchema.methods.updateProgress = function(studentId, lessonId) {
+  const enrollment = this.enrolledStudents.find(
+    (item) => item.student.toString() === studentId.toString()
+  );
+
+  if (!enrollment) {
+    throw new Error('Student is not enrolled in this course');
+  }
+
+  const normalizedLessonId = lessonId.toString();
+  const alreadyCompleted = enrollment.completedLessons.some(
+    (completedLessonId) => completedLessonId.toString() === normalizedLessonId
+  );
+
+  if (!alreadyCompleted) {
+    enrollment.completedLessons.push(new mongoose.Types.ObjectId(normalizedLessonId));
+  }
+
+  const totalLessons = (this.sections || []).reduce(
+    (sum, section) => sum + ((section.lessons || []).length),
+    0
+  );
+
+  const completedLessonsCount = enrollment.completedLessons.length;
+  enrollment.progress = totalLessons > 0
+    ? Math.min(100, Math.round((completedLessonsCount / totalLessons) * 100))
+    : 0;
+  enrollment.lastAccessedAt = new Date();
+
+  if (enrollment.progress >= 100 && !enrollment.completedAt) {
+    enrollment.completedAt = new Date();
+  }
+
+  return enrollment;
+};
+
+courseSchema.methods.calculateAverageRating = function() {
+  if (!this.reviews.length) {
+    this.averageRating = 0;
+    this.totalReviews = 0;
+    return;
+  }
+
+  const totalRating = this.reviews.reduce((sum, review) => sum + Number(review.rating || 0), 0);
+  this.totalReviews = this.reviews.length;
+  this.averageRating = Number((totalRating / this.reviews.length).toFixed(1));
+};
+
+courseSchema.virtual('finalPrice').get(function() {
+  const discountPercentage = Number(this.discount?.percentage || 0);
+  if (!discountPercentage) {
+    return Number(this.price || 0);
+  }
+
+  const discountAmount = (Number(this.price || 0) * discountPercentage) / 100;
+  return Math.max(0, Number(this.price || 0) - discountAmount);
+});
+
+courseSchema.statics.searchCourses = function(query) {
+  return this.find({
+    isPublished: true,
+    status: 'published',
+    $or: [
+      { title: { $regex: query, $options: 'i' } },
+      { description: { $regex: query, $options: 'i' } },
+      { category: { $regex: query, $options: 'i' } },
+      { tags: { $in: [new RegExp(query, 'i')] } }
+    ]
+  });
+};
+
+courseSchema.statics.findFeatured = function(limit = 8) {
+  return this.find({
+    isPublished: true,
+    status: 'published',
+    isFeatured: true
+  })
+    .sort({ createdAt: -1 })
+    .limit(limit);
+};
+
+courseSchema.statics.findPopular = function(limit = 10) {
+  return this.find({
+    isPublished: true,
+    status: 'published'
+  })
+    .sort({ totalEnrollments: -1, averageRating: -1 })
+    .limit(limit);
+};
 
 const Course = mongoose.model('Course', courseSchema);
 

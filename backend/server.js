@@ -93,6 +93,10 @@ app.use('/api/admin', adminRoutes);
 const formateurRoutes = require('./routes/formateur');
 app.use('/api/formateur', formateurRoutes);
 
+// Visiteur Routes
+const visiteurRoutes = require('./routes/visiteur');
+app.use('/api/visiteurs', visiteurRoutes);
+
 // Upload Routes
 const uploadRoutes = require('./routes/upload');
 app.use('/api/upload', uploadRoutes);

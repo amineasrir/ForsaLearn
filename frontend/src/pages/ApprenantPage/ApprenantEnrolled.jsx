@@ -116,7 +116,11 @@ const ApprenantEnrolled = () => {
                     </div>
                     <div className="course-action">
                       <span className="price">{course.priceType === 'free' ? 'Free' : `$${Number(course.price || 0).toFixed(2)}`}</span>
-                      <button className="view-course-btn">Progress {course.myProgress || 0}%</button>
+                      <button className="view-course-btn">
+                        {Number(course.myProgress || 0) >= 100 && course.certificateIssued
+                          ? 'Certificate Earned'
+                          : `Progress ${course.myProgress || 0}%`}
+                      </button>
                     </div>
                   </div>
                 </div>

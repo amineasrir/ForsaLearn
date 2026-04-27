@@ -57,3 +57,52 @@ export const approveFormateur = (id) => {
 export const rejectFormateur = (id, reason) => {
   return API.patch(`admin/formateurs/${id}/reject`, { reason });
 };
+
+export const getAdminConversations = (params = {}) => {
+  const searchParams = new URLSearchParams();
+
+  Object.entries(params).forEach(([key, value]) => {
+    if (value !== undefined && value !== null && value !== "" && value !== "all") {
+      searchParams.append(key, value);
+    }
+  });
+
+  const query = searchParams.toString();
+  return API.get(`messages/conversations${query ? `?${query}` : ""}`);
+};
+
+export const getAdminConversationMessages = (conversationId) => {
+  return API.get(`messages/conversations/${conversationId}/messages`);
+};
+
+export const sendAdminConversationMessage = (conversationId, payload) => {
+  return API.post(`messages/conversations/${conversationId}/messages`, payload);
+};
+
+export const markAdminConversationAsRead = (conversationId) => {
+  return API.patch(`messages/conversations/${conversationId}/read-all`);
+};
+
+export const getAdminUnreadMessagesCount = () => {
+  return API.get("messages/unread-count");
+};
+
+export const pinAdminConversation = (conversationId) => {
+  return API.patch(`messages/conversations/${conversationId}/pin`);
+};
+
+export const unpinAdminConversation = (conversationId) => {
+  return API.patch(`messages/conversations/${conversationId}/unpin`);
+};
+
+export const muteAdminConversation = (conversationId) => {
+  return API.patch(`messages/conversations/${conversationId}/mute`);
+};
+
+export const unmuteAdminConversation = (conversationId) => {
+  return API.patch(`messages/conversations/${conversationId}/unmute`);
+};
+
+export const archiveAdminConversation = (conversationId) => {
+  return API.patch(`messages/conversations/${conversationId}/archive`);
+};
