@@ -3,6 +3,20 @@
 .conversations-main {
     max-width: 100% !important;
   }
+
+  .admin-chat-alert {
+    margin: 16px 0;
+    padding: 12px 16px;
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 500;
+  }
+
+  .admin-chat-alert.error {
+    background: #fef2f2;
+    color: #b91c1c;
+    border: 1px solid #fecaca;
+  }
   
   /* Messages Container */
   .messages-container {
@@ -364,6 +378,13 @@
     flex-direction: column;
     gap: 4px;
   }
+
+  .message-sender-name {
+    font-size: 12px;
+    font-weight: 600;
+    color: #6b7280;
+    padding: 0 4px;
+  }
   
   .message-text {
     padding: 10px 14px;
@@ -501,6 +522,13 @@
   .no-conversation-selected p {
     font-size: 14px;
     color: #9ca3af;
+  }
+
+  .chat-placeholder-state {
+    margin: auto;
+    color: #9ca3af;
+    font-size: 14px;
+    text-align: center;
   }
   
   /* Scrollbar */

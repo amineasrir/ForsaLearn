@@ -1,287 +1,124 @@
-import React, { useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import '../../styles/dashboard.css';
 import '../../styles/conversations-admin.css';
-import { 
+import {
   FaSearch,
-  FaFilter,
-  FaPlus,
   FaUsers,
   FaUser,
   FaHeadset,
   FaPaperPlane,
-  FaPaperclip,
   FaEllipsisV,
   FaArchive,
-  FaTrash,
   FaBell,
   FaBellSlash,
   FaThumbtack,
-  FaBookOpen,
-  FaCircle,
-  FaClock,
-  FaCheckDouble,
-  FaCheck
+  FaBookOpen
 } from 'react-icons/fa';
 import Header from '../../components/admin/Header';
 import Sidebar from '../../components/admin/Sidebar';
 import ProfileCard from '../../components/admin/ProfileCard';
+import {
+  archiveAdminConversation,
+  getAdminConversationMessages,
+  getAdminConversations,
+  getAdminProfile,
+  getAdminUnreadMessagesCount,
+  markAdminConversationAsRead,
+  muteAdminConversation,
+  pinAdminConversation,
+  sendAdminConversationMessage,
+  unmuteAdminConversation,
+  unpinAdminConversation
+} from '../../services/adminService';
+
+const formatTime = (value) => {
+  if (!value) return '';
+
+  return new Date(value).toLocaleTimeString([], {
+    hour: '2-digit',
+    minute: '2-digit'
+  });
+};
+
+const formatConversationTime = (value) => {
+  if (!value) return '';
+
+  const messageDate = new Date(value);
+  const today = new Date();
+  const diffInHours = (today - messageDate) / (1000 * 60 * 60);
+
+  if (diffInHours < 24) {
+    return messageDate.toLocaleTimeString([], {
+      hour: '2-digit',
+      minute: '2-digit'
+    });
+  }
+
+  if (diffInHours < 48) {
+    return 'Yesterday';
+  }
+
+  return messageDate.toLocaleDateString([], {
+    month: 'short',
+    day: 'numeric'
+  });
+};
+
+const getConversationLabel = (conversation, currentUserId) => {
+  if (conversation.name) {
+    return conversation.name;
+  }
+
+  const otherParticipant = (conversation.participants || []).find(
+    (participant) => participant._id !== currentUserId
+  );
+
+  return otherParticipant?.fullName || 'Conversation';
+};
+
+const getConversationAvatar = (conversation, currentUserId) => {
+  if (conversation.type === 'group' || conversation.type === 'support') {
+    return null;
+  }
+
+  const otherParticipant = (conversation.participants || []).find(
+    (participant) => participant._id !== currentUserId
+  );
+
+  return otherParticipant?.profilePicture || 'https://via.placeholder.com/50x50?text=U';
+};
+
+const getLastMessagePreview = (conversation) => {
+  const content = conversation.lastMessage?.content;
+
+  if (!content) {
+    return 'No messages yet';
+  }
+
+  return content.length > 60 ? `${content.slice(0, 60)}...` : content;
+};
+
+const getConversationType = (conversation) => {
+  if (conversation.type === 'support') return 'support';
+  if (conversation.type === 'group') return 'group';
+  return 'direct';
+};
 
 const Conversations = () => {
+  const [admin, setAdmin] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [filterType, setFilterType] = useState('all');
-  const [selectedConversation, setSelectedConversation] = useState(null);
+  const [selectedConversationId, setSelectedConversationId] = useState(null);
   const [messageInput, setMessageInput] = useState('');
-
-  // Sample conversations data based on the schema
-  const conversationsData = [
-    {
-      _id: '1',
-      type: 'direct',
-      participants: [
-        {
-          _id: 'user1',
-          fullName: 'John Smith',
-          email: 'john.smith@example.com',
-          role: 'visiteur',
-          profilePicture: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100'
-        },
-        {
-          _id: 'user2',
-          fullName: 'Sarah Johnson',
-          email: 'sarah.johnson@example.com',
-          role: 'formateur',
-          profilePicture: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100'
-        }
-      ],
-      lastMessage: {
-        _id: 'msg1',
-        content: 'Thank you for the explanation! That really helped.',
-        sender: 'user1',
-        createdAt: new Date('2024-03-02T10:30:00'),
-        isRead: true
-      },
-      lastMessageAt: new Date('2024-03-02T10:30:00'),
-      isActive: true,
-      mutedBy: [],
-      pinnedBy: ['currentUser'],
-      archivedBy: [],
-      unreadCount: 0,
-      isOnline: true
-    },
-    {
-      _id: '2',
-      type: 'group',
-      name: 'Web Development Study Group',
-      participants: [
-        {
-          _id: 'user3',
-          fullName: 'Ahmed Ali',
-          profilePicture: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=100'
-        },
-        {
-          _id: 'user4',
-          fullName: 'Emily Chen',
-          profilePicture: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=100'
-        },
-        {
-          _id: 'user5',
-          fullName: 'Mohammed Hassan',
-          profilePicture: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100'
-        }
-      ],
-      groupAdmin: 'user3',
-      lastMessage: {
-        _id: 'msg2',
-        content: 'Has anyone completed the React assignment yet?',
-        sender: 'user4',
-        createdAt: new Date('2024-03-02T09:15:00'),
-        isRead: false
-      },
-      lastMessageAt: new Date('2024-03-02T09:15:00'),
-      isActive: true,
-      mutedBy: [],
-      pinnedBy: [],
-      archivedBy: [],
-      unreadCount: 3,
-      course: {
-        _id: 'course1',
-        title: 'Complete Web Development Bootcamp',
-        thumbnail: 'https://images.unsplash.com/photo-1498050108023-c5249f4df085?w=100'
-      }
-    },
-    {
-      _id: '3',
-      type: 'support',
-      name: 'Support Ticket #1234',
-      participants: [
-        {
-          _id: 'admin1',
-          fullName: 'Admin Support',
-          role: 'admin',
-          profilePicture: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100'
-        },
-        {
-          _id: 'user6',
-          fullName: 'Lisa Anderson',
-          role: 'visiteur',
-          profilePicture: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=100'
-        }
-      ],
-      lastMessage: {
-        _id: 'msg3',
-        content: 'We are looking into your payment issue. Will update you shortly.',
-        sender: 'admin1',
-        createdAt: new Date('2024-03-01T16:45:00'),
-        isRead: true
-      },
-      lastMessageAt: new Date('2024-03-01T16:45:00'),
-      isActive: true,
-      mutedBy: [],
-      pinnedBy: [],
-      archivedBy: [],
-      unreadCount: 0,
-      isOnline: true
-    },
-    {
-      _id: '4',
-      type: 'direct',
-      participants: [
-        {
-          _id: 'user7',
-          fullName: 'Dr. Ahmed Hassan',
-          role: 'formateur',
-          profilePicture: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100'
-        },
-        {
-          _id: 'currentUser',
-          fullName: 'Current User',
-          profilePicture: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100'
-        }
-      ],
-      lastMessage: {
-        _id: 'msg4',
-        content: 'Could you review my course outline when you have time?',
-        sender: 'currentUser',
-        createdAt: new Date('2024-03-01T14:20:00'),
-        isRead: false
-      },
-      lastMessageAt: new Date('2024-03-01T14:20:00'),
-      isActive: true,
-      mutedBy: [],
-      pinnedBy: [],
-      archivedBy: [],
-      unreadCount: 0,
-      isOnline: false
-    },
-    {
-      _id: '5',
-      type: 'group',
-      name: 'Data Science - Q&A',
-      participants: [
-        {
-          _id: 'user8',
-          fullName: 'Sarah Johnson',
-          profilePicture: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100'
-        },
-        {
-          _id: 'user9',
-          fullName: 'David Martinez',
-          profilePicture: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=100'
-        }
-      ],
-      groupAdmin: 'user8',
-      lastMessage: {
-        _id: 'msg5',
-        content: 'The pandas dataframe tutorial was really helpful!',
-        sender: 'user9',
-        createdAt: new Date('2024-02-29T11:30:00'),
-        isRead: true
-      },
-      lastMessageAt: new Date('2024-02-29T11:30:00'),
-      isActive: true,
-      mutedBy: ['currentUser'],
-      pinnedBy: [],
-      archivedBy: [],
-      unreadCount: 12,
-      course: {
-        _id: 'course2',
-        title: 'Data Science with Python',
-        thumbnail: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=100'
-      }
-    },
-    {
-      _id: '6',
-      type: 'direct',
-      participants: [
-        {
-          _id: 'user10',
-          fullName: 'Emily Chen',
-          role: 'visiteur',
-          profilePicture: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=100'
-        },
-        {
-          _id: 'currentUser',
-          fullName: 'Current User',
-          profilePicture: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100'
-        }
-      ],
-      lastMessage: {
-        _id: 'msg6',
-        content: 'Thanks for your help with the assignment!',
-        sender: 'user10',
-        createdAt: new Date('2024-02-28T08:15:00'),
-        isRead: true
-      },
-      lastMessageAt: new Date('2024-02-28T08:15:00'),
-      isActive: true,
-      mutedBy: [],
-      pinnedBy: [],
-      archivedBy: [],
-      unreadCount: 0,
-      isOnline: true
-    }
-  ];
-
-  // Sample messages for selected conversation
-  const messagesData = {
-    '1': [
-      {
-        _id: 'msg1-1',
-        sender: 'user1',
-        content: 'Hi! I have a question about the React hooks lecture.',
-        createdAt: new Date('2024-03-02T10:15:00'),
-        isRead: true
-      },
-      {
-        _id: 'msg1-2',
-        sender: 'user2',
-        content: 'Sure! What would you like to know?',
-        createdAt: new Date('2024-03-02T10:20:00'),
-        isRead: true
-      },
-      {
-        _id: 'msg1-3',
-        sender: 'user1',
-        content: 'Can you explain the difference between useState and useEffect?',
-        createdAt: new Date('2024-03-02T10:25:00'),
-        isRead: true
-      },
-      {
-        _id: 'msg1-4',
-        sender: 'user2',
-        content: 'Of course! useState is for managing state in functional components, while useEffect is for side effects like API calls or subscriptions.',
-        createdAt: new Date('2024-03-02T10:28:00'),
-        isRead: true
-      },
-      {
-        _id: 'msg1-5',
-        sender: 'user1',
-        content: 'Thank you for the explanation! That really helped.',
-        createdAt: new Date('2024-03-02T10:30:00'),
-        isRead: true
-      }
-    ]
-  };
+  const [conversations, setConversations] = useState([]);
+  const [messages, setMessages] = useState([]);
+  const [loadingConversations, setLoadingConversations] = useState(true);
+  const [loadingMessages, setLoadingMessages] = useState(false);
+  const [sending, setSending] = useState(false);
+  const [error, setError] = useState('');
+  const [unreadTotal, setUnreadTotal] = useState(0);
+  const messagesEndRef = useRef(null);
+  const lastLoadedConversationRef = useRef(null);
 
   const typeOptions = [
     { value: 'all', label: 'All Conversations', icon: <FaUsers /> },
@@ -290,88 +127,249 @@ const Conversations = () => {
     { value: 'support', label: 'Support', icon: <FaHeadset /> }
   ];
 
-  // Filter conversations
-  const filteredConversations = conversationsData.filter(conv => {
-    const matchesType = filterType === 'all' || conv.type === filterType;
-    
-    let matchesSearch = false;
-    if (conv.type === 'direct') {
-      const otherParticipant = conv.participants.find(p => p._id !== 'currentUser');
-      matchesSearch = otherParticipant?.fullName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                     otherParticipant?.email?.toLowerCase().includes(searchTerm.toLowerCase());
-    } else {
-      matchesSearch = conv.name?.toLowerCase().includes(searchTerm.toLowerCase());
+  useEffect(() => {
+    const loadInitialData = async () => {
+      try {
+        setLoadingConversations(true);
+        setError('');
+
+        const [profileResponse, conversationsResponse, unreadResponse] = await Promise.all([
+          getAdminProfile(),
+          getAdminConversations(),
+          getAdminUnreadMessagesCount()
+        ]);
+
+        const currentAdmin = profileResponse.data?.user || null;
+        const loadedConversations = conversationsResponse.data?.data || [];
+
+        setAdmin(currentAdmin);
+        setConversations(loadedConversations);
+        setUnreadTotal(unreadResponse.data?.data?.unreadCount || 0);
+        setSelectedConversationId((currentId) => currentId || loadedConversations[0]?._id || null);
+      } catch (err) {
+        setError(err.response?.data?.message || 'Failed to load conversations.');
+      } finally {
+        setLoadingConversations(false);
+      }
+    };
+
+    loadInitialData();
+  }, []);
+
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [messages]);
+
+  const filteredConversations = useMemo(() => {
+    const normalizedSearch = searchTerm.trim().toLowerCase();
+
+    return conversations
+      .filter((conversation) => {
+        const matchesType = filterType === 'all' || getConversationType(conversation) === filterType;
+
+        if (!matchesType) {
+          return false;
+        }
+
+        if (!normalizedSearch) {
+          return true;
+        }
+
+        const label = getConversationLabel(conversation, admin?._id).toLowerCase();
+        const participantMatch = (conversation.participants || []).some((participant) =>
+          `${participant.fullName || ''} ${participant.email || ''}`.toLowerCase().includes(normalizedSearch)
+        );
+        const courseMatch = (conversation.course?.title || '').toLowerCase().includes(normalizedSearch);
+
+        return label.includes(normalizedSearch) || participantMatch || courseMatch;
+      })
+      .sort((a, b) => {
+        const aPinned = (a.pinnedBy || []).includes(admin?._id);
+        const bPinned = (b.pinnedBy || []).includes(admin?._id);
+
+        if (aPinned && !bPinned) return -1;
+        if (!aPinned && bPinned) return 1;
+
+        return new Date(b.lastMessageAt || 0) - new Date(a.lastMessageAt || 0);
+      });
+  }, [admin?._id, conversations, filterType, searchTerm]);
+
+  const selectedConversation = useMemo(
+    () => conversations.find((conversation) => conversation._id === selectedConversationId) || null,
+    [conversations, selectedConversationId]
+  );
+
+  useEffect(() => {
+    if (!selectedConversationId) {
+      setMessages([]);
+      return;
     }
-    
-    return matchesType && (searchTerm === '' || matchesSearch);
-  });
 
-  // Sort: pinned first, then by lastMessageAt
-  const sortedConversations = filteredConversations.sort((a, b) => {
-    const aPinned = a.pinnedBy.includes('currentUser');
-    const bPinned = b.pinnedBy.includes('currentUser');
-    
-    if (aPinned && !bPinned) return -1;
-    if (!aPinned && bPinned) return 1;
-    
-    return new Date(b.lastMessageAt) - new Date(a.lastMessageAt);
-  });
+    if (lastLoadedConversationRef.current === selectedConversationId) {
+      return;
+    }
 
-  // Get conversation display info
-  const getConversationDisplay = (conv) => {
-    if (conv.type === 'direct') {
-      const otherParticipant = conv.participants.find(p => p._id !== 'currentUser');
-      return {
-        name: otherParticipant?.fullName || 'Unknown User',
-        avatar: otherParticipant?.profilePicture,
-        isOnline: conv.isOnline
-      };
-    } else {
-      return {
-        name: conv.name,
-        avatar: conv.course?.thumbnail || null,
-        isOnline: false
-      };
+    const loadMessages = async () => {
+      try {
+        setLoadingMessages(true);
+        setError('');
+
+        const unreadBeforeOpening = selectedConversation?.unreadCount || 0;
+
+        const response = await getAdminConversationMessages(selectedConversationId);
+        setMessages(response.data?.data || []);
+
+        await markAdminConversationAsRead(selectedConversationId);
+        setConversations((prev) => prev.map((conversation) => (
+          conversation._id === selectedConversationId
+            ? { ...conversation, unreadCount: 0 }
+            : conversation
+        )));
+        setUnreadTotal((prev) => Math.max(0, prev - unreadBeforeOpening));
+        lastLoadedConversationRef.current = selectedConversationId;
+      } catch (err) {
+        setError(err.response?.data?.message || 'Failed to load messages.');
+      } finally {
+        setLoadingMessages(false);
+      }
+    };
+
+    loadMessages();
+  }, [selectedConversation, selectedConversationId]);
+
+  const stats = useMemo(() => ({
+    total: conversations.length,
+    direct: conversations.filter((conversation) => getConversationType(conversation) === 'direct').length,
+    groups: conversations.filter((conversation) => getConversationType(conversation) === 'group').length,
+    support: conversations.filter((conversation) => getConversationType(conversation) === 'support').length,
+    unread: unreadTotal
+  }), [conversations, unreadTotal]);
+
+  const handleSelectConversation = (conversationId) => {
+    lastLoadedConversationRef.current = null;
+    setSelectedConversationId(conversationId);
+  };
+
+  const updateConversationState = (conversationId, updates) => {
+    setConversations((prev) => prev.map((conversation) => (
+      conversation._id === conversationId
+        ? { ...conversation, ...updates }
+        : conversation
+    )));
+  };
+
+  const handleTogglePin = async () => {
+    if (!selectedConversation || !admin?._id) return;
+
+    const isPinned = (selectedConversation.pinnedBy || []).includes(admin._id);
+
+    try {
+      if (isPinned) {
+        await unpinAdminConversation(selectedConversation._id);
+        updateConversationState(
+          selectedConversation._id,
+          {
+            pinnedBy: (selectedConversation.pinnedBy || []).filter((id) => id !== admin._id)
+          }
+        );
+      } else {
+        await pinAdminConversation(selectedConversation._id);
+        updateConversationState(
+          selectedConversation._id,
+          {
+            pinnedBy: [...(selectedConversation.pinnedBy || []), admin._id]
+          }
+        );
+      }
+    } catch (err) {
+      setError(err.response?.data?.message || 'Failed to update pin status.');
     }
   };
 
-  // Format time
-  const formatTime = (date) => {
-    const now = new Date();
-    const messageDate = new Date(date);
-    const diffInHours = (now - messageDate) / (1000 * 60 * 60);
-    
-    if (diffInHours < 24) {
-      return messageDate.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
-    } else if (diffInHours < 48) {
-      return 'Yesterday';
-    } else {
-      return messageDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+  const handleToggleMute = async () => {
+    if (!selectedConversation || !admin?._id) return;
+
+    const isMuted = (selectedConversation.mutedBy || []).includes(admin._id);
+
+    try {
+      if (isMuted) {
+        await unmuteAdminConversation(selectedConversation._id);
+        updateConversationState(
+          selectedConversation._id,
+          {
+            mutedBy: (selectedConversation.mutedBy || []).filter((id) => id !== admin._id)
+          }
+        );
+      } else {
+        await muteAdminConversation(selectedConversation._id);
+        updateConversationState(
+          selectedConversation._id,
+          {
+            mutedBy: [...(selectedConversation.mutedBy || []), admin._id]
+          }
+        );
+      }
+    } catch (err) {
+      setError(err.response?.data?.message || 'Failed to update mute status.');
     }
   };
 
-  // Handle send message
-  const handleSendMessage = (e) => {
-    e.preventDefault();
-    if (messageInput.trim()) {
-      console.log('Sending message:', messageInput);
+  const handleArchive = async () => {
+    if (!selectedConversation) return;
+
+    try {
+      await archiveAdminConversation(selectedConversation._id);
+      setConversations((prev) => prev.filter(
+        (conversation) => conversation._id !== selectedConversation._id
+      ));
+      lastLoadedConversationRef.current = null;
+      setSelectedConversationId((prev) => (
+        prev === selectedConversation._id ? null : prev
+      ));
+      setMessages([]);
+    } catch (err) {
+      setError(err.response?.data?.message || 'Failed to archive conversation.');
+    }
+  };
+
+  const handleSendMessage = async (event) => {
+    event.preventDefault();
+
+    if (!messageInput.trim() || !selectedConversationId || sending) {
+      return;
+    }
+
+    try {
+      setSending(true);
+      setError('');
+
+      const response = await sendAdminConversationMessage(selectedConversationId, {
+        content: messageInput.trim(),
+        type: 'text'
+      });
+
+      const createdMessage = response.data?.data;
+
+      if (createdMessage) {
+        setMessages((prev) => [...prev, createdMessage]);
+        updateConversationState(selectedConversationId, {
+          lastMessage: createdMessage,
+          lastMessageAt: createdMessage.createdAt
+        });
+      }
+
       setMessageInput('');
+    } catch (err) {
+      setError(err.response?.data?.message || 'Failed to send message.');
+    } finally {
+      setSending(false);
     }
-  };
-
-  // Calculate stats
-  const stats = {
-    total: conversationsData.length,
-    direct: conversationsData.filter(c => c.type === 'direct').length,
-    groups: conversationsData.filter(c => c.type === 'group').length,
-    support: conversationsData.filter(c => c.type === 'support').length,
-    unread: conversationsData.reduce((sum, c) => sum + c.unreadCount, 0)
   };
 
   return (
     <div className="dashboard">
-      <Header title='Conversations'/>
-      
+      <Header title="Conversations" />
+
       <div className="container main-content">
         <div className="content-wrapper">
           <aside className="sidebar">
@@ -379,9 +377,14 @@ const Conversations = () => {
           </aside>
 
           <main className="main conversations-main">
-            {/* Page Header */}
-            <ProfileCard />
-            {/* Stats Grid */}
+            <ProfileCard
+              name={admin?.fullName || 'Admin'}
+              role={admin?.role || 'admin'}
+              image={admin?.profilePicture}
+            />
+
+            {error && <div className="admin-chat-alert error">{error}</div>}
+
             <div className="stats-grid">
               <div className="stat-card">
                 <div className="stat-header">
@@ -424,9 +427,7 @@ const Conversations = () => {
               </div>
             </div>
 
-            {/* Messages Container */}
             <div className="chart-card messages-container">
-              {/* Conversations List */}
               <div className="conversations-sidebar">
                 <div className="conversations-header">
                   <div className="search-box">
@@ -435,13 +436,13 @@ const Conversations = () => {
                       type="text"
                       placeholder="Search conversations..."
                       value={searchTerm}
-                      onChange={(e) => setSearchTerm(e.target.value)}
+                      onChange={(event) => setSearchTerm(event.target.value)}
                       className="search-input-small"
                     />
                   </div>
 
                   <div className="filter-tabs">
-                    {typeOptions.map(option => (
+                    {typeOptions.map((option) => (
                       <button
                         key={option.value}
                         className={`filter-tab ${filterType === option.value ? 'active' : ''}`}
@@ -455,113 +456,130 @@ const Conversations = () => {
                 </div>
 
                 <div className="conversations-list">
-                  {sortedConversations.map(conv => {
-                    const display = getConversationDisplay(conv);
-                    const isPinned = conv.pinnedBy.includes('currentUser');
-                    const isMuted = conv.mutedBy.includes('currentUser');
-                    const isActive = selectedConversation?._id === conv._id;
+                  {loadingConversations ? (
+                    <div className="empty-conversations">
+                      <FaUsers className="empty-icon" />
+                      <p>Loading conversations...</p>
+                    </div>
+                  ) : filteredConversations.length === 0 ? (
+                    <div className="empty-conversations">
+                      <FaUsers className="empty-icon" />
+                      <p>No conversations found</p>
+                    </div>
+                  ) : filteredConversations.map((conversation) => {
+                    const isPinned = (conversation.pinnedBy || []).includes(admin?._id);
+                    const isMuted = (conversation.mutedBy || []).includes(admin?._id);
+                    const isActive = selectedConversationId === conversation._id;
+                    const label = getConversationLabel(conversation, admin?._id);
+                    const avatar = getConversationAvatar(conversation, admin?._id);
 
                     return (
                       <div
-                        key={conv._id}
-                        className={`conversation-item ${isActive ? 'active' : ''} ${conv.unreadCount > 0 ? 'unread' : ''}`}
-                        onClick={() => setSelectedConversation(conv)}
+                        key={conversation._id}
+                        className={`conversation-item ${isActive ? 'active' : ''} ${conversation.unreadCount > 0 ? 'unread' : ''}`}
+                        onClick={() => handleSelectConversation(conversation._id)}
                       >
                         {isPinned && <FaThumbtack className="pin-icon" />}
-                        
+
                         <div className="conversation-avatar-wrapper">
-                          {conv.type === 'group' ? (
+                          {conversation.type === 'group' ? (
                             <div className="group-avatar">
                               <FaUsers />
                             </div>
-                          ) : conv.type === 'support' ? (
+                          ) : conversation.type === 'support' ? (
                             <div className="support-avatar">
                               <FaHeadset />
                             </div>
                           ) : (
-                            <img src={display.avatar} alt={display.name} className="conversation-avatar" />
+                            <img src={avatar} alt={label} className="conversation-avatar" />
                           )}
-                          {display.isOnline && <span className="online-dot"></span>}
                         </div>
 
                         <div className="conversation-content">
                           <div className="conversation-top">
-                            <h4 className="conversation-name">{display.name}</h4>
-                            <span className="conversation-time">{formatTime(conv.lastMessageAt)}</span>
+                            <h4 className="conversation-name">{label}</h4>
+                            <span className="conversation-time">
+                              {formatConversationTime(conversation.lastMessageAt)}
+                            </span>
                           </div>
                           <div className="conversation-bottom">
                             <p className="conversation-last-message">
                               {isMuted && <FaBellSlash className="muted-icon" />}
-                              {conv.lastMessage?.content}
+                              {getLastMessagePreview(conversation)}
                             </p>
-                            {conv.unreadCount > 0 && (
-                              <span className="unread-badge">{conv.unreadCount}</span>
+                            {conversation.unreadCount > 0 && (
+                              <span className="unread-badge">{conversation.unreadCount}</span>
                             )}
                           </div>
-                          {conv.course && (
+                          {conversation.course && (
                             <div className="conversation-course-tag">
-                              <FaBookOpen /> {conv.course.title}
+                              <FaBookOpen /> {conversation.course.title}
                             </div>
                           )}
                         </div>
                       </div>
                     );
                   })}
-
-                  {sortedConversations.length === 0 && (
-                    <div className="empty-conversations">
-                      <FaUsers className="empty-icon" />
-                      <p>No conversations found</p>
-                    </div>
-                  )}
                 </div>
               </div>
 
-              {/* Chat Area */}
               <div className="chat-area">
                 {selectedConversation ? (
                   <>
-                    {/* Chat Header */}
                     <div className="chat-header">
                       <div className="chat-header-info">
-                        {(() => {
-                          const display = getConversationDisplay(selectedConversation);
-                          return (
-                            <>
-                              {selectedConversation.type === 'group' ? (
-                                <div className="chat-avatar group-avatar-header">
-                                  <FaUsers />
-                                </div>
-                              ) : selectedConversation.type === 'support' ? (
-                                <div className="chat-avatar support-avatar-header">
-                                  <FaHeadset />
-                                </div>
-                              ) : (
-                                <div className="chat-avatar-wrapper">
-                                  <img src={display.avatar} alt={display.name} className="chat-avatar" />
-                                  {display.isOnline && <span className="online-dot-large"></span>}
-                                </div>
-                              )}
-                              <div>
-                                <h3 className="chat-name">{display.name}</h3>
-                                {selectedConversation.type === 'group' ? (
-                                  <p className="chat-status">{selectedConversation.participants.length} participants</p>
-                                ) : selectedConversation.type === 'support' ? (
-                                  <p className="chat-status">Support Team</p>
-                                ) : (
-                                  <p className="chat-status">{display.isOnline ? 'Online' : 'Offline'}</p>
-                                )}
-                              </div>
-                            </>
-                          );
-                        })()}
+                        {selectedConversation.type === 'group' ? (
+                          <div className="chat-avatar group-avatar-header">
+                            <FaUsers />
+                          </div>
+                        ) : selectedConversation.type === 'support' ? (
+                          <div className="chat-avatar support-avatar-header">
+                            <FaHeadset />
+                          </div>
+                        ) : (
+                          <div className="chat-avatar-wrapper">
+                            <img
+                              src={getConversationAvatar(selectedConversation, admin?._id)}
+                              alt={getConversationLabel(selectedConversation, admin?._id)}
+                              className="chat-avatar"
+                            />
+                          </div>
+                        )}
+
+                        <div>
+                          <h3 className="chat-name">
+                            {getConversationLabel(selectedConversation, admin?._id)}
+                          </h3>
+                          <p className="chat-status">
+                            {selectedConversation.type === 'group'
+                              ? `${selectedConversation.participants?.length || 0} participants`
+                              : selectedConversation.type === 'support'
+                                ? 'Support conversation'
+                                : 'Direct conversation'}
+                          </p>
+                        </div>
                       </div>
 
                       <div className="chat-actions">
-                        <button className="chat-action-btn" title="Mute">
-                          {selectedConversation.mutedBy.includes('currentUser') ? <FaBellSlash /> : <FaBell />}
+                        <button
+                          className="chat-action-btn"
+                          title={(selectedConversation.mutedBy || []).includes(admin?._id) ? 'Unmute' : 'Mute'}
+                          onClick={handleToggleMute}
+                        >
+                          {(selectedConversation.mutedBy || []).includes(admin?._id) ? <FaBellSlash /> : <FaBell />}
                         </button>
-                        <button className="chat-action-btn" title="Archive">
+                        <button
+                          className="chat-action-btn"
+                          title={(selectedConversation.pinnedBy || []).includes(admin?._id) ? 'Unpin' : 'Pin'}
+                          onClick={handleTogglePin}
+                        >
+                          <FaThumbtack />
+                        </button>
+                        <button
+                          className="chat-action-btn"
+                          title="Archive"
+                          onClick={handleArchive}
+                        >
                           <FaArchive />
                         </button>
                         <button className="chat-action-btn" title="More">
@@ -570,48 +588,52 @@ const Conversations = () => {
                       </div>
                     </div>
 
-                    {/* Messages */}
                     <div className="messages-area">
-                      {messagesData[selectedConversation._id]?.map(message => {
-                        const isOwn = message.sender === 'currentUser' || message.sender === 'user2';
+                      {loadingMessages ? (
+                        <div className="chat-placeholder-state">Loading messages...</div>
+                      ) : messages.length === 0 ? (
+                        <div className="chat-placeholder-state">
+                          Start the conversation by sending a message.
+                        </div>
+                      ) : messages.map((message) => {
+                        const isOwn = message.sender?._id === admin?._id;
+
                         return (
                           <div key={message._id} className={`message ${isOwn ? 'own' : ''}`}>
                             {!isOwn && (
-                              <img 
-                                src={selectedConversation.participants.find(p => p._id === message.sender)?.profilePicture}
-                                alt="Avatar"
+                              <img
+                                src={message.sender?.profilePicture || 'https://via.placeholder.com/32x32?text=U'}
+                                alt={message.sender?.fullName || 'User'}
                                 className="message-avatar"
                               />
                             )}
                             <div className="message-content">
+                              {!isOwn && (
+                                <span className="message-sender-name">
+                                  {message.sender?.fullName || 'User'}
+                                </span>
+                              )}
                               <p className="message-text">{message.content}</p>
                               <div className="message-meta">
                                 <span className="message-time">{formatTime(message.createdAt)}</span>
-                                {isOwn && (
-                                  <span className="message-status">
-                                    {message.isRead ? <FaCheckDouble className="read" /> : <FaCheck />}
-                                  </span>
-                                )}
                               </div>
                             </div>
                           </div>
                         );
                       })}
+                      <div ref={messagesEndRef} />
                     </div>
 
-                    {/* Message Input */}
                     <form className="message-input-area" onSubmit={handleSendMessage}>
-                      <button type="button" className="attach-btn" title="Attach file">
-                        <FaPaperclip />
-                      </button>
                       <input
                         type="text"
                         placeholder="Type a message..."
                         value={messageInput}
-                        onChange={(e) => setMessageInput(e.target.value)}
+                        onChange={(event) => setMessageInput(event.target.value)}
                         className="message-input"
+                        disabled={sending}
                       />
-                      <button type="submit" className="send-btn" disabled={!messageInput.trim()}>
+                      <button type="submit" className="send-btn" disabled={!messageInput.trim() || sending}>
                         <FaPaperPlane />
                       </button>
                     </form>

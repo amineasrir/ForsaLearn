@@ -1,29 +1,69 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import '../../styles/formateur.css';
 import logo_rem from '../../assets/image/home_page/logo_rem.png';
 import i18nInstance from '../../i18n';
 import { useTranslation } from 'react-i18next';
 import 'flag-icons/css/flag-icons.min.css';
-import { useNavigate, useLocation } from 'react-router-dom';
 import SidebarF from '../../components/formateur/sidebarF';
 import ProfilSection from '../../components/formateur/profilSection';
+import {
+  archiveFormateurCourse,
+  deleteFormateurCourse,
+  getFormateurCourses,
+  getFormateurProfile
+} from '../../services/formateurService';
+
+const labelToStatus = {
+  Published: 'published',
+  Pending: 'pending',
+  Draft: 'draft',
+  Archived: 'archived',
+  Rejected: 'rejected',
+  All: 'all'
+};
 
 const FormateurCourses = () => {
   const { i18n } = useTranslation();
-  const [activeMenu, setActiveMenu] = useState('mycourses');
-  const navigate = useNavigate();
-  const location = useLocation();
+  const [profile, setProfile] = useState(null);
+  const [courses, setCourses] = useState([]);
+  const [statusFilter, setStatusFilter] = useState('Published');
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
 
-  // sync active menu for navigation highlights
-  useEffect(() => {
-    if (location.pathname.includes('/profile')) {
-      setActiveMenu('profile');
-    } else if (location.pathname.includes('/dashboard')) {
-      setActiveMenu('dashboard');
-    } else if (location.pathname.includes('/courses')) {
-      setActiveMenu('mycourses');
+  const loadCourses = async (status) => {
+    try {
+      setLoading(true);
+      const params = {};
+      const normalizedStatus = labelToStatus[status];
+      if (normalizedStatus && normalizedStatus !== 'all') {
+        params.status = normalizedStatus;
+      }
+
+      const response = await getFormateurCourses(params);
+      setCourses(response.data?.data || []);
+    } catch (err) {
+      setError(err.response?.data?.message || 'Failed to load courses.');
+    } finally {
+      setLoading(false);
     }
-  }, [location.pathname]);
+  };
+
+  useEffect(() => {
+    const loadInitialData = async () => {
+      try {
+        const profileResponse = await getFormateurProfile();
+        setProfile(profileResponse.data?.data || null);
+      } catch (err) {
+        setError(err.response?.data?.message || 'Failed to load profile.');
+      }
+    };
+
+    loadInitialData();
+  }, []);
+
+  useEffect(() => {
+    loadCourses(statusFilter);
+  }, [statusFilter]);
 
   const changeLanguage = () => {
     const lang = (i18n && i18n.language === 'en') ? 'fr' : 'en';
@@ -46,79 +86,54 @@ const FormateurCourses = () => {
 
   const currentLang = (i18n && i18n.language) ? i18n.language : 'en';
 
-  // sample course data
-  const courses = [
-    {
-      id: 1,
-      title: 'Information About UI/UX Design & Degree',
-      image: 'https://via.placeholder.com/120x80',
-      price: '$200',
-      lessons: '12',
-      duration: '30min',
-      status: 'Published',
-    },
-    {
-      id: 2,
-      title: 'Wordpress for Beginners – Master Webpages Quickly',
-      image: 'https://via.placeholder.com/120x80',
-      price: '$150',
-      lessons: '10',
-      duration: '45min',
-      status: 'Published',
-    },
-    {
-      id: 3,
-      title: 'Sketch From A to Z (2022): Become an app designer',
-      image: 'https://via.placeholder.com/120x80',
-      price: 'Free',
-      lessons: '8',
-      duration: '20min',
-      status: 'Draft',
-    },
-    {
-      id: 4,
-      title: 'Learn Angular Fundamental From beginning to adv',
-      image: 'https://via.placeholder.com/120x80',
-      price: '$145',
-      lessons: '12',
-      duration: '30min',
-      status: 'Pending',
-    },
-    {
-      id: 5,
-      title: 'C# Developers Double Your Coding Speed',
-      image: 'https://via.placeholder.com/120x80',
-      price: '$120',
-      lessons: '12',
-      duration: '30min',
-      status: 'Inactive',
-    },
-    {
-      id: 6,
-      title: 'Build Responsive Real World Websites',
-      image: 'https://via.placeholder.com/120x80',
-      price: '$200',
-      lessons: '10',
-      duration: '30min',
-      status: 'Published',
-    },
-  ];
+  const counts = useMemo(() => {
+    const summary = {
+      Published: 0,
+      Pending: 0,
+      Draft: 0,
+      Archived: 0,
+      Rejected: 0
+    };
 
-  const [statusFilter, setStatusFilter] = useState('Published');
+    courses.forEach((course) => {
+      const label = Object.keys(labelToStatus).find((key) => labelToStatus[key] === course.status);
+      if (label && summary[label] !== undefined) {
+        summary[label] += 1;
+      }
+    });
+
+    return summary;
+  }, [courses]);
 
   const statusOptions = [
     { label: 'Published', key: 'Published' },
     { label: 'Pending', key: 'Pending' },
     { label: 'Draft', key: 'Draft' },
-    { label: 'Inactive', key: 'Inactive' },
-    { label: 'All', key: 'All' },
+    { label: 'Archived', key: 'Archived' },
+    { label: 'Rejected', key: 'Rejected' },
+    { label: 'All', key: 'All' }
   ];
 
-  const filteredCourses = courses.filter(c => statusFilter === 'All' || c.status === statusFilter);
+  const handleArchive = async (courseId) => {
+    try {
+      await archiveFormateurCourse(courseId);
+      loadCourses(statusFilter);
+    } catch (err) {
+      setError(err.response?.data?.message || 'Failed to update course status.');
+    }
+  };
+
+  const handleDelete = async (courseId) => {
+    try {
+      await deleteFormateurCourse(courseId);
+      loadCourses(statusFilter);
+    } catch (err) {
+      setError(err.response?.data?.message || 'Failed to delete course.');
+    }
+  };
 
   return (
     <div className="formateur-page">
-      {/* Navbar */}
       <nav className="navbar-dashboard">
         <div className="navbar-dashboard-content">
           <div className="navbar-dashboard-left">
@@ -141,14 +156,18 @@ const FormateurCourses = () => {
       </nav>
 
       <div className="formateur-container">
-        {/* Sidebar */}
         <SidebarF />
 
-        {/* Main Content */}
         <main className="formateur-main">
-          {/* profile section with add course button */}
-          <ProfilSection/>
-          {/* status filters */}
+          <ProfilSection
+            formateur={{
+              avatar: profile?.profilePicture || 'https://via.placeholder.com/60',
+              name: profile?.fullName || 'Instructor'
+            }}
+          />
+
+          {error && <div className="alert alert-error">{error}</div>}
+
           <div className="status-filters">
             {statusOptions.map((opt) => (
               <button
@@ -156,27 +175,57 @@ const FormateurCourses = () => {
                 className={statusFilter === opt.key ? 'active' : ''}
                 onClick={() => setStatusFilter(opt.key)}
               >
-                {opt.label} {opt.key !== 'All' ? `(${courses.filter(c => c.status === opt.key).length})` : `(${courses.length})`}
+                {opt.label} {opt.key !== 'All' ? `(${counts[opt.key] || 0})` : `(${courses.length})`}
               </button>
             ))}
           </div>
 
           <div className="courses-section">
             <div className="courses-table">
-              <div className="table-header">
+              <div className="table-header formateur-courses-header">
                 <div className="col-title">Course</div>
-                <div className="col-students">Lessons</div>
+                <div className="col-students">Students</div>
                 <div className="col-status">Status</div>
+                <div className="col-actions">Actions</div>
               </div>
-              {filteredCourses.map((course) => (
-                <div key={course.id} className="table-row">
+              {loading ? (
+                <div className="table-row formateur-courses-row">
+                  <div className="col-title">Loading courses...</div>
+                  <div className="col-students">...</div>
+                  <div className="col-status">...</div>
+                  <div className="col-actions">...</div>
+                </div>
+              ) : courses.length === 0 ? (
+                <div className="table-row formateur-courses-row">
+                  <div className="col-title">No courses found for this filter.</div>
+                  <div className="col-students">0</div>
+                  <div className="col-status">-</div>
+                  <div className="col-actions">-</div>
+                </div>
+              ) : courses.map((course) => (
+                <div key={course._id} className="table-row formateur-courses-row">
                   <div className="col-title">
-                    <img src={course.image} alt={course.title} className="course-thumbnail" />
-                    <span>{course.title}</span>
+                    <img
+                      src={course.thumbnail || 'https://via.placeholder.com/120x80'}
+                      alt={course.title}
+                      className="course-thumbnail"
+                    />
+                    <div className="course-title-stack">
+                      <span>{course.title}</span>
+                      <small>{course.category} • {course.level}</small>
+                    </div>
                   </div>
-                  <div className="col-students">{course.lessons}</div>
+                  <div className="col-students">{course.totalEnrollments || 0}</div>
                   <div className="col-status">
                     <span className="status-badge">{course.status}</span>
+                  </div>
+                  <div className="col-actions">
+                    <button className="mini-action-btn" onClick={() => handleArchive(course._id)}>
+                      {course.status === 'archived' ? 'Unarchive' : 'Archive'}
+                    </button>
+                    <button className="mini-action-btn danger" onClick={() => handleDelete(course._id)}>
+                      Delete
+                    </button>
                   </div>
                 </div>
               ))}

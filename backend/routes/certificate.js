@@ -5,10 +5,10 @@ const Certificate = require('../models/Certificate');
 const Course = require('../models/Course');
 const { protect, authorize } = require('../middleware/auth');
 const {
-  generateCertificate,
-  generateCertificateId,
   verifyCertificate
 } = require('../utils/certificateGenerator');
+const { issueCertificateForCompletion } = require('../utils/issueCertificate');
+const { User } = require('../models/User');
 
 // PUBLIC ROUTES
 
@@ -122,67 +122,22 @@ router.post('/generate/:courseId',
         });
       }
       
-      // Check if certificate already exists
-      const existingCertificate = await Certificate.findOne({
-        student: req.user.id,
-        course: courseId
-      });
-      
-      if (existingCertificate) {
-        return res.status(200).json({
-          success: true,
-          message: 'Certificate already generated',
-          data: existingCertificate
-        });
-      }
-      
-      // Generate certificate ID
-      const certificateId = generateCertificateId();
-      
-      // Generate PDF
-      const pdfResult = await generateCertificate({
-        studentName: req.user.fullName,
-        courseName: course.title,
-        instructorName: course.formateur.fullName,
-        completionDate: enrollment.completedAt || Date.now(),
-        certificateId,
-        courseDuration: Math.round(course.totalDuration / 60) // Convert to hours
-      });
-      
-      if (!pdfResult.success) {
-        return res.status(500).json({ message: 'Error generating certificate PDF' });
-      }
-      
-      // Save certificate to database
-      const certificate = await Certificate.create({
-        certificateId,
-        student: req.user.id,
-        course: courseId,
-        instructor: course.formateur._id,
-        pdfUrl: pdfResult.filepath,
-        filename: pdfResult.filename,
-        completionDate: enrollment.completedAt || Date.now(),
-        finalScore: enrollment.progress,
-        metadata: {
-          generatedBy: 'system',
+      const certificateResult = await issueCertificateForCompletion({
+        course,
+        student: req.user,
+        enrollment,
+        reqMeta: {
           ipAddress: req.ip,
           userAgent: req.get('user-agent')
         }
       });
-      
-      // Update course enrollment
-      enrollment.certificateIssued = true;
-      enrollment.certificateUrl = pdfResult.filepath;
+
       await course.save();
       
-      // Send certificate email
-      const { sendCourseCompletionEmail } = require('../utils/emailService');
-      await sendCourseCompletionEmail(req.user, course);
-      
-      res.status(201).json({
+      res.status(certificateResult.issued ? 201 : 200).json({
         success: true,
-        message: 'Certificate generated successfully',
-        data: certificate
+        message: certificateResult.issued ? 'Certificate generated successfully' : 'Certificate already generated',
+        data: certificateResult.certificate
       });
     } catch (error) {
       console.error('Generate certificate error:', error);
@@ -381,34 +336,21 @@ router.post('/admin/bulk-generate/:courseId',
       
       for (const enrollment of completedStudents) {
         try {
-          const User = require('../models/User').User;
-          const student = await User.findById(enrollment.student);
-          
-          const certificateId = generateCertificateId();
-          
-          const pdfResult = await generateCertificate({
-            studentName: student.fullName,
-            courseName: course.title,
-            instructorName: course.formateur.fullName,
-            completionDate: enrollment.completedAt || Date.now(),
-            certificateId,
-            courseDuration: Math.round(course.totalDuration / 60)
+          const student = await User.findById(enrollment.student).select('fullName email language');
+
+          const certificateResult = await issueCertificateForCompletion({
+            course,
+            student,
+            enrollment,
+            reqMeta: {
+              ipAddress: req.ip,
+              userAgent: req.get('user-agent')
+            }
           });
-          
-          const certificate = await Certificate.create({
-            certificateId,
-            student: student._id,
-            course: courseId,
-            instructor: course.formateur._id,
-            pdfUrl: pdfResult.filepath,
-            filename: pdfResult.filename,
-            completionDate: enrollment.completedAt || Date.now()
-          });
-          
-          enrollment.certificateIssued = true;
-          enrollment.certificateUrl = pdfResult.filepath;
-          
-          generated.push(certificate);
+
+          if (certificateResult.certificate) {
+            generated.push(certificateResult.certificate);
+          }
         } catch (err) {
           errors.push({
             studentId: enrollment.student,

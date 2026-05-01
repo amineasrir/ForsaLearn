@@ -33,6 +33,10 @@ export const getMyCertificates = () => {
   return API.get("certificate/my-certificates");
 };
 
+export const getCertificateDownloadUrl = (certificateId) => {
+  return API.get(`certificate/download/${certificateId}`);
+};
+
 export const getMyPayments = () => {
   return API.get("payment/my-payments");
 };

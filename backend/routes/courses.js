@@ -8,6 +8,8 @@ const {
   sendNewStudentNotification
 } = require('../utils/emailService');
 const { Formateur } = require('../models/User');
+const { User } = require('../models/User');
+const { issueCertificateForCompletion } = require('../utils/issueCertificate');
 
 // PUBLIC ROUTES - No authentication required
 
@@ -350,7 +352,10 @@ router.get('/student/my-courses', protect, authorize('visiteur'), async (req, re
         ...course.toObject(),
         myProgress: enrollment.progress,
         enrolledAt: enrollment.enrolledAt,
-        lastAccessedAt: enrollment.lastAccessedAt
+        lastAccessedAt: enrollment.lastAccessedAt,
+        completedAt: enrollment.completedAt,
+        certificateIssued: enrollment.certificateIssued,
+        certificateUrl: enrollment.certificateUrl
       };
     });
     
@@ -374,15 +379,36 @@ router.post('/:courseId/lessons/:lessonId/complete', protect, authorize('visiteu
       return res.status(404).json({ message: 'Course not found' });
     }
     
-    course.updateProgress(req.user.id, req.params.lessonId);
+    const enrollment = course.updateProgress(req.user.id, req.params.lessonId);
+
+    let issuedCertificate = null;
+    if (Number(enrollment.progress || 0) >= 100) {
+      await course.populate('formateur', 'fullName');
+      const student = await User.findById(req.user.id).select('fullName email language');
+
+      const certificateResult = await issueCertificateForCompletion({
+        course,
+        student,
+        enrollment,
+        reqMeta: {
+          ipAddress: req.ip,
+          userAgent: req.get('user-agent')
+        }
+      });
+
+      issuedCertificate = certificateResult.certificate || null;
+    }
+
     await course.save();
     
     res.status(200).json({
       success: true,
       message: 'Lesson marked as completed',
-      progress: course.enrolledStudents.find(
-        e => e.student.toString() === req.user.id
-      ).progress
+      progress: enrollment.progress,
+      completedAt: enrollment.completedAt,
+      certificateIssued: enrollment.certificateIssued,
+      certificateUrl: enrollment.certificateUrl,
+      certificate: issuedCertificate
     });
   } catch (error) {
     console.error('Complete lesson error:', error);

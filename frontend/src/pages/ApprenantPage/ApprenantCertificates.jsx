@@ -3,7 +3,11 @@ import { FaEye, FaDownload } from 'react-icons/fa';
 import Sidebar from '../../components/apprenant/Sidebar';
 import CardP from '../../components/apprenant/CardP';
 import DashboardNavbar from '../../components/common/DashboardNavbar';
-import { getApprenantProfile, getMyCertificates } from '../../services/apprenentService';
+import {
+  getApprenantProfile,
+  getCertificateDownloadUrl,
+  getMyCertificates
+} from '../../services/apprenentService';
 import './dashboard.css';
 
 const ApprenantCertificates = () => {
@@ -28,6 +32,25 @@ const ApprenantCertificates = () => {
 
     loadData();
   }, []);
+
+  const handleViewCertificate = (certificate) => {
+    if (!certificate?.pdfUrl) return;
+    window.open(`http://localhost:5000${certificate.pdfUrl}`, '_blank');
+  };
+
+  const handleDownloadCertificate = async (certificate) => {
+    if (!certificate?.certificateId) return;
+
+    try {
+      const response = await getCertificateDownloadUrl(certificate.certificateId);
+      const downloadUrl = response.data?.downloadUrl;
+      if (downloadUrl) {
+        window.open(downloadUrl, '_blank');
+      }
+    } catch (err) {
+      setError(err.response?.data?.message || 'Failed to download certificate.');
+    }
+  };
 
   const rightContent = (
     <>
@@ -75,8 +98,16 @@ const ApprenantCertificates = () => {
                       <td>{cert.instructor?.fullName || cert.instructorName}</td>
                       <td>{cert.status || 'active'}</td>
                       <td>
-                        <FaEye title="View" style={{cursor: 'pointer', marginRight: '0.5rem'}} />
-                        <FaDownload title="Download" style={{cursor: 'pointer'}} />
+                        <FaEye
+                          title="View"
+                          style={{cursor: 'pointer', marginRight: '0.5rem'}}
+                          onClick={() => handleViewCertificate(cert)}
+                        />
+                        <FaDownload
+                          title="Download"
+                          style={{cursor: 'pointer'}}
+                          onClick={() => handleDownloadCertificate(cert)}
+                        />
                       </td>
                     </tr>
                   ))}

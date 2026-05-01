@@ -1,92 +1,109 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import '../../styles/formateur.css';
 import logo_rem from '../../assets/image/home_page/logo_rem.png';
 import i18nInstance from '../../i18n';
 import { useTranslation } from 'react-i18next';
 import 'flag-icons/css/flag-icons.min.css';
 import { FaEdit } from 'react-icons/fa';
-import { useNavigate, useLocation } from 'react-router-dom';
 import SidebarF from '../../components/formateur/sidebarF';
 import ProfilSection from '../../components/formateur/profilSection';
+import {
+  getFormateurProfile,
+  updateFormateurProfile
+} from '../../services/formateurService';
 
 const FormateurProfile = () => {
   const { i18n } = useTranslation();
-  const [activeMenu, setActiveMenu] = useState('profile');
-  const navigate = useNavigate();
-  const location = useLocation();
+  const [formateur, setFormateur] = useState(null);
+  const [editing, setEditing] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState('');
+  const [formData, setFormData] = useState({
+    fullName: '',
+    phoneNumber: '',
+    email: '',
+    bio: '',
+    field: '',
+    skills: ''
+  });
+
+  useEffect(() => {
+    const loadProfile = async () => {
+      try {
+        const response = await getFormateurProfile();
+        const user = response.data?.data || null;
+        setFormateur(user);
+        setFormData({
+          fullName: user?.fullName || '',
+          phoneNumber: user?.phoneNumber || '',
+          email: user?.email || '',
+          bio: user?.bio || '',
+          field: user?.field || '',
+          skills: (user?.skills || []).join(', ')
+        });
+      } catch (err) {
+        setError(err.response?.data?.message || 'Failed to load profile.');
+      }
+    };
+
+    loadProfile();
+  }, []);
 
   const changeLanguage = () => {
-    const lang = (i18n && i18n.language === "en") ? "fr" : "en";
-    const instance = (i18n && typeof i18n.changeLanguage === "function") ? i18n : i18nInstance;
-    if (instance && typeof instance.changeLanguage === "function") {
+    const lang = (i18n && i18n.language === 'en') ? 'fr' : 'en';
+    const instance = (i18n && typeof i18n.changeLanguage === 'function') ? i18n : i18nInstance;
+    if (instance && typeof instance.changeLanguage === 'function') {
       instance.changeLanguage(lang);
     }
   };
 
   const getFlagClass = (lang) => {
     switch (lang) {
-      case "en":
-        return "fi fi-gb";
-      case "fr":
-        return "fi fi-fr";
+      case 'en':
+        return 'fi fi-gb';
+      case 'fr':
+        return 'fi fi-fr';
       default:
-        return "fi fi-gl";
+        return 'fi fi-gl';
     }
   };
 
-  const currentLang = (i18n && i18n.language) ? i18n.language : "en";
+  const currentLang = (i18n && i18n.language) ? i18n.language : 'en';
 
-  // sync menu state based on path
-  useEffect(() => {
-    if (location.pathname.includes('/profile')) {
-      setActiveMenu('profile');
-    } else if (location.pathname.includes('/dashboard')) {
-      setActiveMenu('dashboard');
-    } else if (location.pathname.includes('/courses')) {
-      setActiveMenu('mycourses');
-    } else if (location.pathname.includes('/students')) {
-      setActiveMenu('students');
+  const handleSave = async () => {
+    try {
+      setSaving(true);
+      setError('');
+      const payload = {
+        fullName: formData.fullName,
+        phoneNumber: formData.phoneNumber,
+        email: formData.email,
+        bio: formData.bio,
+        field: formData.field,
+        skills: formData.skills.split(',').map((skill) => skill.trim()).filter(Boolean)
+      };
+
+      const response = await updateFormateurProfile(payload);
+      const updatedUser = response.data?.data || null;
+      setFormateur(updatedUser);
+      setFormData({
+        fullName: updatedUser?.fullName || '',
+        phoneNumber: updatedUser?.phoneNumber || '',
+        email: updatedUser?.email || '',
+        bio: updatedUser?.bio || '',
+        field: updatedUser?.field || '',
+        skills: (updatedUser?.skills || []).join(', ')
+      });
+      setEditing(false);
+    } catch (err) {
+      setError(err.response?.data?.message || 'Failed to update profile.');
+    } finally {
+      setSaving(false);
     }
-  }, [location.pathname]);
-
-  // profile information stored in state so we can edit
-  const [formateur, setFormateur] = useState({
-    name: 'Khadija Essir',
-    avatar: 'https://via.placeholder.com/60',
-    phone: '+123 456 789',
-    email: 'khadija@example.com',
-    bio: 'Web developer with a vast array of knowledge in many different front-end and back-end languages.',
-    education: [
-      { title: 'BCA - Bachelor of Computer Applications', period: '2015 - 2018' },
-      { title: 'MCA - Master of Computer Application', period: '2018 - 2020' },
-    ],
-    experience: [
-      { title: 'Web Design & Development Team Leader', company: 'Comany XYZ', period: '2019 - 2021' },
-      { title: 'Project Manager', company: 'Industry Tech', period: '2021 - Present' },
-    ],
-  });
-
-  // editing state flags
-  const [editing, setEditing] = useState({
-    basic: false,
-    education: false,
-    experience: false,
-  });
-
-  // temporary fields used when editing
-  const [tempBasic, setTempBasic] = useState({
-    name: formateur.name,
-    phone: formateur.phone,
-    email: formateur.email,
-    bio: formateur.bio,
-  });
-  const [tempEducation, setTempEducation] = useState(formateur.education);
-  const [tempExperience, setTempExperience] = useState(formateur.experience);
-
+  };
 
   return (
     <div className="formateur-page">
-      {/* Navbar */}
       <nav className="navbar-dashboard">
         <div className="navbar-dashboard-content">
           <div className="navbar-dashboard-left">
@@ -109,168 +126,83 @@ const FormateurProfile = () => {
       </nav>
 
       <div className="formateur-container">
-        {/* Sidebar */}
         <SidebarF />
 
-        {/* Main Content */}
         <main className="formateur-main">
-          {/* Profile header section (reused from dashboard) */}
-          <ProfilSection formateur={formateur}/>
+          <ProfilSection
+            formateur={{
+              avatar: formateur?.profilePicture || 'https://via.placeholder.com/60',
+              name: formateur?.fullName || 'Instructor'
+            }}
+            actionLabel="Edit Profile"
+            onAction={() => setEditing(true)}
+          />
 
-          {/* Basic information */}
+          {error && <div className="alert alert-error">{error}</div>}
+
           <div className="profile-details">
             <h2>
               Basic Information
-              <FaEdit className="section-edit-icon" onClick={() => setEditing(prev => ({...prev, basic: true}))} />
+              <FaEdit className="section-edit-icon" onClick={() => setEditing(true)} />
             </h2>
-            {editing.basic ? (
+            {editing ? (
               <div className="edit-form">
                 <label>
-                  Name: <input type="text" value={tempBasic.name} onChange={e => setTempBasic({...tempBasic, name: e.target.value})} />
+                  Full Name
+                  <input type="text" value={formData.fullName} onChange={(e) => setFormData({ ...formData, fullName: e.target.value })} />
                 </label>
                 <label>
-                  Phone: <input type="text" value={tempBasic.phone} onChange={e => setTempBasic({...tempBasic, phone: e.target.value})} />
+                  Phone
+                  <input type="text" value={formData.phoneNumber} onChange={(e) => setFormData({ ...formData, phoneNumber: e.target.value })} />
                 </label>
                 <label>
-                  Email: <input type="email" value={tempBasic.email} onChange={e => setTempBasic({...tempBasic, email: e.target.value})} />
+                  Email
+                  <input type="email" value={formData.email} onChange={(e) => setFormData({ ...formData, email: e.target.value })} />
                 </label>
                 <label>
-                  Bio: <textarea value={tempBasic.bio} onChange={e => setTempBasic({...tempBasic, bio: e.target.value})} />
+                  Expertise Field
+                  <input type="text" value={formData.field} onChange={(e) => setFormData({ ...formData, field: e.target.value })} />
+                </label>
+                <label>
+                  Bio
+                  <textarea value={formData.bio} onChange={(e) => setFormData({ ...formData, bio: e.target.value })} />
+                </label>
+                <label>
+                  Skills
+                  <input type="text" value={formData.skills} onChange={(e) => setFormData({ ...formData, skills: e.target.value })} placeholder="React, Node.js, UI Design" />
                 </label>
                 <div className="form-actions">
-                  <button onClick={() => {
-                    setFormateur(f => ({...f, ...tempBasic}));
-                    setEditing(prev => ({...prev, basic: false}));
-                  }}>Save</button>
-                  <button onClick={() => {
-                    setTempBasic({
-                      name: formateur.name,
-                      phone: formateur.phone,
-                      email: formateur.email,
-                      bio: formateur.bio,
-                    });
-                    setEditing(prev => ({...prev, basic: false}));
-                  }}>Cancel</button>
+                  <button onClick={handleSave} disabled={saving}>{saving ? 'Saving...' : 'Save'}</button>
+                  <button onClick={() => setEditing(false)}>Cancel</button>
                 </div>
               </div>
             ) : (
               <>
-                <p><strong>Full Name:</strong> {formateur.name}</p>
-                <p><strong>Phone Number:</strong> {formateur.phone}</p>
-                <p><strong>Email:</strong> {formateur.email}</p>
-                <p><strong>Bio:</strong> {formateur.bio}</p>
+                <p><strong>Full Name:</strong> {formateur?.fullName || '-'}</p>
+                <p><strong>Phone Number:</strong> {formateur?.phoneNumber || '-'}</p>
+                <p><strong>Email:</strong> {formateur?.email || '-'}</p>
+                <p><strong>Expertise Field:</strong> {formateur?.field || '-'}</p>
+                <p><strong>Bio:</strong> {formateur?.bio || 'No bio added yet.'}</p>
               </>
             )}
           </div>
 
-          {/* Education */}
           <div className="profile-details">
-            <h2>
-              Education
-              <FaEdit className="section-edit-icon" onClick={() => setEditing(prev => ({...prev, education: true}))} />
-            </h2>
-            {editing.education ? (
-              <div className="edit-form">
-                {tempEducation.map((edu, idx) => (
-                  <div key={idx} className="list-item-edit">
-                    <input
-                      type="text"
-                      value={edu.title}
-                      onChange={e => {
-                        const newEdu = [...tempEducation];
-                        newEdu[idx].title = e.target.value;
-                        setTempEducation(newEdu);
-                      }}
-                      placeholder="Title"
-                    />
-                    <input
-                      type="text"
-                      value={edu.period}
-                      onChange={e => {
-                        const newEdu = [...tempEducation];
-                        newEdu[idx].period = e.target.value;
-                        setTempEducation(newEdu);
-                      }}
-                      placeholder="Period"
-                    />
-                  </div>
-                ))}
-                <div className="form-actions">
-                  <button onClick={() => {
-                    setFormateur(f => ({...f, education: tempEducation}));
-                    setEditing(prev => ({...prev, education: false}));
-                  }}>Save</button>
-                  <button onClick={() => {
-                    setTempEducation(formateur.education);
-                    setEditing(prev => ({...prev, education: false}));
-                  }}>Cancel</button>
-                </div>
-              </div>
+            <h2>Skills</h2>
+            {(formateur?.skills || []).length === 0 ? (
+              <p>No skills added yet.</p>
             ) : (
-              formateur.education.map((edu, idx) => (
-                <p key={idx}>&#8226; {edu.title} ({edu.period})</p>
+              (formateur.skills || []).map((skill, idx) => (
+                <p key={idx}>&#8226; {skill}</p>
               ))
             )}
           </div>
 
-          {/* Experience */}
           <div className="profile-details">
-            <h2>
-              Experience
-              <FaEdit className="section-edit-icon" onClick={() => setEditing(prev => ({...prev, experience: true}))} />
-            </h2>
-            {editing.experience ? (
-              <div className="edit-form">
-                {tempExperience.map((exp, idx) => (
-                  <div key={idx} className="list-item-edit">
-                    <input
-                      type="text"
-                      value={exp.title}
-                      onChange={e => {
-                        const newExp = [...tempExperience];
-                        newExp[idx].title = e.target.value;
-                        setTempExperience(newExp);
-                      }}
-                      placeholder="Title"
-                    />
-                    <input
-                      type="text"
-                      value={exp.company}
-                      onChange={e => {
-                        const newExp = [...tempExperience];
-                        newExp[idx].company = e.target.value;
-                        setTempExperience(newExp);
-                      }}
-                      placeholder="Company"
-                    />
-                    <input
-                      type="text"
-                      value={exp.period}
-                      onChange={e => {
-                        const newExp = [...tempExperience];
-                        newExp[idx].period = e.target.value;
-                        setTempExperience(newExp);
-                      }}
-                      placeholder="Period"
-                    />
-                  </div>
-                ))}
-                <div className="form-actions">
-                  <button onClick={() => {
-                    setFormateur(f => ({...f, experience: tempExperience}));
-                    setEditing(prev => ({...prev, experience: false}));
-                  }}>Save</button>
-                  <button onClick={() => {
-                    setTempExperience(formateur.experience);
-                    setEditing(prev => ({...prev, experience: false}));
-                  }}>Cancel</button>
-                </div>
-              </div>
-            ) : (
-              formateur.experience.map((exp, idx) => (
-                <p key={idx}>&#8226; {exp.title} - {exp.company} ({exp.period})</p>
-              ))
-            )}
+            <h2>Account Status</h2>
+            <p><strong>Role:</strong> {formateur?.role || 'formateur'}</p>
+            <p><strong>Approved:</strong> {formateur?.isApproved ? 'Yes' : 'Pending review'}</p>
+            <p><strong>Language:</strong> {formateur?.language || 'en'}</p>
           </div>
         </main>
       </div>
