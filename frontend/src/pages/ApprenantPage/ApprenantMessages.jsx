@@ -184,10 +184,11 @@ const ApprenantMessages = () => {
         breadcrumb={[{ to: '/', label: 'Home' }, { label: 'Messages' }]}
         rightContent={rightContent}
       />
-      <CardP user={user} />
       <div className="dashboard-container">
         <Sidebar />
         <main className="main-content">
+      <CardP user={user} />
+
           {error && <div className="error-message">{error}</div>}
           <div className="message-wrapper">
             <div className="conv-list">

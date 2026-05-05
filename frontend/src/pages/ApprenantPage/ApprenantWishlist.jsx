@@ -25,11 +25,12 @@ const ApprenantWishlist = () => {
         breadcrumb={[{ to: '/', label: 'Home' }, { label: 'Wishlist' }]}
         rightContent={rightContent}
       />
-      <CardP />
 
       <div className="dashboard-container">
         <Sidebar />
         <main className="main-content">
+      <CardP  />
+
           <div className="wishlist-grid">
             {items.length === 0 ? (
               <p>Your wishlist is empty.</p>

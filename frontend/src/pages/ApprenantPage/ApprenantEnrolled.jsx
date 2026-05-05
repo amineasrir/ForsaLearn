@@ -62,12 +62,13 @@ const ApprenantEnrolled = () => {
         rightContent={rightContent}
       />
 
-      <CardP user={user} />
 
       <div className="dashboard-container">
         <Sidebar />
 
         <main className="main-content">
+      <CardP user={user} />
+
           {error && <div className="error-message">{error}</div>}
           <section className="enrolled-courses">
             <div className="courses-header-row">

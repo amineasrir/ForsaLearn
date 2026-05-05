@@ -68,12 +68,13 @@ const ApprenantCertificates = () => {
         rightContent={rightContent}
       />
 
-      <CardP user={user} />
 
       <div className="dashboard-container">
         <Sidebar />
 
         <main className="main-content">
+      <CardP user={user} />
+
           {error && <div className="error-message">{error}</div>}
           <section className="certificates-section">
             <h2>My Certificates</h2>

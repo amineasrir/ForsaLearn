@@ -25,8 +25,13 @@ const SignUp = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
-  // Redirect to FormatterSignUp if formateur is selected
-
+  const handleUserTypeChange = (e) => {
+    const value = e.target.value;
+    setUserType(value);
+    if (value === 'formateur') {
+      navigate('/formateur/signup');
+    }
+  };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -106,7 +111,7 @@ const SignUp = () => {
                   name="userType"
                   value="apprenant"
                   checked={userType === 'apprenant'}
-                  onChange={(e) => setUserType(e.target.value)}
+                  onChange={handleUserTypeChange}
                 />
                 <span>{t('student') || 'Student'}</span>
               </label>
@@ -116,7 +121,7 @@ const SignUp = () => {
                   name="userType"
                   value="formateur"
                   checked={userType === 'formateur'}
-                  onChange={(e) => setUserType(e.target.value)}
+                  onChange={handleUserTypeChange}
                 />
                 <span>{t('instructor') || 'Instructor'}</span>
               </label>

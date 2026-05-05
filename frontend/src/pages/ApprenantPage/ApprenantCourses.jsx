@@ -58,11 +58,12 @@ const ApprenantCourses = () => {
         rightContent={rightContent}
       />
 
-      <CardP user={user} />
 
       <div className="dashboard-container course-dashboard-container">
         {sidebarVisible && <Sidebar />}
         <main className="main-content">
+      <CardP user={user} />
+
           {error && <div className="error-message">{error}</div>}
           <div className={`course-grid-page${sidebarVisible ? '' : ' no-sidebar'}`}>
             {sidebarVisible && (

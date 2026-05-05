@@ -79,38 +79,50 @@ app.get('/api/health', (req, res) => {
 
 // Authentication Routes
 const authRoutes = require('./routes/auth');
+console.log('auth:', typeof authRoutes);
+
 app.use('/api/auth', authRoutes);
 
 // Course Routes (Public & Students)
 const courseRoutes = require('./routes/courses');
+console.log('courses:', typeof courseRoutes);
+
 app.use('/api/courses', courseRoutes);
 
-// Admin Routes
+// // Admin Routes
 const adminRoutes = require('./routes/admin');
+console.log('admin:', typeof adminRoutes);
+
 app.use('/api/admin', adminRoutes);
 
-// Formateur Routes
+// // Formateur Routes
 const formateurRoutes = require('./routes/formateur');
+console.log('formateur:', typeof formateurRoutes);
 app.use('/api/formateur', formateurRoutes);
 
-// Visiteur Routes
+// // Visiteur Routes
 const visiteurRoutes = require('./routes/visiteur');
+console.log('visiteur:', typeof visiteurRoutes);
 app.use('/api/visiteurs', visiteurRoutes);
 
-// Upload Routes
+// // Upload Routes
 const uploadRoutes = require('./routes/upload');
+console.log('upload:', typeof uploadRoutes);
 app.use('/api/upload', uploadRoutes);
 
-// Payment Routes
+// // Payment Routes
 const paymentRoutes = require('./routes/payment');
+console.log('payment:', typeof paymentRoutes);
 app.use('/api/payment', paymentRoutes);
 
-// Certificate Routes
+// // Certificate Routes
 const certificateRoutes = require('./routes/certificate');
+console.log('certificate:', typeof certificateRoutes);
 app.use('/api/certificate', certificateRoutes);
 
-// Message Routes 
+// // Message Routes 
 const messageRoutes = require('./routes/message');
+console.log('message:', typeof messageRoutes);
 app.use('/api/messages', messageRoutes);
 
 // ============================================

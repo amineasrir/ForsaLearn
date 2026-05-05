@@ -56,12 +56,14 @@ const ApprenantQuizzes = () => {
         rightContent={rightContent}
       />
 
-      <CardP />
+   
 
       <div className="dashboard-container">
         <Sidebar />
 
         <main className="main-content">
+      <CardP />
+
           <section className="quizzes-list-section">
             <h2>My Quiz Attempts</h2>
             <div className="quizzes-list">

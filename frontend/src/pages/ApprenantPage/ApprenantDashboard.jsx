@@ -68,11 +68,12 @@ const ApprenantDashboard = () => {
         breadcrumb={[{ to: '/', label: 'Home' }, { label: 'Dashboard' }]}
         rightContent={rightContent}
       />
-      <CardP user={user} />
       <div className="dashboard-container">
         <Sidebar />
 
         <main className="main-content">
+      <CardP user={user} />
+
           {error && <div className="error-message">{error}</div>}
 
           <div className="apprenant-quiz-section">

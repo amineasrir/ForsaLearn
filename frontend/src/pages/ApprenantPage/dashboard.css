@@ -39,7 +39,7 @@ body {
 /* ================= HEADER ================= */
 .dashboard-header {
   background: linear-gradient(90deg, #ffe9ea 0%, #eef6ff 55%, #e6f4ff 100%);
-  height: 120px;
+  height: 90px;
 }
 
 .header-container {
@@ -95,8 +95,8 @@ body {
   padding: 1.25rem;
   border: 1px solid var(--border);
   position: sticky;
-  margin-top: 20px;
-  height: fit-content;
+  margin-top: 100px;
+  /* height: fit-content; */
 }
 
 .apprenant-menu-title {
@@ -170,8 +170,8 @@ body {
   align-items: center;
   margin-bottom: 2rem;
   color: #fff;
-  margin-right: 46px;
-  margin-left: 46px;
+  height: 110px;
+  
 }
 
 .apprenant-profil-content {
@@ -212,7 +212,7 @@ body {
 }
 
 .apprenant-stat-card {
-  /* background: var(--card); */
+  background: var(--card);
   border-radius: 15px;
   padding: 1rem;
   display: flex;

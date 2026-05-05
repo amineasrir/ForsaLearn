@@ -44,10 +44,11 @@ const ApprenantSettings = () => {
         breadcrumb={[{ to: '/', label: 'Home' }, { label: 'Settings' }]}
         rightContent={rightContent}
       />
-      <CardP />
       <div className="dashboard-container">
         <Sidebar />
         <main className="main-content">
+      <CardP  />
+
           <div className="settings-page">
             <div className="settings-container">
               <div className="settings-tabs">

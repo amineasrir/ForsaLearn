@@ -13,3 +13,4 @@ router.get('/profile', getProfile);
 // @desc    Update visitor profile
 // @access  Private
 router.put('/profile', updateProfile);
+module.exports = router;

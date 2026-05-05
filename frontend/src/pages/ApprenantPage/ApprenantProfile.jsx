@@ -45,11 +45,12 @@ const ApprenantProfile = () => {
           </>
         }
       />
-      <CardP user={user} />
       <div className="dashboard-container">
         <Sidebar />
 
         <main className="main-content">
+      <CardP user={user} />
+
           {error && <div className="error-message">{error}</div>}
           <div className="profile-page-content">
             <h2 className="profile-title">

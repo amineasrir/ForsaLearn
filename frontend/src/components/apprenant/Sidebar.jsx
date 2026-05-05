@@ -23,7 +23,7 @@ const Sidebar = () => {
 
   return (
     <div>
-      <aside className="apprenant-sidebar">
+      <aside className="apprenant-sidebar" style={{marginTop:"48px"}}>
         <div className="sidebar-content">
           <h3 className="apprenant-menu-title">Main Menu</h3>
           <nav className="apprenant-menu">

@@ -47,6 +47,7 @@ const SignIn = () => {
         }
         return;
       }
+      console.log("LOGIN USER:", user);
 
       navigate('/apprenant/dashboard');
     } catch (err) {
@@ -72,22 +73,7 @@ const SignIn = () => {
             <h2 style={{ textAlign: 'center' }}>{t('signInTitle') || 'Sign into Your Account'}</h2>
 
             {/* User Type Selection */}
-            <div className="user-type-selector">
-              <button
-                type="button"
-                className={`user-type-btn ${userType === 'apprenant' ? 'active' : ''}`}
-                onClick={() => setUserType('apprenant')}
-              >
-                👨‍🎓 Apprenant
-              </button>
-              <button
-                type="button"
-                className={`user-type-btn ${userType === 'formateur' ? 'active' : ''}`}
-                onClick={() => setUserType('formateur')}
-              >
-                👨‍🏫 Formateur
-              </button>
-            </div>
+           
 
             {error && <div className="error-message">{error}</div>}
 
