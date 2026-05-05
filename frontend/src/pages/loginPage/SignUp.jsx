@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import logo_rem from "../../assets/image/home_page/logo_rem.png";
@@ -32,6 +32,12 @@ const SignUp = () => {
       navigate('/formateur/signup');
     }
   };
+  // Redirect to FormatterSignUp if formateur is selected
+  useEffect(() => {
+    if (userType === 'formateur') {
+      navigate('/formateur/signup');
+    }
+  }, [userType, navigate]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;

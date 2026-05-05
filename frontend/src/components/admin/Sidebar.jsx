@@ -10,6 +10,16 @@ const Sidebar = () => {
   const location = useLocation();
   const path = location.pathname;
 
+  const handleLogout = () => {
+    const token = localStorage.getItem('adminToken');
+    const user = localStorage.getItem('adminUser');
+    if (token) {
+      localStorage.removeItem('authToken');
+      localStorage.removeItem('authUser');
+      window.location.href = '/signin';
+    }
+  };
+
   const makeItem = (to, icon, text) => (
     <Link
       to={to}
@@ -38,7 +48,10 @@ const Sidebar = () => {
           <h3 className="apprenant-menu-title">Account Settings</h3>
           <nav className="menu">
             {makeItem('/admin/settings', <FaCog />, 'Settings')}
-            {makeItem('/admin/logout', <FaSignOutAlt />, 'Logout')}
+            <button className="menu-item" onClick={handleLogout}>
+              <span className="menu-icon"><FaSignOutAlt /></span>
+              <span className="menu-text">Logout</span>
+            </button>
           </nav>
         </div>
       </aside>

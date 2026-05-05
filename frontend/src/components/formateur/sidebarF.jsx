@@ -10,8 +10,13 @@ const SidebarF = ({ activeMenu: propActive, setActiveMenu: propSetActive }) => {
   const [internalActive, setInternalActive] = useState('dashboard');
 
   const handleLogout = () => {
-    clearUserSession();
-    navigate('/signin');
+    const token = localStorage.getItem('authToken');
+    const user = localStorage.getItem('authUser');
+    if (token) {
+      localStorage.removeItem('authToken');
+      localStorage.removeItem('authUser');
+      navigate('/signin');
+    }
   };
 
   const menuItems = [

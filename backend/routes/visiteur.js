@@ -7,10 +7,15 @@ const { protect } = require('../middleware/auth');
 // @route   GET /api/visiteurs/profile
 // @desc    Get visitor profile
 // @access  Private
-router.get('/profile', getProfile);
+router.get('/profile', protect, getProfile);
 
 // @route   PUT /api/visiteurs/profile
 // @desc    Update visitor profile
 // @access  Private
+
 router.put('/profile', updateProfile);
+module.exports = router;
+
+router.put('/profile', protect, updateProfile);
+
 module.exports = router;
