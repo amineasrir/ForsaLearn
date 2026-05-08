@@ -1,12 +1,13 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import Sidebar from '../../components/apprenant/Sidebar';
+import { useTranslation } from 'react-i18next';
+import ApprenantLayout from '../../components/apprenant/ApprenantLayout';
 import CardP from '../../components/apprenant/CardP';
-import DashboardNavbar from '../../components/common/DashboardNavbar';
 import { FaStar } from 'react-icons/fa';
 import { getApprenantProfile, getEnrolledCourses } from '../../services/apprenentService';
 import './dashboard.css';
 
 const ApprenantEnrolled = () => {
+  const { t } = useTranslation();
   const [tab, setTab] = useState('enrolled');
   const [courses, setCourses] = useState([]);
   const [user, setUser] = useState(null);
@@ -23,7 +24,7 @@ const ApprenantEnrolled = () => {
         setCourses(coursesResponse.data?.data || []);
         setUser(userResponse.data?.user || null);
       } catch (err) {
-        setError(err.response?.data?.message || 'Failed to load enrolled courses.');
+        setError(err.response?.data?.message || t('errorOccurred'));
       }
     };
 
@@ -48,49 +49,41 @@ const ApprenantEnrolled = () => {
 
   const rightContent = (
     <>
-      <button className="lang-btn">ENG</button>
       <div className="notification-icon"></div>
       <div className="cart-icon"></div>
     </>
   );
 
   return (
-    <div className="apprenant-dashboard">
-      <DashboardNavbar
-        title="Enrolled Courses"
-        breadcrumb={[{ to: '/', label: 'Home' }, { label: 'Enrolled Courses' }]}
-        rightContent={rightContent}
-      />
-
-
-      <div className="dashboard-container">
-        <Sidebar />
-
-        <main className="main-content">
+    <ApprenantLayout
+      title={t('apprenant.enrolledCourses')}
+      breadcrumb={[{ to: '/', label: t('home') }, { label: t('apprenant.enrolledCourses') }]}
+      rightContent={rightContent}
+    >
       <CardP user={user} />
 
           {error && <div className="error-message">{error}</div>}
           <section className="enrolled-courses">
             <div className="courses-header-row">
-              <h2>Enrolled Courses</h2>
+              <h2>{t('apprenant.enrolledCourses')}</h2>
               <div className="courses-tabs">
                 <button
                   className={tab === 'enrolled' ? 'active' : ''}
                   onClick={() => setTab('enrolled')}
                 >
-                  Enrolled ({counts.enrolled})
+                  {t('apprenant.enrolled')} ({counts.enrolled})
                 </button>
                 <button
                   className={tab === 'active' ? 'active' : ''}
                   onClick={() => setTab('active')}
                 >
-                  Active ({counts.active})
+                  {t('apprenant.active')} ({counts.active})
                 </button>
                 <button
                   className={tab === 'completed' ? 'active' : ''}
                   onClick={() => setTab('completed')}
                 >
-                  Completed ({counts.completed})
+                  {t('apprenant.completed')} ({counts.completed})
                 </button>
               </div>
             </div>
@@ -106,7 +99,7 @@ const ApprenantEnrolled = () => {
                   <div className="course-info">
                     <p className="course-category">{course.category}</p>
                     <h3>{course.title}</h3>
-                    <p className="instructor">{course.formateur?.fullName || 'Instructor'}</p>
+                    <p className="instructor">{course.formateur?.fullName || t('instructor')}</p>
                     <div className="course-footer">
                       <div className="rating">
                         <FaStar className="star" />
@@ -116,11 +109,11 @@ const ApprenantEnrolled = () => {
                       </div>
                     </div>
                     <div className="course-action">
-                      <span className="price">{course.priceType === 'free' ? 'Free' : `$${Number(course.price || 0).toFixed(2)}`}</span>
+                      <span className="price">{course.priceType === 'free' ? t('apprenant.priceFree') : `$${Number(course.price || 0).toFixed(2)}`}</span>
                       <button className="view-course-btn">
                         {Number(course.myProgress || 0) >= 100 && course.certificateIssued
-                          ? 'Certificate Earned'
-                          : `Progress ${course.myProgress || 0}%`}
+                          ? t('apprenant.certificateEarned')
+                          : t('apprenant.progress', { value: course.myProgress || 0 })}
                       </button>
                     </div>
                   </div>
@@ -128,9 +121,7 @@ const ApprenantEnrolled = () => {
               ))}
             </div>
           </section>
-        </main>
-      </div>
-    </div>
+      </ApprenantLayout>
   );
 };
 

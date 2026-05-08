@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { FaEye, FaDownload } from 'react-icons/fa';
-import Sidebar from '../../components/apprenant/Sidebar';
+import ApprenantLayout from '../../components/apprenant/ApprenantLayout';
 import CardP from '../../components/apprenant/CardP';
-import DashboardNavbar from '../../components/common/DashboardNavbar';
 import {
   getApprenantProfile,
   getCertificateDownloadUrl,
@@ -11,6 +11,7 @@ import {
 import './dashboard.css';
 
 const ApprenantCertificates = () => {
+  const { t } = useTranslation();
   const [certificates, setCertificates] = useState([]);
   const [user, setUser] = useState(null);
   const [error, setError] = useState('');
@@ -26,7 +27,7 @@ const ApprenantCertificates = () => {
         setCertificates(certificatesResponse.data?.data || []);
         setUser(userResponse.data?.user || null);
       } catch (err) {
-        setError(err.response?.data?.message || 'Failed to load certificates.');
+        setError(err.response?.data?.message || t('errorOccurred'));
       }
     };
 
@@ -54,40 +55,32 @@ const ApprenantCertificates = () => {
 
   const rightContent = (
     <>
-      <button className="lang-btn">ENG</button>
       <div className="notification-icon"></div>
       <div className="cart-icon"></div>
     </>
   );
 
   return (
-    <div className="apprenant-dashboard">
-      <DashboardNavbar
-        title="My Certificates"
-        breadcrumb={[{ to: '/', label: 'Home' }, { label: 'My Certificates' }]}
-        rightContent={rightContent}
-      />
-
-
-      <div className="dashboard-container">
-        <Sidebar />
-
-        <main className="main-content">
+    <ApprenantLayout
+      title={t('apprenant.myCertificates')}
+      breadcrumb={[{ to: '/', label: t('home') }, { label: t('apprenant.myCertificates') }]}
+      rightContent={rightContent}
+    >
       <CardP user={user} />
 
           {error && <div className="error-message">{error}</div>}
           <section className="certificates-section">
-            <h2>My Certificates</h2>
+            <h2>{t('apprenant.myCertificates')}</h2>
             <div className="certificates-table-container" style={{marginTop:"20px"}}>
               <table className="certificates-table">
                 <thead>
                   <tr>
-                    <th>ID</th>
-                    <th>Course Name</th>
-                    <th>Date</th>
-                    <th>Instructor</th>
-                    <th>Status</th>
-                    <th>Actions</th>
+                    <th>{t('apprenant.certificateId')}</th>
+                    <th>{t('apprenant.courseName')}</th>
+                    <th>{t('apprenant.date')}</th>
+                    <th>{t('apprenant.instructor')}</th>
+                    <th>{t('apprenant.status')}</th>
+                    <th>{t('apprenant.actions')}</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -100,12 +93,12 @@ const ApprenantCertificates = () => {
                       <td>{cert.status || 'active'}</td>
                       <td>
                         <FaEye
-                          title="View"
+                          title={t('apprenant.view')}
                           style={{cursor: 'pointer', marginRight: '0.5rem'}}
                           onClick={() => handleViewCertificate(cert)}
                         />
                         <FaDownload
-                          title="Download"
+                          title={t('apprenant.download')}
                           style={{cursor: 'pointer'}}
                           onClick={() => handleDownloadCertificate(cert)}
                         />
@@ -123,9 +116,7 @@ const ApprenantCertificates = () => {
               </table>
             </div>
           </section>
-        </main>
-      </div>
-    </div>
+      </ApprenantLayout>
   );
 };
 

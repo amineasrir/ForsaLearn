@@ -39,7 +39,7 @@ body {
 /* ================= HEADER ================= */
 .dashboard-header {
   background: linear-gradient(90deg, #ffe9ea 0%, #eef6ff 55%, #e6f4ff 100%);
-  height: 90px;
+  height: 85px;
 }
 
 .header-container {
@@ -47,19 +47,42 @@ body {
   margin: 0 auto;
   padding: 0 1rem;
   display: flex;
-  justify-content: space-between;
+  justify-content: center;
   align-items: center;
+  position: relative;
+  text-align: center;
 }
 
 .header-left {
+  position: absolute;
+  left: 1rem;
   display: flex;
   align-items: center;
   gap: 1rem;
 }
 
+.navbar-dashboard-right {
+  position: absolute;
+  right: 1rem;
+  display: flex;
+  align-items: center;
+}
+
+.mobile-menu-btn {
+  display: none;
+  border: none;
+  background: transparent;
+  color: var(--text);
+  font-size: 1.2rem;
+  cursor: pointer;
+  margin-right: 0.75rem;
+}
+
 .header-center {
- text-align: center;
-  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
   text-align: center;
 }
 
@@ -69,12 +92,11 @@ body {
   margin: 0;
 }
 
-.header-center .breadcrumb {
+.breadcrumb {
   margin-top: 0.35rem;
   font-size: 0.85rem;
   color: var(--muted);
-   text-align: center;
-
+  text-align: center;
 }
 
 
@@ -96,7 +118,38 @@ body {
   border: 1px solid var(--border);
   position: sticky;
   margin-top: 100px;
-  /* height: fit-content; */
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.sidebar-header {
+  display: none;
+  justify-content: flex-end;
+  margin-bottom: 1rem;
+}
+
+.sidebar-close-btn {
+  border: none;
+  background: transparent;
+  color: var(--text);
+  font-size: 1.2rem;
+  cursor: pointer;
+}
+
+.sidebar-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.35);
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.3s ease, visibility 0.3s ease;
+  z-index: 90;
+  pointer-events: none;
+}
+
+.sidebar-overlay.active {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
 }
 
 .apprenant-menu-title {
@@ -787,57 +840,261 @@ body {
 
 /* ================= RESPONSIVE ================= */
 @media (max-width: 1024px) {
-  .courses-container {
-    grid-template-columns: repeat(2, 1fr);
+  .dashboard-container {
+    grid-template-columns: 1fr;
+  }
+
+  .courses-container,
+  .apprenant-stats-cards {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
   .two-column-section {
     grid-template-columns: 1fr;
   }
 
-  .dashboard-container {
-    grid-template-columns: 240px 1fr;
+  .apprenant-sidebar {
+    position: fixed;
+    left: 0;
+    top: 0;
+    width: min(320px, 85%);
+    max-width: 320px;
+    height: 100vh;
+    margin-top: 0;
+    transform: translateX(-110%);
+    box-shadow: 0 24px 60px rgba(15, 23, 42, 0.18);
+    z-index: 100;
+    overflow-y: auto;
+    padding-top: 1.5rem;
+    background: var(--card);
+  }
+
+  .apprenant-sidebar.open {
+    transform: translateX(0);
+  }
+
+  .sidebar-header {
+    display: flex;
+  }
+
+  .course-grid-page {
+    grid-template-columns: 1fr;
+  }
+
+  .course-cards > .course-card {
+    flex: 0 0 48%;
+  }
+
+  .header-left,
+  .navbar-dashboard-right {
+    position: static;
+    width: auto;
+    justify-content: center;
+    margin-bottom: 0.75rem;
+  }
+
+  .header-container {
+    justify-content: center;
+    align-items: center;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+  }
+
+  .mobile-menu-btn {
+    display: inline-flex;
   }
 }
 
 @media (max-width: 768px) {
   .dashboard-header {
-    padding: 2rem 0 4rem;
+    height: auto;
+    padding: 1.5rem 0 1rem;
+  }
+
+  .header-container {
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0 1rem;
+  }
+
+  .header-left,
+  .navbar-dashboard-right {
+    position: static;
+    width: 100%;
+    justify-content: center;
+    margin: 0 auto;
   }
 
   .header-center {
     position: static;
     transform: none;
     margin-bottom: 0.75rem;
+    padding: 0 0.5rem;
+  }
+
+  .header-center h1 {
+    font-size: 1.9rem;
   }
 
   .dashboard-container {
     grid-template-columns: 1fr;
     gap: 1rem;
+    padding-bottom: 2rem;
   }
 
   .apprenant-sidebar {
-    position: relative;
-    top: auto;
+    padding: 1rem;
+    margin-top: 0;
+    border-radius: 12px;
   }
 
-  .courses-container {
+  .apprenant-menu-item {
+    gap: 0.6rem;
+    padding: 0.75rem 0.85rem;
+  }
+
+  .apprenant-profile-card,
+  .apprenant-profil-section {
+    padding: 1.5rem;
+  }
+
+  .apprenant-profil-content {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .apprenant-stats-cards,
+  .courses-container,
+  .profile-details {
     grid-template-columns: 1fr;
   }
 
-  .apprenant-stats-cards {
+  .courses-header-row {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .courses-tabs {
+    flex-wrap: wrap;
+    justify-content: stretch;
+  }
+
+  .courses-tabs button {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .course-card {
+    flex-direction: column;
+  }
+
+  .course-image {
+    height: 170px;
+  }
+
+  .course-action {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.75rem;
+  }
+
+  .view-course-btn,
+  .apprenant-continue-button {
+    width: 100%;
+  }
+
+  .profile-details {
     grid-template-columns: 1fr;
   }
 
-  .two-column-section {
-    grid-template-columns: 1fr;
+  .profile-details div:last-child {
+    grid-column: auto;
   }
 
-  .apprenant-profile-card {
-    padding: 1.75rem;
-    margin-top: -3rem;
+  .certificates-table th,
+  .certificates-table td {
+    padding: 0.6rem 0.5rem;
+    font-size: 0.78rem;
   }
 
+  .quiz-item-card,
+  .invoice-item {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.75rem;
+  }
+
+  .chat-input {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .chat-input button {
+    width: 100%;
+    margin-left: 0;
+  }
+
+  .message-wrapper {
+    flex-direction: column;
+  }
+
+  .conv-list {
+    width: 100%;
+  }
+}
+
+@media (max-width: 640px) {
+  .header-center h1 {
+    font-size: 1.6rem;
+  }
+
+  .dashboard-container {
+    padding: 0 0.75rem 1.5rem;
+  }
+
+  .apprenant-sidebar {
+    padding: 0.85rem;
+  }
+
+  .apprenant-menu-title {
+    margin: 1rem 0 0.5rem;
+  }
+
+  .apprenant-menu-item {
+    padding: 0.65rem 0.75rem;
+  }
+
+  .course-grid-header {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .course-grid-header > * {
+    width: 100%;
+  }
+
+  .course-cards > .course-card {
+    flex: 1 1 100%;
+  }
+
+  .apprenant-quiz-section {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .apprenant-quiz-content {
+    margin-bottom: 1rem;
+  }
+
+  .chat-body {
+    padding: 0.75rem;
+  }
+
+  .courses-tabs button {
+    font-size: 0.9rem;
+  }
 }
 
 /* ================= COURSES GRID PAGE ================= */

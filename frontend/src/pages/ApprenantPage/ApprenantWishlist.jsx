@@ -1,39 +1,34 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
-import Sidebar from '../../components/apprenant/Sidebar';
+import ApprenantLayout from '../../components/apprenant/ApprenantLayout';
 import CardP from '../../components/apprenant/CardP';
-import DashboardNavbar from '../../components/common/DashboardNavbar';
 import './dashboard.css';
 import { useWishlist } from '../../context/WishlistContext';
 import { FaHeart, FaPlayCircle, FaStar } from 'react-icons/fa';
 
 const ApprenantWishlist = () => {
+  const { t } = useTranslation();
   const { items, toggleItem } = useWishlist();
 
   const rightContent = (
     <>
-      <button className="lang-btn">ENG</button>
       <div className="notification-icon"></div>
       <div className="cart-icon"></div>
     </>
   );
 
   return (
-    <div className="apprenant-dashboard">
-      <DashboardNavbar
-        title="Wishlist"
-        breadcrumb={[{ to: '/', label: 'Home' }, { label: 'Wishlist' }]}
-        rightContent={rightContent}
-      />
-
-      <div className="dashboard-container">
-        <Sidebar />
-        <main className="main-content">
+    <ApprenantLayout
+      title={t('apprenant.wishlist')}
+      breadcrumb={[{ to: '/', label: t('home') }, { label: t('apprenant.wishlist') }]}
+      rightContent={rightContent}
+    >
       <CardP  />
 
           <div className="wishlist-grid">
             {items.length === 0 ? (
-              <p>Your wishlist is empty.</p>
+              <p>{t('apprenant.wishlistEmpty')}</p>
             ) : (
               items.map(course => (
                 <div key={course.id} className="course-card">
@@ -49,21 +44,19 @@ const ApprenantWishlist = () => {
                   </div>
                   <div className="course-details">
                     <h4>{course.title}</h4>
-                    <p className="instructor">{course.instructor}</p>
+                    <p className="instructor">{course.instructor || t('instructor')}</p>
                     <p className="category">{course.category}</p>
                     <div className="course-rating">
                       <FaStar /> <span>{course.rating} ({course.reviews} Reviews)</span>
                     </div>
                     <p className="price">{course.price}</p>
-                    <button className="view-course-btn">View Course</button>
+                    <button className="view-course-btn">{t('apprenant.viewCourse')}</button>
                   </div>
                 </div>
               ))
             )}
           </div>
-        </main>
-      </div>
-    </div>
+      </ApprenantLayout>
   );
 };
 

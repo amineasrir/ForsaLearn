@@ -1,14 +1,14 @@
 import React, { useEffect, useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { FaHeart, FaPlayCircle, FaStar, FaThLarge, FaBars } from 'react-icons/fa';
-import Sidebar from '../../components/apprenant/Sidebar';
+import ApprenantLayout from '../../components/apprenant/ApprenantLayout';
 import CardP from '../../components/apprenant/CardP';
-import DashboardNavbar from '../../components/common/DashboardNavbar';
 import { useWishlist } from '../../context/WishlistContext';
 import { getApprenantProfile, getPublishedCourses } from '../../services/apprenentService';
 import './dashboard.css';
 
 const ApprenantCourses = () => {
-  const [sidebarVisible] = useState(true);
+  const { t } = useTranslation();
   const [courses, setCourses] = useState([]);
   const [user, setUser] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
@@ -26,7 +26,7 @@ const ApprenantCourses = () => {
         setCourses(coursesResponse.data?.data || []);
         setUser(userResponse.data?.user || null);
       } catch (err) {
-        setError(err.response?.data?.message || 'Failed to load courses.');
+        setError(err.response?.data?.message || t('errorOccurred'));
       }
     };
 
@@ -44,52 +44,44 @@ const ApprenantCourses = () => {
 
   const rightContent = (
     <>
-      <button className="lang-btn">ENG</button>
       <div className="notification-icon"></div>
       <div className="cart-icon"></div>
     </>
   );
 
   return (
-    <div className="apprenant-dashboard">
-      <DashboardNavbar
-        title="Course Grid"
-        breadcrumb={[{ to: '/', label: 'Home' }, { label: 'Course Grid' }]}
-        rightContent={rightContent}
-      />
-
-
-      <div className="dashboard-container course-dashboard-container">
-        {sidebarVisible && <Sidebar />}
-        <main className="main-content">
+    <ApprenantLayout
+      title={t('apprenant.courses')}
+      breadcrumb={[{ to: '/', label: t('home') }, { label: t('apprenant.courses') }]}
+      rightContent={rightContent}
+      className="course-dashboard-container"
+    >
       <CardP user={user} />
 
           {error && <div className="error-message">{error}</div>}
-          <div className={`course-grid-page${sidebarVisible ? '' : ' no-sidebar'}`}>
-            {sidebarVisible && (
-              <aside className="course-filters">
-                <h3>Filters</h3>
-                <div className="filter-section">
-                  <h4>Published Courses</h4>
-                  <p>{mappedCourses.length} course(s) available</p>
-                  <button className="clear-filters">Clear</button>
-                </div>
-              </aside>
-            )}
+          <div className="course-grid-page">
+            <aside className="course-filters">
+              <h3>{t('apprenant.filters')}</h3>
+              <div className="filter-section">
+                <h4>{t('apprenant.publishedCourses')}</h4>
+                <p>{t('apprenant.coursesAvailable', { count: mappedCourses.length })}</p>
+                <button className="clear-filters">{t('apprenant.clear')}</button>
+              </div>
+            </aside>
 
             <section className="course-grid-section">
               <div className="course-grid-header">
-                <span>Showing {mappedCourses.length} result(s)</span>
+                <span>{t('apprenant.showingResults', { count: mappedCourses.length })}</span>
                 <div className="view-toggle">
                   <button className="grid-view active"><FaThLarge /></button>
                   <button className="list-view"><FaBars /></button>
                 </div>
                 <select className="sort-select">
-                  <option>Newly published</option>
+                  <option>{t('apprenant.newlyPublished')}</option>
                 </select>
                 <input
                   type="search"
-                  placeholder="Search"
+                  placeholder={t('apprenant.search')}
                   className="course-search"
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
@@ -111,22 +103,20 @@ const ApprenantCourses = () => {
                     </div>
                     <div className="course-details">
                       <h4>{course.title}</h4>
-                      <p className="instructor">{course.instructor}</p>
+                      <p className="instructor">{course.instructor || t('instructor')}</p>
                       <p className="category">{course.category}</p>
                       <div className="course-rating">
                         <FaStar /> <span>{Number(course.averageRating || 0).toFixed(1)} ({course.totalReviews || 0} Reviews)</span>
                       </div>
                       <p className="price">{course.priceLabel}</p>
-                      <button className="view-course-btn">View Course</button>
+                      <button className="view-course-btn">{t('apprenant.viewCourse')}</button>
                     </div>
                   </div>
                 ))}
               </div>
             </section>
           </div>
-        </main>
-      </div>
-    </div>
+      </ApprenantLayout>
   );
 };
 

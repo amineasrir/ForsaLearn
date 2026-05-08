@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
-import Sidebar from '../../components/apprenant/Sidebar';
+import { useTranslation } from 'react-i18next';
+import ApprenantLayout from '../../components/apprenant/ApprenantLayout';
 import CardP from '../../components/apprenant/CardP';
 import './dashboard.css';
 import '../../styles/formateur.css';
-import DashboardNavbar from '../../components/common/DashboardNavbar';
 
 const ApprenantSettings = () => {
+  const { t } = useTranslation();
   const [activeTab, setActiveTab] = useState('account');
   const [account, setAccount] = useState({ email: 'studentdemo@example.com' });
   const [passwords, setPasswords] = useState({ current: '', new: '', confirm: '' });
@@ -26,27 +27,22 @@ const ApprenantSettings = () => {
   };
 
   const saveSettings = () => {
-    alert('Settings saved (mock)');
+    alert(t('apprenant.settingsSaved'));
   };
 
   const rightContent = (
     <>
-      <button className="lang-btn">ENG</button>
       <div className="notification-icon"></div>
       <div className="cart-icon"></div>
     </>
   );
 
   return (
-    <div className="apprenant-dashboard">
-      <DashboardNavbar
-        title="Settings"
-        breadcrumb={[{ to: '/', label: 'Home' }, { label: 'Settings' }]}
-        rightContent={rightContent}
-      />
-      <div className="dashboard-container">
-        <Sidebar />
-        <main className="main-content">
+    <ApprenantLayout
+      title={t('apprenant.settings')}
+      breadcrumb={[{ to: '/', label: t('home') }, { label: t('apprenant.settings') }]}
+      rightContent={rightContent}
+    >
       <CardP  />
 
           <div className="settings-page">
@@ -56,27 +52,27 @@ const ApprenantSettings = () => {
                   className={`settings-tab ${activeTab === 'account' ? 'active' : ''}`}
                   onClick={() => setActiveTab('account')}
                 >
-                  Account
+                  {t('apprenant.accountInformation')}
                 </button>
                 <button
                   className={`settings-tab ${activeTab === 'security' ? 'active' : ''}`}
                   onClick={() => setActiveTab('security')}
                 >
-                  Security
+                  {t('apprenant.changePassword')}
                 </button>
                 <button
                   className={`settings-tab ${activeTab === 'notifications' ? 'active' : ''}`}
                   onClick={() => setActiveTab('notifications')}
                 >
-                  Notifications
+                  {t('apprenant.notifications')}
                 </button>
               </div>
               <div className="settings-panel">
                 {activeTab === 'account' && (
                   <div>
-                    <h2>Account Information</h2>
+                    <h2>{t('apprenant.accountInformation')}</h2>
                     <div className="form-group">
-                      <label>Email</label>
+                      <label>{t('email')}</label>
                       <input
                         type="email"
                         name="email"
@@ -88,9 +84,9 @@ const ApprenantSettings = () => {
                 )}
                 {activeTab === 'security' && (
                   <div>
-                    <h2>Change Password</h2>
+                    <h2>{t('apprenant.changePassword')}</h2>
                     <div className="form-group">
-                      <label>Current Password</label>
+                      <label>{t('apprenant.currentPassword')}</label>
                       <input
                         type="password"
                         name="current"
@@ -99,7 +95,7 @@ const ApprenantSettings = () => {
                       />
                     </div>
                     <div className="form-group">
-                      <label>New Password</label>
+                      <label>{t('apprenant.newPassword')}</label>
                       <input
                         type="password"
                         name="new"
@@ -108,7 +104,7 @@ const ApprenantSettings = () => {
                       />
                     </div>
                     <div className="form-group">
-                      <label>Confirm Password</label>
+                      <label>{t('apprenant.confirmPassword')}</label>
                       <input
                         type="password"
                         name="confirm"
@@ -120,7 +116,7 @@ const ApprenantSettings = () => {
                 )}
                 {activeTab === 'notifications' && (
                   <div>
-                    <h2>Notifications</h2>
+                    <h2>{t('apprenant.notifications')}</h2>
                     <div className="form-group">
                       <label>
                         <input
@@ -128,7 +124,7 @@ const ApprenantSettings = () => {
                           name="email"
                           checked={notifications.email}
                           onChange={handleNotifToggle}
-                        /> Email notifications
+                        /> {t('apprenant.emailNotifications')}
                       </label>
                     </div>
                     <div className="form-group">
@@ -138,20 +134,18 @@ const ApprenantSettings = () => {
                           name="sms"
                           checked={notifications.sms}
                           onChange={handleNotifToggle}
-                        /> SMS notifications
+                        /> {t('apprenant.smsNotifications')}
                       </label>
                     </div>
                   </div>
                 )}
                 <button className="btn-save-settings" onClick={saveSettings}>
-                  Save Changes
+                  {t('apprenant.saveChanges')}
                 </button>
               </div>
             </div>
           </div>
-        </main>
-      </div>
-    </div>
+      </ApprenantLayout>
   );
 };
 

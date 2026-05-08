@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
-import Sidebar from '../../components/apprenant/Sidebar';
+import { useTranslation } from 'react-i18next';
+import ApprenantLayout from '../../components/apprenant/ApprenantLayout';
 import CardP from '../../components/apprenant/CardP';
-import DashboardNavbar from '../../components/common/DashboardNavbar';
 import '../../styles/formateur.css';
 import './dashboard.css';
 import {
@@ -53,6 +53,7 @@ const getLastMessagePreview = (conversation) => {
 };
 
 const ApprenantMessages = () => {
+  const { t } = useTranslation();
   const [user, setUser] = useState(null);
   const [conversations, setConversations] = useState([]);
   const [activeConvId, setActiveConvId] = useState(null);
@@ -81,7 +82,7 @@ const ApprenantMessages = () => {
         setConversations(loadedConversations);
         setActiveConvId(loadedConversations[0]?._id || null);
       } catch (err) {
-        setError(err.response?.data?.message || 'Failed to load conversations.');
+        setError(err.response?.data?.message || t('errorOccurred'));
       } finally {
         setLoadingConversations(false);
       }
@@ -108,7 +109,7 @@ const ApprenantMessages = () => {
             : conversation
         )));
       } catch (err) {
-        setError(err.response?.data?.message || 'Failed to load messages.');
+        setError(err.response?.data?.message || t('errorOccurred'));
       } finally {
         setLoadingMessages(false);
       }
@@ -171,105 +172,98 @@ const ApprenantMessages = () => {
 
   const rightContent = (
     <>
-      <button className="lang-btn">ENG</button>
       <div className="notification-icon"></div>
       <div className="cart-icon"></div>
     </>
   );
 
   return (
-    <div className="apprenant-dashboard message-page">
-      <DashboardNavbar
-        title="Messages"
-        breadcrumb={[{ to: '/', label: 'Home' }, { label: 'Messages' }]}
-        rightContent={rightContent}
-      />
-      <div className="dashboard-container">
-        <Sidebar />
-        <main className="main-content">
+    <ApprenantLayout
+      title={t('apprenant.messages')}
+      breadcrumb={[{ to: '/', label: t('home') }, { label: t('apprenant.messages') }]}
+      rightContent={rightContent}
+    >
       <CardP user={user} />
 
-          {error && <div className="error-message">{error}</div>}
-          <div className="message-wrapper">
-            <div className="conv-list">
-              <div className="chat-search-box">
-                <input
-                  type="text"
-                  placeholder="Search conversations..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                />
-              </div>
+      {error && <div className="error-message">{error}</div>}
+      <div className="message-wrapper">
+        <div className="conv-list">
+          <div className="chat-search-box">
+            <input
+              type="text"
+              placeholder={t('apprenant.searchConversations')}
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
+          </div>
 
-              {loadingConversations ? (
-                <div className="conv-empty-state">Loading conversations...</div>
-              ) : filteredConversations.length === 0 ? (
-                <div className="conv-empty-state">No conversations found.</div>
-              ) : filteredConversations.map((conv) => (
-                <div
-                  key={conv._id}
-                  className={`conv-item ${conv._id === activeConvId ? 'active' : ''}`}
-                  onClick={() => setActiveConvId(conv._id)}
-                >
-                  <div className="conv-item-top">
-                    <span className="conv-student-name">{getConversationLabel(conv, user?._id)}</span>
-                    <span className="conv-time">{formatConversationTime(conv.lastMessageAt)}</span>
-                  </div>
-                  <div className="conv-item-bottom">
-                    <span className="conv-preview">{getLastMessagePreview(conv)}</span>
-                    {conv.unreadCount > 0 && <span className="conv-unread">{conv.unreadCount}</span>}
-                  </div>
-                </div>
-              ))}
+          {loadingConversations ? (
+            <div className="conv-empty-state">{t('apprenant.loadingConversations')}</div>
+          ) : filteredConversations.length === 0 ? (
+            <div className="conv-empty-state">{t('apprenant.noConversations')}</div>
+          ) : filteredConversations.map((conv) => (
+            <div
+              key={conv._id}
+              className={`conv-item ${conv._id === activeConvId ? 'active' : ''}`}
+              onClick={() => setActiveConvId(conv._id)}
+            >
+              <div className="conv-item-top">
+                <span className="conv-student-name">{getConversationLabel(conv, user?._id)}</span>
+                <span className="conv-time">{formatConversationTime(conv.lastMessageAt)}</span>
+              </div>
+              <div className="conv-item-bottom">
+                <span className="conv-preview">{getLastMessagePreview(conv)}</span>
+                {conv.unreadCount > 0 && <span className="conv-unread">{conv.unreadCount}</span>}
+              </div>
             </div>
+          ))}
+        </div>
 
-            <div className="chat-window">
-              <div className="chat-header">
-                <div>
-                  <h3>{activeConv ? getConversationLabel(activeConv, user?._id) : 'Messages'}</h3>
-                  <p>{activeConv?.type || 'direct conversation'}</p>
-                </div>
-              </div>
-
-              <div className="chat-body">
-                {loadingMessages ? (
-                  <div className="chat-empty-state">Loading messages...</div>
-                ) : messages.length === 0 ? (
-                  <div className="chat-empty-state">Start the conversation by sending a message.</div>
-                ) : messages.map((message) => (
-                  <div
-                    key={message._id}
-                    className={`chat-message ${message.sender?._id === user?._id ? 'sent' : 'received'}`}
-                  >
-                    <div className="chat-bubble">
-                      <div>{message.content}</div>
-                      <span className="chat-meta">
-                        {formatTime(message.createdAt)}
-                      </span>
-                    </div>
-                  </div>
-                ))}
-                <div ref={messagesEndRef} />
-              </div>
-
-              <div className="chat-input">
-                <input
-                  type="text"
-                  placeholder={activeConvId ? 'Write a message...' : 'Select a conversation first'}
-                  value={newMessage}
-                  onChange={e => setNewMessage(e.target.value)}
-                  onKeyDown={e => { if (e.key === 'Enter') sendMessage(); }}
-                  disabled={!activeConvId || sending}
-                />
-                <button onClick={sendMessage} disabled={!activeConvId || sending || !newMessage.trim()}>
-                  {sending ? 'Sending...' : 'Send'}
-                </button>
-              </div>
+        <div className="chat-window">
+          <div className="chat-header">
+            <div>
+              <h3>{activeConv ? getConversationLabel(activeConv, user?._id) : t('apprenant.messages')}</h3>
+              <p>{activeConv?.type || t('apprenant.directConversation')}</p>
             </div>
           </div>
-        </main>
+
+          <div className="chat-body">
+            {loadingMessages ? (
+              <div className="chat-empty-state">{t('apprenant.loadingMessages')}</div>
+            ) : messages.length === 0 ? (
+              <div className="chat-empty-state">{t('apprenant.startConversation')}</div>
+            ) : messages.map((message) => (
+              <div
+                key={message._id}
+                className={`chat-message ${message.sender?._id === user?._id ? 'sent' : 'received'}`}
+              >
+                <div className="chat-bubble">
+                  <div>{message.content}</div>
+                  <span className="chat-meta">
+                    {formatTime(message.createdAt)}
+                  </span>
+                </div>
+              </div>
+            ))}
+            <div ref={messagesEndRef} />
+          </div>
+
+          <div className="chat-input">
+            <input
+              type="text"
+              placeholder={activeConvId ? t('apprenant.writeMessage') : t('apprenant.selectConversationFirst')}
+              value={newMessage}
+              onChange={e => setNewMessage(e.target.value)}
+              onKeyDown={e => { if (e.key === 'Enter') sendMessage(); }}
+              disabled={!activeConvId || sending}
+            />
+            <button onClick={sendMessage} disabled={!activeConvId || sending || !newMessage.trim()}>
+              {sending ? t('apprenant.sending') : t('apprenant.send')}
+            </button>
+          </div>
+        </div>
       </div>
-    </div>
+    </ApprenantLayout>
   );
 };
 

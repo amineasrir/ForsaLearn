@@ -1,9 +1,9 @@
 import React, { useEffect, useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import './dashboard.css';
-import DashboardNavbar from '../../components/common/DashboardNavbar';
+import ApprenantLayout from '../../components/apprenant/ApprenantLayout';
 import { FaBook, FaCheckCircle, FaStar, FaFileAlt } from 'react-icons/fa';
 import CardP from '../../components/apprenant/CardP';
-import Sidebar from '../../components/apprenant/Sidebar';
 import {
   getApprenantProfile,
   getEnrolledCourses,
@@ -11,6 +11,7 @@ import {
 } from '../../services/apprenentService';
 
 const ApprenantDashboard = () => {
+  const { t } = useTranslation();
   const [user, setUser] = useState(null);
   const [courses, setCourses] = useState([]);
   const [payments, setPayments] = useState([]);
@@ -29,7 +30,7 @@ const ApprenantDashboard = () => {
         setCourses(coursesResponse.data?.data || []);
         setPayments(paymentsResponse.data?.data || []);
       } catch (err) {
-        setError(err.response?.data?.message || 'Failed to load dashboard.');
+        setError(err.response?.data?.message || t('errorOccurred'));
       }
     };
 
@@ -55,33 +56,27 @@ const ApprenantDashboard = () => {
 
   const rightContent = (
     <>
-      <button className="lang-btn">ENG</button>
       <div className="notification-icon"></div>
       <div className="cart-icon"></div>
     </>
   );
 
   return (
-    <div className="apprenant-dashboard">
-      <DashboardNavbar
-        title="Dashboard"
-        breadcrumb={[{ to: '/', label: 'Home' }, { label: 'Dashboard' }]}
-        rightContent={rightContent}
-      />
-      <div className="dashboard-container">
-        <Sidebar />
-
-        <main className="main-content">
+    <ApprenantLayout
+      title={t('apprenant.dashboard')}
+      breadcrumb={[{ to: '/', label: t('home') }, { label: t('apprenant.dashboard') }]}
+      rightContent={rightContent}
+    >
       <CardP user={user} />
 
           {error && <div className="error-message">{error}</div>}
 
           <div className="apprenant-quiz-section">
             <div className="apprenant-quiz-content">
-              <h3>Learning Progress</h3>
-              <p>You are enrolled in {courses.length} course(s)</p>
+              <h3>{t('apprenant.learningProgress')}</h3>
+              <p>{t('apprenant.enrolledIn', { count: courses.length })}</p>
             </div>
-            <button className="apprenant-continue-button">Keep Learning</button>
+            <button className="apprenant-continue-button">{t('apprenant.keepLearning')}</button>
           </div>
 
           <div className="apprenant-stats-cards">
@@ -115,7 +110,7 @@ const ApprenantDashboard = () => {
           </div>
 
           <section className="enrolled-courses">
-            <h2>Recently Enrolled Courses</h2>
+            <h2>{t('apprenant.recentlyEnrolledCourses')}</h2>
             <div className="courses-container">
               {enrolledCourses.map(course => (
                 <div key={course._id} className="course-card">
@@ -123,16 +118,20 @@ const ApprenantDashboard = () => {
                   <div className="course-info">
                     <p className="course-category">{course.category}</p>
                     <h3>{course.title}</h3>
-                    <p className="instructor">{course.formateur?.fullName || 'Instructor'}</p>
+                    <p className="instructor">{course.formateur?.fullName || t('instructor')}</p>
                     <div className="course-footer">
                       <div className="rating">
                         <FaStar className="star" />
-                        <span>{Number(course.averageRating || 0).toFixed(1)} ({course.totalReviews || 0} Reviews)</span>
+                        <span>{Number(course.averageRating || 0).toFixed(1)} ({course.totalReviews || 0} {t('apprenant.reviews')})</span>
                       </div>
                     </div>
                     <div className="course-action">
-                      <span className="price">{course.priceType === 'free' ? 'Free' : `$${Number(course.price || 0).toFixed(2)}`}</span>
-                      <button className="view-course-btn">Progress {course.myProgress || 0}%</button>
+                      <span className="price">{course.priceType === 'free' ? t('apprenant.priceFree') : `$${Number(course.price || 0).toFixed(2)}`}</span>
+                      <button className="view-course-btn">
+                        {Number(course.myProgress || 0) >= 100 && course.certificateIssued
+                          ? t('apprenant.certificateEarned')
+                          : t('apprenant.progress', { value: course.myProgress || 0 })}
+                      </button>
                     </div>
                   </div>
                 </div>
@@ -142,12 +141,12 @@ const ApprenantDashboard = () => {
 
           <div className="two-column-section">
             <section className="invoices-section">
-              <h2>Recent Payments</h2>
+              <h2>{t('apprenant.recentPayments')}</h2>
               <div className="invoices-list">
                 {recentInvoices.length === 0 ? (
                   <div className="invoice-item">
                     <div className="invoice-info">
-                      <p className="invoice-title">No payments yet</p>
+                      <p className="invoice-title">{t('apprenant.noPaymentsYet')}</p>
                     </div>
                   </div>
                 ) : recentInvoices.map(invoice => (
@@ -167,13 +166,13 @@ const ApprenantDashboard = () => {
             </section>
 
             <section className="quizzes-section">
-              <h2>Latest Quizzes</h2>
+              <h2>{t('apprenant.latestQuizzes')}</h2>
               <div className="quizzes-list">
                 {latestQuizzes.length === 0 ? (
                   <div className="quiz-item">
                     <div className="quiz-info">
-                      <h4>No quiz attempts yet</h4>
-                      <p className="quiz-date">Your quiz history will appear here.</p>
+                      <h4>{t('apprenant.noQuizAttempts')}</h4>
+                      <p className="quiz-date">{t('apprenant.quizHistoryPlaceholder')}</p>
                     </div>
                   </div>
                 ) : latestQuizzes.map(quiz => (
@@ -185,17 +184,15 @@ const ApprenantDashboard = () => {
                     </div>
                     <div className="quiz-info">
                       <h4>{quiz.title}</h4>
-                      <p className="quiz-score">Correct Answer : {quiz.correctAnswers}</p>
-                      <p className="quiz-date">Date : {quiz.date}</p>
+                      <p className="quiz-score">{t('apprenant.numberOfQuestions', { count: quiz.correctAnswers })}</p>
+                      <p className="quiz-date">{t('apprenant.date')} : {quiz.date}</p>
                     </div>
                   </div>
                 ))}
               </div>
             </section>
           </div>
-        </main>
-      </div>
-    </div>
+      </ApprenantLayout>
   );
 };
 

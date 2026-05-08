@@ -429,6 +429,38 @@
   transition: all 0.3s ease;
 }
 
+@media (max-width: 768px) {
+  .message-page .message-wrapper {
+    flex-direction: column;
+  }
+
+  .conv-list {
+    width: 100%;
+    max-height: 240px;
+  }
+
+  .chat-window {
+    width: 100%;
+  }
+
+  .chat-header,
+  .chat-input,
+  .chat-body {
+    padding: 0.75rem;
+  }
+
+  .chat-input {
+    flex-direction: column;
+    gap: 0.65rem;
+  }
+
+  .chat-input button {
+    width: 100%;
+    margin-left: 0;
+  }
+}
+
+
 .add-course-btn:hover {
   background: #fff;
   color: #667eea;

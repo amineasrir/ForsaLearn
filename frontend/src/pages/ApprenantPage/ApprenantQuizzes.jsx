@@ -1,9 +1,9 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 import { FaArrowRight } from 'react-icons/fa';
-import Sidebar from '../../components/apprenant/Sidebar';
+import ApprenantLayout from '../../components/apprenant/ApprenantLayout';
 import CardP from '../../components/apprenant/CardP';
-import DashboardNavbar from '../../components/common/DashboardNavbar';
 import './dashboard.css';
 
 const sampleQuizzes = [
@@ -40,38 +40,30 @@ const sampleQuizzes = [
 ];
 
 const ApprenantQuizzes = () => {
+  const { t } = useTranslation();
   const rightContent = (
     <>
-      <button className="lang-btn">ENG</button>
       <div className="notification-icon"></div>
       <div className="cart-icon"></div>
     </>
   );
 
   return (
-    <div className="apprenant-dashboard">
-      <DashboardNavbar
-        title="My Quiz Attempts"
-        breadcrumb={[{ to: '/', label: 'Home' }, { label: 'My Quiz Attempts' }]}
-        rightContent={rightContent}
-      />
-
-   
-
-      <div className="dashboard-container">
-        <Sidebar />
-
-        <main className="main-content">
+    <ApprenantLayout
+      title={t('apprenant.myQuizAttempts')}
+      breadcrumb={[{ to: '/', label: t('home') }, { label: t('apprenant.myQuizAttempts') }]}
+      rightContent={rightContent}
+    >
       <CardP />
 
           <section className="quizzes-list-section">
-            <h2>My Quiz Attempts</h2>
+            <h2>{t('apprenant.myQuizAttempts')}</h2>
             <div className="quizzes-list">
               {sampleQuizzes.map(q => (
                 <div key={q.id} className="quiz-item-card">
                   <div className="quiz-info">
                     <h3>{q.title}</h3>
-                    <p>Number of Questions : {q.questions < 10 ? `0${q.questions}` : q.questions}</p>
+                    <p>{t('apprenant.numberOfQuestions', { count: q.questions < 10 ? `0${q.questions}` : q.questions })}</p>
                   </div>
                   <div className="quiz-action">
                     <Link to={`/quiz/${q.id}`} className="quiz-start-btn">
@@ -82,9 +74,7 @@ const ApprenantQuizzes = () => {
               ))}
             </div>
           </section>
-        </main>
-      </div>
-    </div>
+      </ApprenantLayout>
   );
 };
 

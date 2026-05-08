@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from 'react';
-import Sidebar from '../../components/apprenant/Sidebar';
+import { useTranslation } from 'react-i18next';
+import ApprenantLayout from '../../components/apprenant/ApprenantLayout';
 import CardP from '../../components/apprenant/CardP';
 import './dashboard.css';
-import DashboardNavbar from '../../components/common/DashboardNavbar';
 import { getApprenantProfile } from '../../services/apprenentService';
 
 const ApprenantProfile = () => {
+  const { t } = useTranslation();
   const [user, setUser] = useState(null);
   const [editMode, setEditMode] = useState(false);
   const [error, setError] = useState('');
@@ -33,69 +34,61 @@ const ApprenantProfile = () => {
   };
 
   return (
-    <div className="apprenant-dashboard">
-      <DashboardNavbar
-        title="My Profile"
-        breadcrumb={[{ to: '/', label: 'Home' }, { label: 'My Profile' }]}
-        rightContent={
-          <>
-            <button className="lang-btn">ENG</button>
-            <div className="notification-icon"></div>
-            <div className="cart-icon"></div>
-          </>
-        }
-      />
-      <div className="dashboard-container">
-        <Sidebar />
-
-        <main className="main-content">
+    <ApprenantLayout
+      title={t('apprenant.myProfile')}
+      breadcrumb={[{ to: '/', label: t('home') }, { label: t('apprenant.myProfile') }]}
+      rightContent={
+        <>
+          <div className="notification-icon"></div>
+          <div className="cart-icon"></div>
+        </>
+      }
+    >
       <CardP user={user} />
 
           {error && <div className="error-message">{error}</div>}
           <div className="profile-page-content">
             <h2 className="profile-title">
-              My Profile
+              {t('apprenant.myProfile')}
               <button
                 className="title-edit-btn"
                 onClick={() => setEditMode(v => !v)}
-                title={editMode ? 'Cancel editing' : 'Edit profile'}
+                title={editMode ? t('apprenant.close') : t('apprenant.settings')}
               >✎</button>
             </h2>
             <div className="profile-details">
               <div>
-                <label>Full Name</label>
+                <label>{t('apprenant.fullName')}</label>
                 <p className="value">{profileData.fullName}</p>
               </div>
               <div>
-                <label>Registration Date</label>
+                <label>{t('apprenant.registrationDate')}</label>
                 <p className="value">{profileData.registrationDate}</p>
               </div>
               <div>
-                <label>Phone Number</label>
+                <label>{t('apprenant.phoneNumber')}</label>
                 <p className="value">{profileData.phone}</p>
               </div>
               <div>
-                <label>Email</label>
+                <label>{t('email')}</label>
                 <p className="value">{profileData.email}</p>
               </div>
               <div>
-                <label>Gender</label>
+                <label>{t('apprenant.gender')}</label>
                 <p className="value">{profileData.gender}</p>
               </div>
               <div>
-                <label>Bio</label>
+                <label>{t('apprenant.bio')}</label>
                 <p className="value">{profileData.bio}</p>
               </div>
             </div>
             {editMode && (
               <div className="profile-actions">
-                <button className="cancel-btn" onClick={() => setEditMode(false)}>Close</button>
+                <button className="cancel-btn" onClick={() => setEditMode(false)}>{t('apprenant.close')}</button>
               </div>
             )}
           </div>
-        </main>
-      </div>
-    </div>
+      </ApprenantLayout>
   );
 };
 

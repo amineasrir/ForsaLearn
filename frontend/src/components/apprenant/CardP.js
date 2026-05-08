@@ -1,11 +1,13 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import ava from '../../assets/image/student/ava.jpg';
 import "../../pages/ApprenantPage/dashboard.css";
 
 const CardP = ({ user }) => {
-  const name = user?.fullName || 'Student';
+  const { t } = useTranslation();
+  const name = user?.fullName || t('student');
   const avatar = user?.profilePicture || ava;
-  const roleLabel = user?.role === 'visiteur' ? 'Student' : (user?.role || 'Student');
+  const roleLabel = user?.role === 'visiteur' ? t('student') : (user?.role || t('student'));
 
   return (
     <div>
