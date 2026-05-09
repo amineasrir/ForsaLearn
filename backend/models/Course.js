@@ -166,6 +166,10 @@ const courseSchema = new mongoose.Schema({
     required: true,
     trim: true
   }],
+  videoUrl: {
+    type: String,
+    trim: true
+  },
   targetAudience: [{
     type: String,
     trim: true

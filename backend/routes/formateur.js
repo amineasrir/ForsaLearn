@@ -231,6 +231,7 @@ router.post('/courses',
     body('language').isIn(['Arabic', 'English', 'French']).withMessage('Invalid language'),
     body('price').isNumeric().withMessage('Price must be a number'),
     body('priceType').isIn(['free', 'paid', 'semi-free']).withMessage('Invalid price type'),
+    body('videoUrl').optional({ checkFalsy: true }).isURL().withMessage('Video URL must be valid'),
     body('learningOutcomes').isArray({ min: 1 }).withMessage('At least one learning outcome is required')
   ],
   async (req, res) => {
