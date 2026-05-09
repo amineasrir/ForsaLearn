@@ -41,8 +41,17 @@ export const getMyPayments = () => {
   return API.get("payment/my-payments");
 };
 
-export const getConversations = () => {
-  return API.get("messages/conversations");
+export const getConversations = (params = {}) => {
+  const searchParams = new URLSearchParams();
+
+  Object.entries(params).forEach(([key, value]) => {
+    if (value !== undefined && value !== null && value !== "") {
+      searchParams.append(key, value);
+    }
+  });
+
+  const query = searchParams.toString();
+  return API.get(`messages/conversations${query ? `?${query}` : ""}`);
 };
 
 export const getConversationMessages = (conversationId, params = {}) => {
