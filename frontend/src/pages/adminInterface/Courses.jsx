@@ -14,7 +14,7 @@ import {
 import Header from '../../components/admin/Header';
 import Sidebar from '../../components/admin/Sidebar';
 import ProfileCard from '../../components/admin/ProfileCard';
-import { deleteAdminCourse, getAdminCourses, getAdminProfile } from '../../services/adminService';
+import { approveAdminCourse, deleteAdminCourse, getAdminCourses, getAdminProfile } from '../../services/adminService';
 
 const categories = [
   'Web Development',
@@ -110,6 +110,17 @@ const Courses = () => {
       setCoursesData((prev) => prev.filter((course) => course._id !== courseId));
     } catch (err) {
       setError(err.response?.data?.message || 'Failed to delete course.');
+    }
+  };
+
+  const handleApprove = async (courseId) => {
+    try {
+      await approveAdminCourse(courseId);
+      setCoursesData((prev) => prev.map((course) => (
+        course._id === courseId ? { ...course, status: 'published' } : course
+      )));
+    } catch (err) {
+      setError(err.response?.data?.message || 'Failed to approve course.');
     }
   };
 
@@ -297,6 +308,11 @@ const Courses = () => {
                         </div>
 
                         <div className="course-actions">
+                          {course.status === 'pending' && (
+                            <button className="action-btn approve" title="Approve" onClick={() => handleApprove(course._id)}>
+                              Approve
+                            </button>
+                          )}
                           <button className="action-btn view" title="View">
                             <FaEye />
                           </button>

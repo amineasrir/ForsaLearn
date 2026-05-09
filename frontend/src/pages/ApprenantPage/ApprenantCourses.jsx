@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useNavigate } from 'react-router-dom';
 import { FaHeart, FaPlayCircle, FaStar, FaThLarge, FaBars } from 'react-icons/fa';
 import ApprenantLayout from '../../components/apprenant/ApprenantLayout';
 import CardP from '../../components/apprenant/CardP';
@@ -9,6 +10,7 @@ import './dashboard.css';
 
 const ApprenantCourses = () => {
   const { t } = useTranslation();
+  const navigate = useNavigate();
   const [courses, setCourses] = useState([]);
   const [user, setUser] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
@@ -109,7 +111,7 @@ const ApprenantCourses = () => {
                         <FaStar /> <span>{Number(course.averageRating || 0).toFixed(1)} ({course.totalReviews || 0} Reviews)</span>
                       </div>
                       <p className="price">{course.priceLabel}</p>
-                      <button className="view-course-btn">{t('apprenant.viewCourse')}</button>
+                      <button className="view-course-btn" onClick={() => navigate(`/apprenant/course/${course.id}`)}>{t('apprenant.viewCourse')}</button>
                     </div>
                   </div>
                 ))}

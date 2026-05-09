@@ -206,12 +206,17 @@ const AddCourses = () => {
     setError('');
     setSuccess('');
 
+    if (!formData.title.trim() || !formData.description.trim() || !formData.category || !formData.language || !formData.priceType) {
+      setError(t('addCourse.pleaseFillRequiredFields'));
+      return;
+    }
+
     const learningOutcomes = formData.learningOutcomes
       .map((item) => item.trim())
       .filter((item) => item !== '');
 
-    if (!formData.title.trim() || !formData.description.trim() || !formData.category || !formData.language || !formData.priceType) {
-      setError(t('addCourse.pleaseFillRequiredFields'));
+    if (learningOutcomes.length === 0) {
+      setError(t('addCourse.pleaseAddLearningOutcomes'));
       return;
     }
 
@@ -260,6 +265,7 @@ const AddCourses = () => {
         priceType: formData.priceType,
         price: Number(formData.price || 0),
         videoUrl,
+        learningOutcomes,
       };
 
       if (quizPayload) {
@@ -286,7 +292,12 @@ const AddCourses = () => {
         ]
       });
     } catch (err) {
-      setError(err.response?.data?.message || t('addCourse.failedToCreateCourse'));
+      const responseData = err.response?.data;
+      if (responseData?.errors && Array.isArray(responseData.errors) && responseData.errors.length > 0) {
+        setError(responseData.errors.map((errorItem) => errorItem.msg || errorItem.message).join(' '));
+      } else {
+        setError(responseData?.message || t('addCourse.failedToCreateCourse'));
+      }
     } finally {
       setLoading(false);
     }
@@ -580,6 +591,33 @@ const AddCourses = () => {
                   disabled={formData.priceType === 'free'}
                   placeholder={formData.priceType === 'free' ? t('addCourse.freeCourse') : t('addCourse.enterPrice')}
                 />
+              </div>
+
+              <div className="form-group learning-outcomes-group">
+                <label>{t('addCourse.learningOutcomes')}</label>
+                {formData.learningOutcomes.map((outcome, index) => (
+                  <div key={`outcome-${index}`} className="learning-outcome-row">
+                    <input
+                      type="text"
+                      className="form-input"
+                      value={outcome}
+                      onChange={(event) => handleOutcomeChange(index, event.target.value)}
+                      placeholder={t('addCourse.learningOutcomePlaceholder')}
+                    />
+                    {formData.learningOutcomes.length > 1 && (
+                      <button
+                        type="button"
+                        className="btn-text remove-outcome-btn"
+                        onClick={() => removeOutcome(index)}
+                      >
+                        {t('addCourse.remove')}
+                      </button>
+                    )}
+                  </div>
+                ))}
+                <button type="button" className="btn-secondary" onClick={addOutcome}>
+                  {t('addCourse.addLearningOutcome')}
+                </button>
               </div>
 
               <div className="form-actions">

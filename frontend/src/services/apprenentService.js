@@ -25,6 +25,14 @@ export const getPublishedCourses = (params = {}) => {
   return API.get(`courses${query ? `?${query}` : ""}`);
 };
 
+export const getCourseDetails = (courseId) => {
+  return API.get(`courses/${courseId}`);
+};
+
+export const enrollInCourse = (courseId) => {
+  return API.post(`courses/${courseId}/enroll`);
+};
+
 export const getEnrolledCourses = () => {
   return API.get("courses/student/my-courses");
 };

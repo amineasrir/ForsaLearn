@@ -341,6 +341,18 @@
     background: #ef4444;
     color: white;
   }
+
+  .action-btn.approve {
+    min-width: 80px;
+    padding: 0 12px;
+    background: #d1fae5;
+    color: #059669;
+  }
+
+  .action-btn.approve:hover {
+    background: #059669;
+    color: white;
+  }
   
   /* Empty State */
   .empty-state {

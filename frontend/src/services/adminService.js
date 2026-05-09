@@ -33,6 +33,10 @@ export const deleteAdminCourse = (courseId) => {
   return API.delete(`admin/courses/${courseId}`);
 };
 
+export const approveAdminCourse = (courseId) => {
+  return API.patch(`admin/courses/${courseId}/approve`);
+};
+
 export const getAdminUsers = (params = {}) => {
   const searchParams = new URLSearchParams();
 
