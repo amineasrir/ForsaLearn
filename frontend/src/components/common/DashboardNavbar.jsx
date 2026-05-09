@@ -4,6 +4,8 @@ import { useTranslation } from 'react-i18next';
 import { FaBars } from 'react-icons/fa';
 import logo_rem from '../../assets/image/home_page/logo_rem.png';
 import '../../pages/ApprenantPage/dashboard.css';
+import 'flag-icons/css/flag-icons.min.css'; // Import CSS des drapeaux
+
 /**
  * Props:
  * - title: page title string
@@ -14,8 +16,12 @@ import '../../pages/ApprenantPage/dashboard.css';
 const DashboardNavbar = ({ title, breadcrumb = [], rightContent = null, onMenuClick = null }) => {
   const { i18n } = useTranslation();
   const currentLang = i18n.language || 'en';
-  const toggleLanguage = () => {
+  const changeLanguage = () => {
     i18n.changeLanguage(currentLang === 'en' ? 'fr' : 'en');
+  };
+
+  const getFlagClass = (lang) => {
+    return lang === 'fr' ? 'fi fi-fr' : 'fi fi-us';
   };
 
   return (
@@ -44,9 +50,10 @@ const DashboardNavbar = ({ title, breadcrumb = [], rightContent = null, onMenuCl
         </div>
         <div className="navbar-dashboard-right">
           {rightContent}
-          <button type="button" className="lang-btn" onClick={toggleLanguage}>
-            {currentLang === 'en' ? 'ENG' : 'FR'}
-          </button>
+           <button className="lang-btn" onClick={changeLanguage} style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
+          <span className={getFlagClass(currentLang)} style={{ fontSize: '18px' }}></span>
+          <span>{currentLang.toUpperCase()}</span>
+        </button>
         </div>
       </div>
     </header>

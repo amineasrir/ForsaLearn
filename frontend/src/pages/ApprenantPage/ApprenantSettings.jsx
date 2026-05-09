@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { FaUser, FaLock, FaBell } from 'react-icons/fa';
 import ApprenantLayout from '../../components/apprenant/ApprenantLayout';
 import CardP from '../../components/apprenant/CardP';
 import './dashboard.css';
@@ -51,19 +52,25 @@ const ApprenantSettings = () => {
                 <button
                   className={`settings-tab ${activeTab === 'account' ? 'active' : ''}`}
                   onClick={() => setActiveTab('account')}
+                  data-tab="account"
                 >
+                  <FaUser className="tab-icon" />
                   {t('apprenant.accountInformation')}
                 </button>
                 <button
                   className={`settings-tab ${activeTab === 'security' ? 'active' : ''}`}
                   onClick={() => setActiveTab('security')}
+                  data-tab="security"
                 >
+                  <FaLock className="tab-icon" />
                   {t('apprenant.changePassword')}
                 </button>
                 <button
                   className={`settings-tab ${activeTab === 'notifications' ? 'active' : ''}`}
                   onClick={() => setActiveTab('notifications')}
+                  data-tab="notifications"
                 >
+                  <FaBell className="tab-icon" />
                   {t('apprenant.notifications')}
                 </button>
               </div>

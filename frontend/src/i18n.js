@@ -123,6 +123,7 @@ i18n.use(initReactI18next).init({
           quizHistoryPlaceholder: "Your quiz history will appear here.",
           filters: "Filters",
           publishedCourses: "Published Courses",
+          courses: "Courses",
           coursesAvailable: "{{count}} course(s) available",
           clear: "Clear",
           showingResults: "Showing {{count}} result(s)",
@@ -180,7 +181,10 @@ i18n.use(initReactI18next).init({
           writeMessage: "Write a message...",
           selectConversationFirst: "Select a conversation first",
           sending: "Sending...",
-          send: "Send"
+          send: "Send",
+          searchConversations: "Search conversations...",
+          loadingConversations: "Loading conversations...",
+          noConversations: "No conversations found."
         },
         homePage: {
           hero: {
@@ -414,6 +418,7 @@ i18n.use(initReactI18next).init({
           quizHistoryPlaceholder: "Votre historique de quiz apparaîtra ici.",
           filters: "Filtres",
           publishedCourses: "Cours publiés",
+          courses: "Cours",
           coursesAvailable: "{{count}} cours disponibles",
           clear: "Effacer",
           showingResults: "Affichage de {{count}} résultat(s)",
@@ -471,7 +476,10 @@ i18n.use(initReactI18next).init({
           writeMessage: "Écrire un message...",
           selectConversationFirst: "Sélectionnez d'abord une conversation",
           sending: "Envoi...",
-          send: "Envoyer"
+          send: "Envoyer",
+          searchConversations: "Rechercher des conversations...",
+          loadingConversations: "Chargement des conversations...",
+          noConversations: "Aucune conversation trouvée."
         },
         homePage: {
           hero: {
