@@ -21,7 +21,7 @@ const formatCurrency = (value) => {
 };
 
 const FormateurDashboard = () => {
-  const { i18n } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [profile, setProfile] = useState(null);
   const [stats, setStats] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -39,7 +39,7 @@ const FormateurDashboard = () => {
         setProfile(profileResponse.data?.data || null);
         setStats(statsResponse.data?.data || null);
       } catch (err) {
-        setError(err.response?.data?.message || 'Failed to load dashboard.');
+        setError(err.response?.data?.message || t('dashboard.failedToLoadDashboard'));
       } finally {
         setLoading(false);
       }
@@ -75,23 +75,23 @@ const FormateurDashboard = () => {
   const cards = useMemo(() => ([
     {
       icon: '📚',
-      label: 'Total Courses',
+      label: t('dashboard.totalCourses'),
       value: overview.totalCourses || 0,
       color: '#FF6B9D'
     },
     {
       icon: '👥',
-      label: 'Students Enrolled',
+      label: t('dashboard.studentsEnrolled'),
       value: overview.totalEnrollments || 0,
       color: '#4F46E5'
     },
     {
       icon: '💰',
-      label: 'Total Revenue',
+      label: t('dashboard.totalRevenue'),
       value: formatCurrency(overview.totalRevenue),
       color: '#10B981'
     }
-  ]), [overview.totalCourses, overview.totalEnrollments, overview.totalRevenue]);
+  ]), [overview.totalCourses, overview.totalEnrollments, overview.totalRevenue, t]);
 
   return (
     <div className="formateur-page">
@@ -102,9 +102,9 @@ const FormateurDashboard = () => {
           </div>
 
           <div className="navbar-dashboard-center">
-            <h1>Dashboard</h1>
-            <a href="/">Home</a>
-            <span style={{ color: '#6b7280' }}>/Dashboard</span>
+            <h1>{t('dashboard.title')}</h1>
+            <a href="/">{t('dashboard.home')}</a>
+            <span style={{ color: '#6b7280' }}>/ {t('dashboard.title')}</span>
           </div>
 
           <div className="navbar-dashboard-right">
@@ -146,19 +146,19 @@ const FormateurDashboard = () => {
           <div className="earnings-section">
             <div className="dashboard-summary-grid">
               <div className="dashboard-summary-card">
-                <span>Published Courses</span>
+                <span>{t('dashboard.publishedCourses')}</span>
                 <strong>{overview.publishedCourses || 0}</strong>
               </div>
               <div className="dashboard-summary-card">
-                <span>Pending Review</span>
+                <span>{t('dashboard.pendingReview')}</span>
                 <strong>{overview.pendingCourses || 0}</strong>
               </div>
               <div className="dashboard-summary-card">
-                <span>Average Rating</span>
+                <span>{t('dashboard.averageRating')}</span>
                 <strong>{overview.averageRating || 0}</strong>
               </div>
               <div className="dashboard-summary-card">
-                <span>Total Reviews</span>
+                <span>{t('dashboard.totalReviews')}</span>
                 <strong>{overview.totalReviews || 0}</strong>
               </div>
             </div>
@@ -166,16 +166,16 @@ const FormateurDashboard = () => {
           </div>
 
           <div className="courses-section">
-            <h2>Top Performing Courses</h2>
+            <h2>{t('dashboard.topPerformingCourses')}</h2>
             <div className="courses-table">
               <div className="table-header">
-                <div className="col-title">Course</div>
-                <div className="col-students">Students</div>
-                <div className="col-status">Status</div>
+                <div className="col-title">{t('dashboard.course')}</div>
+                <div className="col-students">{t('dashboard.students')}</div>
+                <div className="col-status">{t('dashboard.status')}</div>
               </div>
               {topCourses.length === 0 ? (
                 <div className="table-row">
-                  <div className="col-title">No courses available yet.</div>
+                  <div className="col-title">{t('dashboard.noCoursesAvailable')}</div>
                   <div className="col-students">0</div>
                   <div className="col-status"><span className="status-badge">Empty</span></div>
                 </div>

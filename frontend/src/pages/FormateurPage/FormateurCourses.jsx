@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import '../../styles/formateur.css';
 import logo_rem from '../../assets/image/home_page/logo_rem.png';
 import i18nInstance from '../../i18n';
@@ -23,6 +24,7 @@ const labelToStatus = {
 };
 
 const FormateurCourses = () => {
+  const navigate = useNavigate();
   const { i18n } = useTranslation();
   const [profile, setProfile] = useState(null);
   const [courses, setCourses] = useState([]);
@@ -164,6 +166,8 @@ const FormateurCourses = () => {
               avatar: profile?.profilePicture || 'https://via.placeholder.com/60',
               name: profile?.fullName || 'Instructor'
             }}
+            actionLabel="Add New Course"
+            onAction={() => navigate('/formateur/add-course')}
           />
 
           {error && <div className="alert alert-error">{error}</div>}

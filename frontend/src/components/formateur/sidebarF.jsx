@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { FaChartBar, FaUser, FaBook, FaUsers, FaQuestionCircle, FaClipboardList, FaTrophy, FaDollarSign, FaEnvelope, FaHeadset, FaCog, FaSignOutAlt } from 'react-icons/fa';
+import { FaChartBar, FaUser, FaBook, FaUsers, FaPlus, FaQuestionCircle, FaClipboardList, FaTrophy, FaDollarSign, FaEnvelope, FaHeadset, FaCog, FaSignOutAlt } from 'react-icons/fa';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { clearUserSession } from '../../utils/authStorage';
 import '../../styles/formateur.css';  
@@ -23,6 +23,7 @@ const SidebarF = ({ activeMenu: propActive, setActiveMenu: propSetActive }) => {
     { id: 'dashboard', label: 'Dashboard', icon: FaChartBar, path: '/formateur/dashboard' },
     { id: 'profile', label: 'Profile', icon: FaUser, path: '/formateur/profile' },
     { id: 'mycourses', label: 'My Courses', icon: FaBook, path: '/formateur/courses' },
+    { id: 'addcourse', label: 'Add Course', icon: FaPlus, path: '/formateur/add-course' },
     { id: 'students', label: 'Students', icon: FaUsers, path: '/formateur/students' },
     { id: 'quiz', label: 'Quiz', icon: FaQuestionCircle, path: '/formateur/quiz' },
     { id: 'quizResults', label: 'Quiz Results', icon: FaClipboardList, path: '/formateur/quiz-results' },

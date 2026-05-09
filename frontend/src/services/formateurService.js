@@ -49,6 +49,16 @@ export const createFormateurCourse = (payload) => {
   return API.post("formateur/courses", payload);
 };
 
+export const uploadCourseVideo = (videoFile) => {
+  const formData = new FormData();
+  formData.append('video', videoFile);
+  return API.post("upload/course/video", formData, {
+    headers: {
+      'Content-Type': 'multipart/form-data'
+    }
+  });
+};
+
 export const updateFormateurCourse = (courseId, payload) => {
   return API.put(`formateur/courses/${courseId}`, payload);
 };

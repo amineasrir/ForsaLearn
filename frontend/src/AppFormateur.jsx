@@ -5,6 +5,7 @@ import AccountRejected from './pages/FormateurPage/AccountRejected';
 import FormateurDashboard from './pages/FormateurPage/FormateurDashboard';
 import FormateurProfile from './pages/FormateurPage/FormateurProfile';
 import FormateurCourses from './pages/FormateurPage/FormateurCourses';
+import AddCourses from './pages/FormateurPage/AddCourses';
 import FormateurStudent from './pages/FormateurPage/FormateurStudent';
 import FormateurEarnings from './pages/FormateurPage/FormateurEarnings';
 import FormateurCertificats from './pages/FormateurPage/FormateurCertificats';
@@ -24,6 +25,7 @@ const AppFormateur = () => {
         <Route path="dashboard" element={<FormateurDashboard />} />
         <Route path="profile" element={<FormateurProfile />} />
         <Route path="courses" element={<FormateurCourses />} />
+        <Route path="add-course" element={<AddCourses />} />
         <Route path="students" element={<FormateurStudent />} />
         <Route path="earnings" element={<FormateurEarnings />} />
         <Route path="certificates" element={<FormateurCertificats />} />
