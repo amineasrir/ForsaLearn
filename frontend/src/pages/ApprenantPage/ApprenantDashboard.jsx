@@ -9,6 +9,7 @@ import {
   getEnrolledCourses,
   getMyPayments
 } from '../../services/apprenentService';
+import { getMediaUrl } from '../../utils/mediaUrl';
 
 const ApprenantDashboard = () => {
   const { t } = useTranslation();
@@ -114,7 +115,7 @@ const ApprenantDashboard = () => {
             <div className="courses-container">
               {enrolledCourses.map(course => (
                 <div key={course._id} className="course-card">
-                  <img src={course.thumbnail || require('../../assets/image/cours/cours1.jpg')} alt={course.title} className="course-image" />
+                  <img src={getMediaUrl(course.thumbnail) || require('../../assets/image/cours/cours1.jpg')} alt={course.title} className="course-image" />
                   <div className="course-info">
                     <p className="course-category">{course.category}</p>
                     <h3>{course.title}</h3>

@@ -6,6 +6,7 @@ import ApprenantLayout from '../../components/apprenant/ApprenantLayout';
 import CardP from '../../components/apprenant/CardP';
 import { useWishlist } from '../../context/WishlistContext';
 import { getApprenantProfile, getPublishedCourses } from '../../services/apprenentService';
+import { getMediaUrl } from '../../utils/mediaUrl';
 import './dashboard.css';
 
 const CATEGORIES = [
@@ -217,7 +218,7 @@ const ApprenantCourses = () => {
                 {/* Thumbnail */}
                 <div className="cg-card-thumb">
                   <img
-                    src={course.thumbnail || require('../../assets/image/cours/cours.jpg')}
+                    src={getMediaUrl(course.thumbnail) || require('../../assets/image/cours/cours.jpg')}
                     alt={course.title}
                   />
                   <span className="cg-play"><FaPlayCircle /></span>
@@ -235,7 +236,7 @@ const ApprenantCourses = () => {
                   {/* Instructor row */}
                   <div className="cg-card-instructor-row">
                     <img
-                      src={course.formateur?.profileImage || require('../../assets/image/student/ava.jpg')}
+                      src={getMediaUrl(course.formateur?.profileImage) || require('../../assets/image/student/ava.jpg')}
                       alt={course.instructor}
                       className="cg-card-avatar"
                     />

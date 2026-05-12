@@ -13,6 +13,7 @@ import {
   getFormateurCourses,
   getFormateurProfile
 } from '../../services/formateurService';
+import { getMediaUrl } from '../../utils/mediaUrl';
 
 const labelToStatus = {
   Published: 'published',
@@ -210,7 +211,7 @@ const FormateurCourses = () => {
                 <div key={course._id} className="table-row formateur-courses-row">
                   <div className="col-title">
                     <img
-                      src={course.thumbnail || 'https://via.placeholder.com/120x80'}
+                      src={getMediaUrl(course.thumbnail) || 'https://via.placeholder.com/120x80'}
                       alt={course.title}
                       className="course-thumbnail"
                     />
