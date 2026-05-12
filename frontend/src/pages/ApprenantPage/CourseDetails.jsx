@@ -13,6 +13,7 @@ import {
   getCourseDetails, enrollInCourse,
   getCourseComments, postCourseComment
 } from '../../services/apprenentService';
+import { getMediaUrl } from '../../utils/mediaUrl';
 import './CourseDetails.css';
 
 const CourseDetails = () => {
@@ -153,7 +154,7 @@ const CourseDetails = () => {
         {/* Left: thumbnail */}
         <div className="cd-header-thumb">
           <img
-            src={course.thumbnail || require('../../assets/image/cours/cours.jpg')}
+            src={getMediaUrl(course.thumbnail) || require('../../assets/image/cours/cours.jpg')}
             alt={course.title}
           />
           <div className="cd-header-thumb-overlay">
@@ -200,7 +201,7 @@ const CourseDetails = () => {
           {/* Instructor */}
           <div className="cd-instructor-row">
             <img
-              src={course.formateur?.profileImage || require('../../assets/image/student/ava.jpg')}
+              src={getMediaUrl(course.formateur?.profileImage) || require('../../assets/image/student/ava.jpg')}
               alt={course.formateur?.fullName}
               className="cd-inst-avatar"
             />
@@ -351,7 +352,7 @@ const CourseDetails = () => {
           <h2 className="cd-section-h2">About the instructor</h2>
           <div className="cd-instructor-card">
             <img
-              src={course.formateur.profileImage || require('../../assets/image/student/ava.jpg')}
+              src={getMediaUrl(course.formateur.profileImage) || require('../../assets/image/student/ava.jpg')}
               alt={course.formateur.fullName}
               className="cd-inst-big-avatar"
             />
