@@ -12,6 +12,10 @@ export const getApprenantProfile = () => {
   return API.get("auth/me");
 };
 
+export const updateApprenantProfile = (data) => {
+  return API.put("visiteurs/profile", data);
+};
+
 export const getPublishedCourses = (params = {}) => {
   const searchParams = new URLSearchParams();
 
@@ -81,4 +85,16 @@ export const sendConversationMessage = (conversationId, payload) => {
 
 export const markConversationAsRead = (conversationId) => {
   return API.patch(`messages/conversations/${conversationId}/read-all`);
+};
+
+export const getCourseComments = (courseId) => {
+  return API.get(`courses/${courseId}/comments`);
+};
+
+export const postCourseComment = (courseId, data) => {
+  return API.post(`courses/${courseId}/comments`, data);
+};
+
+export const deleteCourseComment = (courseId, commentId) => {
+  return API.delete(`courses/${courseId}/comments/${commentId}`);
 };

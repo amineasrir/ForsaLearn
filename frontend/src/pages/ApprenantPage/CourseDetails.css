@@ -1,346 +1,783 @@
-/* ================= COURSE DETAILS ================= */
-.course-details-container {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 2rem 1rem;
-}
+/* ================================================================
+   COURSE DETAILS PAGE — Matches screenshot style
+   Structure: Header card | Overview | Curriculum | Instructor | Comments
+================================================================ */
 
-.course-details-header {
-  margin-bottom: 2rem;
-}
-
-.back-button {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.5rem;
-  padding: 0.75rem 1.5rem;
-  background: #ffffff;
-  border: 1px solid #e5e7eb;
-  border-radius: 8px;
-  color: #111827;
-  text-decoration: none;
-  font-weight: 500;
-  transition: all 0.2s;
-  cursor: pointer;
-}
-
-.back-button:hover {
-  background: #f5f7fb;
-  border-color: #ff3b63;
-  color: #ff3b63;
-}
-
-.course-details-content {
-  display: grid;
-  gap: 2rem;
-}
-
-.course-main-info {
-  display: grid;
-  grid-template-columns: 1fr 2fr;
-  gap: 2rem;
-  background: #ffffff;
-  border-radius: 12px;
-  padding: 2rem;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-}
-
-.course-thumbnail {
-  position: relative;
-  border-radius: 8px;
-  overflow: hidden;
-  aspect-ratio: 16/9;
-}
-
-.course-thumbnail img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-.play-overlay {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  color: white;
-  font-size: 3rem;
-  opacity: 0.8;
-}
-
-.course-info h1 {
-  font-size: 2.5rem;
-  margin-bottom: 1rem;
-  color: #111827;
-}
-
-.course-description {
-  font-size: 1.1rem;
-  color: #6b7280;
-  margin-bottom: 1.5rem;
-  line-height: 1.6;
-}
-
-.course-meta {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 1.5rem;
-  margin-bottom: 1.5rem;
-}
-
-.meta-item {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  color: #6b7280;
-  font-size: 0.95rem;
-}
-
-.course-instructor {
-  margin-bottom: 2rem;
-}
-
-.course-instructor h3 {
-  font-size: 1.2rem;
-  margin-bottom: 0.5rem;
-  color: #111827;
-}
-
-.course-instructor p {
-  color: #6b7280;
-  line-height: 1.5;
-}
-
-.course-price-section {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding-top: 1.5rem;
-  border-top: 1px solid #e5e7eb;
-}
-
-.price-free .price-label,
-.price-current {
-  font-size: 2rem;
-  font-weight: bold;
-  color: #10b981;
-}
-
-.payment-required-badge {
-  display: inline-flex;
-  align-items: center;
-  margin-left: 1rem;
-  padding: 0.35rem 0.75rem;
-  border-radius: 999px;
-  background-color: #fee2e2;
-  color: #be123c;
-  font-size: 0.9rem;
-  font-weight: 600;
-}
-
-.payment-required-badge.semi-free {
-  background-color: #ffedd5;
-  color: #9a3412;
-}
-
-.price-original {
-  font-size: 1.2rem;
-  color: #6b7280;
-  text-decoration: line-through;
-  margin-left: 1rem;
-}
-
-.enroll-button {
-  padding: 1rem 2rem;
-  background: #ff3b63;
-  color: white;
-  border: none;
-  border-radius: 8px;
-  font-size: 1.1rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s;
-}
-
-.enroll-button:hover:not(:disabled) {
-  background: #e0284f;
-  transform: translateY(-1px);
-}
-
-.enroll-button:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-}
-
-.course-details-sections {
-  background: #ffffff;
-  border-radius: 12px;
-  padding: 2rem;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-}
-
-.course-details-sections h2 {
-  font-size: 1.8rem;
-  margin-bottom: 1.5rem;
-  color: #111827;
-}
-
-.sections-list {
-  margin-bottom: 2rem;
-}
-
-.section-item {
-  border: 1px solid #e5e7eb;
-  border-radius: 8px;
-  padding: 1.5rem;
-  margin-bottom: 1rem;
-}
-
-.section-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 0.5rem;
-}
-
-.section-header h4 {
-  font-size: 1.1rem;
-  color: #111827;
-}
-
-.section-duration {
-  color: #6b7280;
-  font-size: 0.9rem;
-}
-
-.section-item p {
-  color: #6b7280;
-  margin-bottom: 1rem;
-}
-
-.lessons-list {
-  margin-top: 1rem;
-}
-
-.lesson-item {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  padding: 0.5rem 0;
-  color: #6b7280;
-  font-size: 0.95rem;
-}
-
-.lesson-item svg {
-  color: #10b981;
-  flex-shrink: 0;
-}
-
-.lesson-duration {
-  margin-left: auto;
-  color: #6b7280;
-}
-
-.learning-outcomes,
-.course-requirements {
-  margin-top: 2rem;
-  padding-top: 2rem;
-  border-top: 1px solid #e5e7eb;
-}
-
-.learning-outcomes h3,
-.course-requirements h3 {
-  font-size: 1.3rem;
-  margin-bottom: 1rem;
-  color: #111827;
-}
-
-.learning-outcomes ul,
-.course-requirements ul {
-  list-style: none;
-  padding: 0;
-}
-
-.learning-outcomes li,
-.course-requirements li {
-  display: flex;
-  align-items: flex-start;
-  gap: 0.75rem;
-  margin-bottom: 0.75rem;
-  color: #6b7280;
-  line-height: 1.5;
-}
-
-.learning-outcomes li svg,
-.course-requirements li svg {
-  color: #10b981;
-  margin-top: 0.25rem;
-  flex-shrink: 0;
-}
-
+/* ---- Alerts ---- */
 .success-message {
   background: #d1fae5;
   color: #065f46;
-  padding: 1rem;
-  border-radius: 8px;
+  padding: 0.85rem 1.1rem;
+  border-radius: 10px;
   margin-bottom: 1rem;
   border: 1px solid #a7f3d0;
+  font-size: 0.9rem;
 }
 
 .error-message {
   background: #fee2e2;
   color: #991b1b;
-  padding: 1rem;
-  border-radius: 8px;
+  padding: 0.85rem 1.1rem;
+  border-radius: 10px;
   margin-bottom: 1rem;
   border: 1px solid #fecaca;
+  font-size: 0.9rem;
 }
 
-.loading-spinner {
-  display: flex;
-  justify-content: center;
+.cd-loading {
+  padding: 4rem;
+  text-align: center;
+  color: #9ca3af;
+  font-size: 1rem;
+}
+
+/* ---- Back button ---- */
+.cd-back-btn {
+  display: inline-flex;
   align-items: center;
-  height: 200px;
-  font-size: 1.2rem;
-  color: #6b7280;
+  gap: 0.5rem;
+  padding: 0.55rem 1.1rem;
+  background: #fff;
+  border: 1.5px solid #e5e7eb;
+  border-radius: 8px;
+  color: #374151;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  margin-bottom: 1.5rem;
+  transition: border-color 0.2s, color 0.2s;
 }
 
-@media (max-width: 768px) {
-  .course-details-container {
-    padding: 1rem;
-  }
+.cd-back-btn:hover {
+  border-color: #ff3b63;
+  color: #ff3b63;
+}
 
-  .course-main-info {
+/* ================================================================
+   HEADER CARD (thumbnail + info + price card)
+================================================================ */
+.cd-header-card {
+  background: #fff;
+  border-radius: 16px;
+  border: 1px solid #e9ecf1;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.07);
+  display: grid;
+  grid-template-columns: 1fr 1.4fr 300px;
+  gap: 0;
+  overflow: hidden;
+  margin-bottom: 1.75rem;
+}
+
+@media (max-width: 1100px) {
+  .cd-header-card {
     grid-template-columns: 1fr;
-    padding: 1.5rem;
   }
+}
 
-  .course-info h1 {
-    font-size: 2rem;
-  }
+/* Thumbnail */
+.cd-header-thumb {
+  position: relative;
+  min-height: 240px;
+  overflow: hidden;
+  background: #1a1a2e;
+}
 
-  .course-meta {
-    gap: 1rem;
-  }
+.cd-header-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
 
-  .course-price-section {
-    flex-direction: column;
-    gap: 1rem;
-    align-items: stretch;
-  }
+.cd-header-thumb-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0,0,0,0.25);
+  opacity: 0;
+  transition: opacity 0.2s;
+}
 
-  .enroll-button {
-    width: 100%;
-    padding: 1rem;
-  }
+.cd-header-thumb:hover .cd-header-thumb-overlay {
+  opacity: 1;
+}
 
-  .course-details-sections {
-    padding: 1.5rem;
-  }
+.cd-play-icon {
+  font-size: 3.5rem;
+  color: #fff;
+  filter: drop-shadow(0 2px 8px rgba(0,0,0,0.4));
+}
 
-  .section-header {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 0.25rem;
-  }
+/* Info panel */
+.cd-header-info {
+  padding: 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+  border-right: 1px solid #e9ecf1;
+}
+
+.cd-badges-row {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.cd-badge-cat {
+  background: #fff7ed;
+  color: #c2410c;
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 0.22rem 0.75rem;
+  border-radius: 999px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.cd-badge-level {
+  background: #ede9fe;
+  color: #6d28d9;
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 0.22rem 0.75rem;
+  border-radius: 999px;
+}
+
+.cd-title {
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: #111827;
+  line-height: 1.35;
+  margin: 0;
+}
+
+.cd-desc {
+  font-size: 0.88rem;
+  color: #6b7280;
+  line-height: 1.6;
+  margin: 0;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* Meta row */
+.cd-meta-row {
+  display: flex;
+  gap: 1.25rem;
+  flex-wrap: wrap;
+}
+
+.cd-meta-item {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: #374151;
+}
+
+.cd-meta-item svg {
+  font-size: 0.85rem;
+  color: #9ca3af;
+}
+
+/* Rating */
+.cd-rating-row {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+}
+
+.cd-star {
+  font-size: 0.9rem;
+  color: #d1d5db;
+}
+
+.cd-star.filled {
+  color: #f59e0b;
+}
+
+.cd-rating-val {
+  font-weight: 700;
+  color: #111827;
+  font-size: 0.9rem;
+  margin-left: 0.2rem;
+}
+
+.cd-rating-count {
+  color: #9ca3af;
+  font-size: 0.82rem;
+}
+
+/* Instructor row */
+.cd-instructor-row {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-top: auto;
+}
+
+.cd-inst-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid #f0f0f0;
+}
+
+.cd-inst-name {
+  font-weight: 700;
+  font-size: 0.88rem;
+  color: #111827;
+  display: block;
+}
+
+.cd-inst-role {
+  font-size: 0.75rem;
+  color: #9ca3af;
+  display: block;
+}
+
+/* ---- Price card (right column) ---- */
+.cd-price-card {
+  padding: 1.75rem 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  background: #fafbfc;
+}
+
+.cd-price-top {
+  display: flex;
+  align-items: baseline;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.cd-price-main {
+  font-size: 2rem;
+  font-weight: 800;
+  color: #ff3b63;
+}
+
+.cd-price-main.free {
+  color: #10b981;
+}
+
+.cd-price-orig {
+  font-size: 1rem;
+  color: #9ca3af;
+  text-decoration: line-through;
+}
+
+.cd-discount {
+  font-size: 0.78rem;
+  font-weight: 700;
+  background: #fff7ed;
+  color: #c2410c;
+  padding: 0.2rem 0.6rem;
+  border-radius: 6px;
+}
+
+.cd-price-actions {
+  display: flex;
+  gap: 0.6rem;
+}
+
+.cd-wishlist-btn,
+.cd-share-btn {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  padding: 0.55rem 0.75rem;
+  border: 1.5px solid #e5e7eb;
+  border-radius: 8px;
+  background: #fff;
+  font-size: 0.78rem;
+  font-weight: 600;
+  cursor: pointer;
+  color: #374151;
+  transition: background 0.2s, border-color 0.2s, color 0.2s;
+}
+
+.cd-wishlist-btn.active {
+  background: #fee2e2;
+  border-color: #ff3b63;
+  color: #ff3b63;
+}
+
+.cd-wishlist-btn:hover:not(.active),
+.cd-share-btn:hover {
+  background: #f3f4f6;
+  border-color: #d1d5db;
+}
+
+.cd-enroll-btn {
+  width: 100%;
+  padding: 0.85rem;
+  background: #392C7D;
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.15s;
+  letter-spacing: 0.3px;
+}
+
+.cd-enroll-btn:hover:not(:disabled) {
+  background: #2d2265;
+  transform: translateY(-1px);
+}
+
+.cd-enroll-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Includes */
+.cd-includes-title {
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: #374151;
+  margin: 0 0 0.6rem;
+}
+
+.cd-includes-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+}
+
+.cd-includes-item {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  font-size: 0.82rem;
+  color: #4b5563;
+}
+
+.cd-inc-icon {
+  color: #ff3b63;
+  font-size: 0.9rem;
+  flex-shrink: 0;
+}
+
+/* Features */
+.cd-features-block {
+  border-top: 1px solid #e5e7eb;
+  padding-top: 1rem;
+}
+
+.cd-features-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.cd-feature-item {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.82rem;
+  color: #4b5563;
+}
+
+.cd-feat-label {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.cd-feat-label::before {
+  content: '';
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%239ca3af'%3E%3Ccircle cx='12' cy='12' r='4'/%3E%3C/svg%3E") center/contain no-repeat;
+  flex-shrink: 0;
+}
+
+.cd-feat-value {
+  font-weight: 600;
+  color: #111827;
+}
+
+/* ================================================================
+   CONTENT SECTIONS (Overview, Curriculum, Instructor, Comments)
+================================================================ */
+.cd-section-card {
+  background: #fff;
+  border-radius: 16px;
+  border: 1px solid #e9ecf1;
+  padding: 2rem;
+  margin-bottom: 1.5rem;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.05);
+}
+
+.cd-section-h2 {
+  font-size: 1.3rem;
+  font-weight: 800;
+  color: #111827;
+  margin: 0 0 1.25rem;
+  padding-bottom: 0.85rem;
+  border-bottom: 1.5px solid #f3f4f6;
+}
+
+.cd-section-h3 {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #111827;
+  margin: 1.25rem 0 0.75rem;
+}
+
+.cd-section-text {
+  font-size: 0.9rem;
+  color: #4b5563;
+  line-height: 1.7;
+  margin: 0;
+}
+
+/* What you'll learn */
+.cd-learn-list {
+  list-style: none;
+  padding: 0;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.65rem;
+}
+
+@media (max-width: 640px) {
+  .cd-learn-list { grid-template-columns: 1fr; }
+}
+
+.cd-learn-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.6rem;
+  font-size: 0.88rem;
+  color: #374151;
+  line-height: 1.5;
+}
+
+.cd-check {
+  color: #10b981;
+  flex-shrink: 0;
+  margin-top: 2px;
+  font-size: 0.9rem;
+}
+
+/* Requirements */
+.cd-req-list {
+  padding-left: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.cd-req-list li {
+  font-size: 0.88rem;
+  color: #4b5563;
+  line-height: 1.5;
+}
+
+/* ================================================================
+   CURRICULUM (Accordion)
+================================================================ */
+.cd-curriculum {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.cd-sec-item {
+  border: 1px solid #e9ecf1;
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.cd-sec-header {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 1rem 1.25rem;
+  background: #f9fafb;
+  border: none;
+  cursor: pointer;
+  text-align: left;
+  transition: background 0.15s;
+}
+
+.cd-sec-header:hover,
+.cd-sec-header.open {
+  background: #f3f4f6;
+}
+
+.cd-sec-title {
+  flex: 1;
+  font-weight: 700;
+  font-size: 0.92rem;
+  color: #111827;
+}
+
+.cd-sec-dur {
+  font-size: 0.78rem;
+  color: #9ca3af;
+  background: #e9ecf1;
+  padding: 0.2rem 0.6rem;
+  border-radius: 6px;
+}
+
+.cd-sec-arrow {
+  font-size: 0.7rem;
+  color: #9ca3af;
+}
+
+.cd-lessons {
+  padding: 0.5rem 0;
+  border-top: 1px solid #f3f4f6;
+}
+
+.cd-lesson-item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.6rem 1.25rem;
+  font-size: 0.85rem;
+  color: #4b5563;
+  transition: background 0.15s;
+}
+
+.cd-lesson-item:hover {
+  background: #f9fafb;
+}
+
+.cd-lesson-icon {
+  color: #10b981;
+  flex-shrink: 0;
+  font-size: 0.85rem;
+}
+
+.cd-lesson-title { flex: 1; }
+
+.cd-lesson-dur {
+  font-size: 0.78rem;
+  color: #9ca3af;
+}
+
+/* ================================================================
+   INSTRUCTOR CARD
+================================================================ */
+.cd-instructor-card {
+  display: flex;
+  gap: 1.5rem;
+  align-items: flex-start;
+}
+
+@media (max-width: 640px) {
+  .cd-instructor-card { flex-direction: column; align-items: center; text-align: center; }
+}
+
+.cd-inst-big-avatar {
+  width: 90px;
+  height: 90px;
+  border-radius: 50%;
+  object-fit: cover;
+  flex-shrink: 0;
+  border: 3px solid #f0f0f0;
+}
+
+.cd-inst-info { flex: 1; }
+
+.cd-inst-big-name {
+  font-size: 1.1rem;
+  font-weight: 800;
+  color: #111827;
+  margin: 0 0 0.25rem;
+}
+
+.cd-inst-spec {
+  font-size: 0.85rem;
+  color: #6b7280;
+  margin: 0 0 0.75rem;
+}
+
+.cd-inst-stats {
+  display: flex;
+  gap: 1.25rem;
+  flex-wrap: wrap;
+  margin-bottom: 0.85rem;
+}
+
+.cd-inst-stats span {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.82rem;
+  color: #374151;
+  font-weight: 600;
+}
+
+.cd-inst-bio {
+  font-size: 0.88rem;
+  color: #4b5563;
+  line-height: 1.6;
+  margin: 0;
+}
+
+/* ================================================================
+   COMMENTS SECTION
+================================================================ */
+.cd-comment-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.cd-form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+@media (max-width: 640px) {
+  .cd-form-row { grid-template-columns: 1fr; }
+}
+
+.cd-form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.cd-form-group label {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: #374151;
+}
+
+.cd-form-group input,
+.cd-form-group textarea {
+  padding: 0.7rem 0.9rem;
+  border: 1.5px solid #e5e7eb;
+  border-radius: 8px;
+  font-size: 0.88rem;
+  color: #374151;
+  font-family: inherit;
+  resize: vertical;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  background: #fff;
+}
+
+.cd-form-group input:focus,
+.cd-form-group textarea:focus {
+  outline: none;
+  border-color: #ff3b63;
+  box-shadow: 0 0 0 3px rgba(255, 59, 99, 0.1);
+}
+
+.cd-submit-btn {
+  align-self: flex-start;
+  padding: 0.7rem 2rem;
+  background: #392C7D;
+  color: #fff;
+  border: none;
+  border-radius: 999px;
+  font-size: 0.88rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.cd-submit-btn:hover:not(:disabled) { background: #2d2265; }
+.cd-submit-btn:disabled { opacity: 0.6; cursor: not-allowed; }
+
+/* Comments list */
+.cd-comments-list {
+  border-top: 1.5px solid #f3f4f6;
+  padding-top: 1.25rem;
+}
+
+.cd-comment-item {
+  display: flex;
+  gap: 1rem;
+  padding: 1rem 0;
+  border-bottom: 1px solid #f3f4f6;
+}
+
+.cd-comment-item:last-child { border-bottom: none; }
+
+.cd-comment-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: #ede9fe;
+  color: #7c3aed;
+  font-weight: 700;
+  font-size: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.cd-comment-body { flex: 1; }
+
+.cd-comment-header {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 0.4rem;
+  flex-wrap: wrap;
+}
+
+.cd-comment-author {
+  font-weight: 700;
+  font-size: 0.88rem;
+  color: #111827;
+}
+
+.cd-comment-subject {
+  font-size: 0.8rem;
+  color: #6b7280;
+  background: #f3f4f6;
+  padding: 0.15rem 0.5rem;
+  border-radius: 6px;
+}
+
+.cd-comment-date {
+  font-size: 0.78rem;
+  color: #9ca3af;
+  margin-left: auto;
+}
+
+.cd-comment-text {
+  font-size: 0.88rem;
+  color: #4b5563;
+  line-height: 1.6;
+  margin: 0;
+}
+
+.cd-no-comments {
+  text-align: center;
+  padding: 2rem;
+  color: #9ca3af;
+  font-size: 0.9rem;
+  background: #f9fafb;
+  border-radius: 10px;
+  margin-top: 1rem;
 }

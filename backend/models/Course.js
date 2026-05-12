@@ -250,6 +250,31 @@ const courseSchema = new mongoose.Schema({
       default: Date.now
     }
   }],
+  comments: [{
+    name: {
+      type: String,
+      required: true,
+      trim: true
+    },
+    email: {
+      type: String,
+      required: true,
+      trim: true
+    },
+    subject: {
+      type: String,
+      trim: true
+    },
+    content: {
+      type: String,
+      required: true,
+      maxlength: 5000
+    },
+    createdAt: {
+      type: Date,
+      default: Date.now
+    }
+  }],
   status: {
     type: String,
     enum: ['draft', 'pending', 'published', 'rejected', 'archived'],

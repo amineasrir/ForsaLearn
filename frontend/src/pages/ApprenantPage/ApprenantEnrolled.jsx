@@ -2,9 +2,16 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import ApprenantLayout from '../../components/apprenant/ApprenantLayout';
 import CardP from '../../components/apprenant/CardP';
-import { FaStar } from 'react-icons/fa';
+import { FaBook, FaClock } from 'react-icons/fa';
 import { getApprenantProfile, getEnrolledCourses } from '../../services/apprenentService';
 import './dashboard.css';
+
+const getStatusInfo = (progress) => {
+  const p = Number(progress || 0);
+  if (p >= 100) return { label: 'Completed', cls: 'status-completed' };
+  if (p > 0) return { label: 'Inprogress', cls: 'status-inprogress' };
+  return { label: 'Not Started', cls: 'status-notstarted' };
+};
 
 const ApprenantEnrolled = () => {
   const { t } = useTranslation();
@@ -20,108 +27,120 @@ const ApprenantEnrolled = () => {
           getEnrolledCourses(),
           getApprenantProfile()
         ]);
-
         setCourses(coursesResponse.data?.data || []);
         setUser(userResponse.data?.user || null);
       } catch (err) {
         setError(err.response?.data?.message || t('errorOccurred'));
       }
     };
-
     loadData();
   }, []);
 
   const filteredCourses = useMemo(() => {
-    if (tab === 'active') {
-      return courses.filter((course) => Number(course.myProgress || 0) > 0 && Number(course.myProgress || 0) < 100);
-    }
-    if (tab === 'completed') {
-      return courses.filter((course) => Number(course.myProgress || 0) >= 100);
-    }
+    if (tab === 'active') return courses.filter(c => Number(c.myProgress||0) > 0 && Number(c.myProgress||0) < 100);
+    if (tab === 'completed') return courses.filter(c => Number(c.myProgress||0) >= 100);
+    if (tab === 'notstarted') return courses.filter(c => Number(c.myProgress||0) === 0);
     return courses;
   }, [courses, tab]);
 
   const counts = {
     enrolled: courses.length,
-    active: courses.filter((course) => Number(course.myProgress || 0) > 0 && Number(course.myProgress || 0) < 100).length,
-    completed: courses.filter((course) => Number(course.myProgress || 0) >= 100).length
+    active: courses.filter(c => Number(c.myProgress||0) > 0 && Number(c.myProgress||0) < 100).length,
+    completed: courses.filter(c => Number(c.myProgress||0) >= 100).length,
+    notstarted: courses.filter(c => Number(c.myProgress||0) === 0).length,
   };
-
-  const rightContent = (
-    <>
-      <div className="notification-icon"></div>
-      <div className="cart-icon"></div>
-    </>
-  );
 
   return (
     <ApprenantLayout
       title={t('apprenant.enrolledCourses')}
       breadcrumb={[{ to: '/', label: t('home') }, { label: t('apprenant.enrolledCourses') }]}
-      rightContent={rightContent}
+      rightContent={<><div className="notification-icon"></div><div className="cart-icon"></div></>}
     >
       <CardP user={user} />
 
-          {error && <div className="error-message">{error}</div>}
-          <section className="enrolled-courses">
-            <div className="courses-header-row">
-              <h2>{t('apprenant.enrolledCourses')}</h2>
-              <div className="courses-tabs">
-                <button
-                  className={tab === 'enrolled' ? 'active' : ''}
-                  onClick={() => setTab('enrolled')}
-                >
-                  {t('apprenant.enrolled')} ({counts.enrolled})
-                </button>
-                <button
-                  className={tab === 'active' ? 'active' : ''}
-                  onClick={() => setTab('active')}
-                >
-                  {t('apprenant.active')} ({counts.active})
-                </button>
-                <button
-                  className={tab === 'completed' ? 'active' : ''}
-                  onClick={() => setTab('completed')}
-                >
-                  {t('apprenant.completed')} ({counts.completed})
-                </button>
-              </div>
-            </div>
+      {error && <div className="error-message">{error}</div>}
 
-            <div className="courses-container">
-              {filteredCourses.map(course => (
-                <div key={course._id} className="course-card">
+      <section className="enrolled-courses">
+        <div className="courses-header-row">
+          <h2>{t('apprenant.enrolledCourses')}</h2>
+          <div className="courses-tabs">
+            <button className={tab === 'enrolled' ? 'active' : ''} onClick={() => setTab('enrolled')}>
+              All Courses ({counts.enrolled})
+            </button>
+            <button className={tab === 'notstarted' ? 'active' : ''} onClick={() => setTab('notstarted')}>
+              Not Started ({counts.notstarted})
+            </button>
+            <button className={tab === 'active' ? 'active' : ''} onClick={() => setTab('active')}>
+              Inprogress ({counts.active})
+            </button>
+            <button className={tab === 'completed' ? 'active' : ''} onClick={() => setTab('completed')}>
+              Completed ({counts.completed})
+            </button>
+          </div>
+        </div>
+
+        <div className="courses-container">
+          {filteredCourses.map(course => {
+            const progress = Number(course.myProgress || 0);
+            const { label, cls } = getStatusInfo(progress);
+            const totalLessons = course.totalLessons || course.chapters?.length || 0;
+            const doneLessons = Math.round((progress / 100) * totalLessons);
+            const duration = course.duration || course.totalDuration || 0;
+
+            return (
+              <div key={course._id} className="ec-card">
+                <div className="ec-card__thumb">
                   <img
                     src={course.thumbnail || require('../../assets/image/cours/cours1.jpg')}
                     alt={course.title}
-                    className="course-image"
                   />
-                  <div className="course-info">
-                    <p className="course-category">{course.category}</p>
-                    <h3>{course.title}</h3>
-                    <p className="instructor">{course.formateur?.fullName || t('instructor')}</p>
-                    <div className="course-footer">
-                      <div className="rating">
-                        <FaStar className="star" />
-                        <span>
-                          {Number(course.averageRating || 0).toFixed(1)} ({course.totalReviews || 0} Reviews)
-                        </span>
-                      </div>
-                    </div>
-                    <div className="course-action">
-                      <span className="price">{course.priceType === 'free' ? t('apprenant.priceFree') : `$${Number(course.price || 0).toFixed(2)}`}</span>
-                      <button className="view-course-btn">
-                        {Number(course.myProgress || 0) >= 100 && course.certificateIssued
-                          ? t('apprenant.certificateEarned')
-                          : t('apprenant.progress', { value: course.myProgress || 0 })}
-                      </button>
-                    </div>
-                  </div>
+                  <span className={`ec-status-badge ${cls}`}>{label}</span>
                 </div>
-              ))}
-            </div>
-          </section>
-      </ApprenantLayout>
+
+                <div className="ec-card__body">
+                  <div className="ec-card__meta">
+                    <img
+                      src={course.formateur?.profileImage || require('../../assets/image/student/ava.jpg')}
+                      alt={course.formateur?.fullName}
+                      className="ec-card__avatar"
+                    />
+                    <span className="ec-card__instructor">{course.formateur?.fullName || t('instructor')}</span>
+                    <span className="ec-card__category">{course.category}</span>
+                  </div>
+
+                  <h3 className="ec-card__title">{course.title}</h3>
+
+                  <div className="ec-card__stats">
+                    {totalLessons > 0 && (
+                      <span className="ec-stat"><FaBook /> {doneLessons}/{totalLessons} Lesson</span>
+                    )}
+                    {duration > 0 && (
+                      <span className="ec-stat"><FaClock /> {duration}h</span>
+                    )}
+                  </div>
+
+                  <div className="ec-card__progress-row">
+                    <span className="ec-card__progress-label">Progress</span>
+                    <div className="ec-card__progress-bar">
+                      <div
+                        className={`ec-card__progress-fill ${cls}`}
+                        style={{ width: `${progress}%` }}
+                      />
+                    </div>
+                    <span className="ec-card__progress-pct">{progress}%</span>
+                  </div>
+
+                  <button className="ec-card__btn">
+                    <span className="ec-card__btn-icon">▶</span>
+                    Start Learning
+                  </button>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </section>
+    </ApprenantLayout>
   );
 };
 

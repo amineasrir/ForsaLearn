@@ -512,4 +512,100 @@ router.get('/:id', async (req, res) => {
   }
 });
 
+// Get course comments
+router.get('/:id/comments', async (req, res) => {
+  try {
+    const course = await Course.findById(req.params.id).select('comments');
+    
+    if (!course) {
+      return res.status(404).json({ message: 'Course not found' });
+    }
+    
+    // Sort comments by newest first
+    const comments = course.comments.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+    
+    res.status(200).json({
+      success: true,
+      count: comments.length,
+      data: comments
+    });
+  } catch (error) {
+    console.error('Get comments error:', error);
+    res.status(500).json({ message: 'Error fetching comments' });
+  }
+});
+
+// Post course comment
+router.post('/:id/comments', 
+  [
+    body('name').trim().isLength({ min: 2 }).withMessage('Name must be at least 2 characters'),
+    body('email').isEmail().withMessage('Valid email is required'),
+    body('content').trim().isLength({ min: 5 }).withMessage('Comment must be at least 5 characters')
+  ],
+  async (req, res) => {
+    try {
+      const errors = validationResult(req);
+      if (!errors.isEmpty()) {
+        return res.status(400).json({ errors: errors.array() });
+      }
+
+      const course = await Course.findById(req.params.id);
+      
+      if (!course) {
+        return res.status(404).json({ message: 'Course not found' });
+      }
+      
+      const newComment = {
+        name: req.body.name,
+        email: req.body.email,
+        subject: req.body.subject || '',
+        content: req.body.content,
+        createdAt: new Date()
+      };
+      
+      course.comments.push(newComment);
+      await course.save();
+      
+      res.status(201).json({
+        success: true,
+        message: 'Comment posted successfully',
+        data: newComment
+      });
+    } catch (error) {
+      console.error('Post comment error:', error);
+      res.status(500).json({ message: 'Error posting comment' });
+    }
+  }
+);
+
+// Delete course comment (admin or formateur only)
+router.delete('/:courseId/comments/:commentId',
+  protect,
+  async (req, res) => {
+    try {
+      const course = await Course.findById(req.params.courseId);
+      
+      if (!course) {
+        return res.status(404).json({ message: 'Course not found' });
+      }
+      
+      // Check if user is admin or formateur of this course
+      if (req.user.role !== 'admin' && course.formateur.toString() !== req.user.id) {
+        return res.status(403).json({ message: 'Not authorized to delete this comment' });
+      }
+      
+      course.comments = course.comments.filter(c => c._id.toString() !== req.params.commentId);
+      await course.save();
+      
+      res.status(200).json({
+        success: true,
+        message: 'Comment deleted successfully'
+      });
+    } catch (error) {
+      console.error('Delete comment error:', error);
+      res.status(500).json({ message: 'Error deleting comment' });
+    }
+  }
+);
+
 module.exports = router;
