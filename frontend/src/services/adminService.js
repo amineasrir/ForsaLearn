@@ -37,6 +37,10 @@ export const approveAdminCourse = (courseId) => {
   return API.patch(`admin/courses/${courseId}/approve`);
 };
 
+export const getAdminCourseDetails = (courseId) => {
+  return API.get(`admin/courses/${courseId}`);
+};
+
 export const getAdminUsers = (params = {}) => {
   const searchParams = new URLSearchParams();
 

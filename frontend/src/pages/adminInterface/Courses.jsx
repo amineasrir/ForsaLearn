@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import '../../styles/dashboard.css';
 import '../../styles/courses-admin.css';
 import {
@@ -40,6 +41,7 @@ const statusOptions = [
 ];
 
 const Courses = () => {
+  const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState('');
   const [filterStatus, setFilterStatus] = useState('all');
   const [filterCategory, setFilterCategory] = useState('all');
@@ -313,7 +315,7 @@ const Courses = () => {
                               Approve
                             </button>
                           )}
-                          <button className="action-btn view" title="View">
+                          <button className="action-btn view" title="View" onClick={() => navigate(`/admin/courses/${course._id}`)}>
                             <FaEye />
                           </button>
                           <button className="action-btn delete" title="Delete" onClick={() => handleDelete(course._id)}>

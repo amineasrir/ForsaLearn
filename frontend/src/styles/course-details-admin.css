@@ -1,0 +1,253 @@
+.course-details-toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+}
+
+.back-btn-admin,
+.approve-course-btn {
+  border: none;
+  border-radius: 12px;
+  padding: 12px 18px;
+  font-weight: 600;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.back-btn-admin {
+  background: #f3f4f6;
+  color: #1f2937;
+}
+
+.approve-course-btn {
+  background: linear-gradient(135deg, #10b981, #059669);
+  color: white;
+}
+
+.course-hero-card {
+  overflow: hidden;
+}
+
+.course-hero-layout {
+  display: grid;
+  grid-template-columns: 360px 1fr;
+  gap: 24px;
+  align-items: stretch;
+}
+
+.course-hero-image {
+  width: 100%;
+  height: 100%;
+  min-height: 280px;
+  object-fit: cover;
+  border-radius: 18px;
+}
+
+.course-hero-content {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 18px;
+}
+
+.course-hero-top {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.course-hero-title {
+  font-size: 30px;
+  color: #111827;
+  margin: 0;
+}
+
+.course-hero-description {
+  margin: 0;
+  color: #6b7280;
+  line-height: 1.7;
+}
+
+.course-hero-meta {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+  color: #4b5563;
+  font-size: 14px;
+}
+
+.course-hero-meta span {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.course-hero-price {
+  font-size: 28px;
+  font-weight: 700;
+  color: #7c3aed;
+}
+
+.course-details-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 24px;
+  margin-bottom: 24px;
+}
+
+.course-detail-section {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.instructor-detail-card {
+  display: flex;
+  gap: 16px;
+  align-items: flex-start;
+}
+
+.instructor-detail-avatar {
+  width: 82px;
+  height: 82px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.instructor-detail-card h4,
+.admin-section-card h4 {
+  margin: 0 0 8px;
+  color: #111827;
+}
+
+.instructor-detail-card p {
+  margin: 4px 0;
+  color: #6b7280;
+  line-height: 1.6;
+}
+
+.course-list-admin {
+  margin: 0;
+  padding-left: 18px;
+  color: #4b5563;
+  line-height: 1.8;
+}
+
+.student-mini-list,
+.admin-reviews-list,
+.admin-sections-list,
+.admin-lessons-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.student-mini-card,
+.admin-review-card,
+.admin-section-card,
+.admin-lesson-row {
+  border: 1px solid #eef2f7;
+  border-radius: 14px;
+  padding: 14px 16px;
+  background: #fafafa;
+}
+
+.student-mini-card {
+  display: grid;
+  grid-template-columns: 44px 1fr auto;
+  gap: 12px;
+  align-items: center;
+}
+
+.student-mini-card img {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.student-mini-card div {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.student-mini-card strong,
+.admin-review-top strong {
+  color: #111827;
+}
+
+.student-mini-card span,
+.admin-review-card p,
+.admin-section-description,
+.admin-lesson-row span {
+  color: #6b7280;
+}
+
+.student-progress-badge {
+  background: #ede9fe;
+  color: #6d28d9 !important;
+  padding: 6px 10px;
+  border-radius: 999px;
+  font-weight: 700;
+  font-size: 12px;
+}
+
+.admin-review-top,
+.admin-section-header,
+.admin-lesson-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  align-items: center;
+}
+
+.admin-review-top span {
+  color: #f59e0b;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 600;
+}
+
+.admin-review-card p,
+.admin-section-description {
+  margin: 0;
+  line-height: 1.7;
+}
+
+.admin-lesson-row div {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.admin-lesson-row strong {
+  color: #111827;
+}
+
+.admin-lesson-row span {
+  font-size: 13px;
+}
+
+@media (max-width: 1100px) {
+  .course-hero-layout,
+  .course-details-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 640px) {
+  .course-details-toolbar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .student-mini-card {
+    grid-template-columns: 44px 1fr;
+  }
+}
