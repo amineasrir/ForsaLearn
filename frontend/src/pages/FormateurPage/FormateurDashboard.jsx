@@ -11,6 +11,7 @@ import {
   getFormateurDashboardStats,
   getFormateurProfile
 } from '../../services/formateurService';
+import { getMediaUrl } from '../../utils/mediaUrl';
 
 const formatCurrency = (value) => {
   return new Intl.NumberFormat('en-US', {
@@ -183,7 +184,7 @@ const FormateurDashboard = () => {
                 <div key={course._id} className="table-row">
                   <div className="col-title">
                     <img
-                      src={course.thumbnail || 'https://via.placeholder.com/80'}
+                      src={getMediaUrl(course.thumbnail) || 'https://via.placeholder.com/80'}
                       alt={course.title}
                       className="course-thumbnail"
                     />

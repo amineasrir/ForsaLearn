@@ -4,6 +4,7 @@ import ApprenantLayout from '../../components/apprenant/ApprenantLayout';
 import CardP from '../../components/apprenant/CardP';
 import { FaBook, FaClock } from 'react-icons/fa';
 import { getApprenantProfile, getEnrolledCourses } from '../../services/apprenentService';
+import { getMediaUrl } from '../../utils/mediaUrl';
 import './dashboard.css';
 
 const getStatusInfo = (progress) => {
@@ -86,7 +87,7 @@ const ApprenantEnrolled = () => {
               <div key={course._id} className="ec-card">
                 <div className="ec-card__thumb">
                   <img
-                    src={course.thumbnail || require('../../assets/image/cours/cours1.jpg')}
+                    src={getMediaUrl(course.thumbnail) || require('../../assets/image/cours/cours1.jpg')}
                     alt={course.title}
                   />
                   <span className={`ec-status-badge ${cls}`}>{label}</span>

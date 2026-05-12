@@ -59,6 +59,16 @@ export const uploadCourseVideo = (videoFile) => {
   });
 };
 
+export const uploadCourseThumbnail = (thumbnailFile) => {
+  const formData = new FormData();
+  formData.append('thumbnail', thumbnailFile);
+  return API.post("upload/course/thumbnail", formData, {
+    headers: {
+      'Content-Type': 'multipart/form-data'
+    }
+  });
+};
+
 export const updateFormateurCourse = (courseId, payload) => {
   return API.put(`formateur/courses/${courseId}`, payload);
 };

@@ -15,6 +15,7 @@ import Header from '../../components/admin/Header';
 import Sidebar from '../../components/admin/Sidebar';
 import ProfileCard from '../../components/admin/ProfileCard';
 import { approveAdminCourse, deleteAdminCourse, getAdminCourses, getAdminProfile } from '../../services/adminService';
+import { getMediaUrl } from '../../utils/mediaUrl';
 
 const categories = [
   'Web Development',
@@ -244,7 +245,7 @@ const Courses = () => {
                   <div key={course._id} className="course-card">
                     <div className="course-image-wrapper">
                       <img
-                        src={course.thumbnail || 'https://images.unsplash.com/photo-1498050108023-c5249f4df085?w=400'}
+                        src={getMediaUrl(course.thumbnail) || 'https://images.unsplash.com/photo-1498050108023-c5249f4df085?w=400'}
                         alt={course.title}
                         className="course-image"
                       />
