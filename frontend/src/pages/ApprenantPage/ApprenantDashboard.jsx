@@ -62,11 +62,7 @@ const ApprenantDashboard = () => {
   );
 
   return (
-    <ApprenantLayout
-      title={t('apprenant.dashboard')}
-      breadcrumb={[{ to: '/', label: t('home') }, { label: t('apprenant.dashboard') }]}
-      rightContent={rightContent}
-    >
+    <ApprenantLayout>
       <CardP user={user} />
 
           {error && <div className="error-message">{error}</div>}

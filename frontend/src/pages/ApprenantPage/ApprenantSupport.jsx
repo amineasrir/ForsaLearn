@@ -157,10 +157,7 @@ const ApprenantSupport = () => {
   };
 
   return (
-    <ApprenantLayout
-      title={t('apprenant.supportTickets')}
-      breadcrumb={[{ to: '/', label: t('home') }, { label: t('apprenant.supportTickets') }]}
-    >
+    <ApprenantLayout>
       <div className="support-page">
         <div className="support-container">
           <div className="message-wrapper">

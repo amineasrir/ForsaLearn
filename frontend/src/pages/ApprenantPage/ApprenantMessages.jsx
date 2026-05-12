@@ -178,12 +178,7 @@ const ApprenantMessages = () => {
   );
 
   return (
-    <ApprenantLayout
-      title={t('apprenant.messages')}
-      breadcrumb={[{ to: '/', label: t('home') }, { label: t('apprenant.messages') }]}
-      rightContent={rightContent}
-    >
-      <CardP user={user} />
+    <ApprenantLayout>
 
       {error && <div className="error-message">{error}</div>}
       <div className="message-wrapper">

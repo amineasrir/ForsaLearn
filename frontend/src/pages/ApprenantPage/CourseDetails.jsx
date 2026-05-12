@@ -127,16 +127,7 @@ const CourseDetails = () => {
   ];
 
   return (
-    <ApprenantLayout
-      title={course.title}
-      breadcrumb={[
-        { to: '/', label: 'Home' },
-        { to: '/apprenant/courses', label: 'Courses' },
-        { label: course.title }
-      ]}
-      rightContent={<><div className="notification-icon" /><div className="cart-icon" /></>}
-    >
-      <CardP />
+    <ApprenantLayout>
 
       {error && <div className="error-message">{error}</div>}
       {success && <div className="success-message">{success}</div>}

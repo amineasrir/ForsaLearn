@@ -51,7 +51,6 @@ const Sidebar = ({ isOpen = false, onClose = () => {} }) => {
             {makeItem('/apprenant/certificates', <FaTrophy />, t('apprenant.myCertificates'))}
             {makeItem('/apprenant/wishlist', <FaHeart />, t('apprenant.wishlist'))}
             {makeItem('/apprenant/quizzes', <FaClipboardList />, t('apprenant.myQuizAttempts'))}
-            {makeItem('/apprenant/orders', <FaHistory />, t('apprenant.orderHistory'))}
             {makeItem('/apprenant/messages', <FaEnvelope />, t('apprenant.messages'))}
             {makeItem('/apprenant/support', <FaHeadset />, t('apprenant.supportTickets'))}
           </nav>

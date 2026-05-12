@@ -19,12 +19,7 @@ const ApprenantWishlist = () => {
   );
 
   return (
-    <ApprenantLayout
-      title={t('apprenant.wishlist')}
-      breadcrumb={[{ to: '/', label: t('home') }, { label: t('apprenant.wishlist') }]}
-      rightContent={rightContent}
-    >
-      <CardP  />
+    <ApprenantLayout>
 
           <div className="wishlist-grid">
             {items.length === 0 ? (

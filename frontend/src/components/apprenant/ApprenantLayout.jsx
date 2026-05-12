@@ -12,9 +12,7 @@ const ApprenantLayout = ({ title, breadcrumb = [], rightContent = null, classNam
   return (
     <div className="apprenant-dashboard">
       <DashboardNavbar
-        title={title}
-        breadcrumb={breadcrumb}
-        rightContent={rightContent}
+       
         onMenuClick={toggleSidebar}
       />
 

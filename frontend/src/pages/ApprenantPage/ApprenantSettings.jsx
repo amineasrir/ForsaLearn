@@ -68,12 +68,7 @@ const ApprenantSettings = () => {
   };
 
   return (
-    <ApprenantLayout
-      title={t('apprenant.settings')}
-      breadcrumb={[{ to: '/', label: t('home') }, { label: t('apprenant.settings') }]}
-      rightContent={<><div className="notification-icon" /><div className="cart-icon" /></>}
-    >
-      <CardP user={user} />
+    <ApprenantLayout>
 
       <div className="sett-page">
         {/* Horizontal tabs matching screenshot */}

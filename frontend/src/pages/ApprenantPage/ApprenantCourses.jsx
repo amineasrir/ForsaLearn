@@ -90,12 +90,7 @@ const ApprenantCourses = () => {
   }, [courses, selectedCategories, sortBy]);
 
   return (
-    <ApprenantLayout
-      title={t('apprenant.courses')}
-      breadcrumb={[{ to: '/', label: t('home') }, { label: t('apprenant.courses') }]}
-      rightContent={<><div className="notification-icon" /><div className="cart-icon" /></>}
-    >
-      <CardP user={user} />
+    <ApprenantLayout>
 
       {error && <div className="error-message">{error}</div>}
 

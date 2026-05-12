@@ -61,12 +61,7 @@ const ApprenantCertificates = () => {
   );
 
   return (
-    <ApprenantLayout
-      title={t('apprenant.myCertificates')}
-      breadcrumb={[{ to: '/', label: t('home') }, { label: t('apprenant.myCertificates') }]}
-      rightContent={rightContent}
-    >
-      <CardP user={user} />
+    <ApprenantLayout>
 
           {error && <div className="error-message">{error}</div>}
           <section className="certificates-section">
