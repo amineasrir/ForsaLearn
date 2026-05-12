@@ -3,6 +3,7 @@ import Dashboard from './pages/adminInterface/Dashboard';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import MyProfile from './pages/adminInterface/MyProfile';
 import Courses from './pages/adminInterface/Courses';
+import CourseDetails from './pages/adminInterface/CourseDetails';
 import Instructors from './pages/adminInterface/Instructors';
 import Students from './pages/adminInterface/Students';
 import Conversations from './pages/adminInterface/Conversations';
@@ -16,6 +17,7 @@ const AppAdmin = () => {
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path='/profile' element={<MyProfile />} />
         <Route path='/courses' element={<Courses />} />
+        <Route path='/courses/:courseId' element={<CourseDetails />} />
         <Route path='/instructors' element={<Instructors />} />
         <Route path='/students' element={<Students />} />
         <Route path='/conversations' element={<Conversations />} />

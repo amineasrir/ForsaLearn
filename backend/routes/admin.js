@@ -577,6 +577,28 @@ router.patch('/courses/:id/featured', async (req, res) => {
   }
 });
 
+// Get single course details for admin
+router.get('/courses/:id', async (req, res) => {
+  try {
+    const course = await Course.findById(req.params.id)
+      .populate('formateur', 'fullName email phoneNumber bio field rating totalStudents totalEarnings profilePicture')
+      .populate('reviews.user', 'fullName profilePicture')
+      .populate('enrolledStudents.student', 'fullName email profilePicture');
+
+    if (!course) {
+      return res.status(404).json({ message: 'Course not found' });
+    }
+
+    res.status(200).json({
+      success: true,
+      data: course
+    });
+  } catch (error) {
+    console.error('Get course details error:', error);
+    res.status(500).json({ message: 'Error fetching course details' });
+  }
+});
+
 // BULK OPERATIONS
 
 // Bulk approve formateurs

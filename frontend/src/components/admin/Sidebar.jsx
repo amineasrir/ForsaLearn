@@ -14,9 +14,9 @@ const Sidebar = () => {
     const token = localStorage.getItem('adminToken');
     const user = localStorage.getItem('adminUser');
     if (token) {
-      localStorage.removeItem('authToken');
-      localStorage.removeItem('authUser');
-      window.location.href = '/signin';
+      localStorage.removeItem('adminToken');
+      localStorage.removeItem('adminUser');
+      window.location.href = '/admin/login';
     }
   };
 
