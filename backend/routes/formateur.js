@@ -256,7 +256,9 @@ router.post('/courses',
       });
     } catch (error) {
       console.error('Create course error:', error);
-      res.status(500).json({ message: 'Error creating course' });
+      console.error('Error details:', error.message);
+      console.error('Stack:', error.stack);
+      res.status(500).json({ message: 'Error creating course', error: error.message });
     }
   }
 );

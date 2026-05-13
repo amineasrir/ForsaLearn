@@ -70,8 +70,12 @@ const issueCertificateForCompletion = async ({
   const certificate = await Certificate.create({
     certificateId,
     student: student._id,
+    studentName: student.fullName || 'Student',
     course: course._id,
+    courseName: course.title || 'Course',
+    courseDuration: Math.max(1, Math.round(Number(course.totalDuration || 0) / 60)),
     instructor: course.formateur?._id || course.formateur,
+    instructorName,
     pdfUrl: pdfResult.filepath,
     filename: pdfResult.filename,
     completionDate,

@@ -16,6 +16,7 @@ import ApprenantMessages from "./pages/ApprenantPage/ApprenantMessages";
 import ApprenantSettings from "./pages/ApprenantPage/ApprenantSettings";
 import ApprenantSupport from "./pages/ApprenantPage/ApprenantSupport";
 import CourseDetails from "./pages/ApprenantPage/CourseDetails";
+import CoursePlayer from "./pages/ApprenantPage/CoursePlayer";
 import { WishlistProvider } from './context/WishlistContext';
 import ApprenantProtectedRoute from './protectRoutes/ApprenantProtectedRoute';
 
@@ -37,6 +38,7 @@ function App(){
           <Route path="/apprenant/quizzes" element={<ApprenantProtectedRoute><ApprenantQuizzes /></ApprenantProtectedRoute>} />
           <Route path="/apprenant/courses" element={<ApprenantProtectedRoute><ApprenantCourses /></ApprenantProtectedRoute>} />
           <Route path="/apprenant/course/:id" element={<ApprenantProtectedRoute><CourseDetails /></ApprenantProtectedRoute>} />
+          <Route path="/apprenant/course/:id/learn" element={<ApprenantProtectedRoute><CoursePlayer /></ApprenantProtectedRoute>} />
           <Route path="/apprenant/wishlist" element={<ApprenantProtectedRoute><ApprenantWishlist /></ApprenantProtectedRoute>} />
           <Route path="/apprenant/messages" element={<ApprenantProtectedRoute><ApprenantMessages /></ApprenantProtectedRoute>} />
           <Route path="/apprenant/settings" element={<ApprenantProtectedRoute><ApprenantSettings /></ApprenantProtectedRoute>} />

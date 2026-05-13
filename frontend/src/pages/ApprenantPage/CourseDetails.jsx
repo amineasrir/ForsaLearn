@@ -11,7 +11,7 @@ import ApprenantLayout from '../../components/apprenant/ApprenantLayout';
 import CardP from '../../components/apprenant/CardP';
 import {
   getCourseDetails, enrollInCourse,
-  getCourseComments, postCourseComment
+  getCourseComments, postCourseComment, postCourseReview
 } from '../../services/apprenentService';
 import { getMediaUrl } from '../../utils/mediaUrl';
 import './CourseDetails.css';
@@ -32,6 +32,9 @@ const CourseDetails = () => {
   const [openSection, setOpenSection] = useState(null);
   const [inWishlist, setInWishlist] = useState(false);
   const [formData, setFormData] = useState({ name: '', email: '', subject: '', comment: '' });
+  const [reviewRating, setReviewRating] = useState(5);
+  const [reviewText, setReviewText] = useState('');
+  const [reviewSubmitting, setReviewSubmitting] = useState(false);
 
   useEffect(() => {
     if (!id) return;
@@ -63,6 +66,10 @@ const CourseDetails = () => {
     }
   };
 
+  const handleStartLearning = () => {
+    navigate(`/apprenant/course/${id}/learn`);
+  };
+
   const handleSubmitComment = async e => {
     e.preventDefault();
     if (!formData.name || !formData.email || !formData.comment) return;
@@ -81,6 +88,35 @@ const CourseDetails = () => {
       setError(e.response?.data?.message || 'Error posting comment');
     } finally {
       setSubmitting(false);
+    }
+  };
+
+  const handleSubmitReview = async e => {
+    e.preventDefault();
+    if (!reviewRating || !reviewText) {
+      setError('Please choose a rating and write a review.');
+      setTimeout(() => setError(''), 3000);
+      return;
+    }
+
+    try {
+      setReviewSubmitting(true);
+      setError('');
+      await postCourseReview(id, {
+        rating: reviewRating,
+        comment: reviewText
+      });
+
+      setReviewRating(5);
+      setReviewText('');
+      const details = await getCourseDetails(id);
+      setCourse(details.data?.data);
+      setSuccess('Review submitted!');
+      setTimeout(() => setSuccess(''), 2500);
+    } catch (e) {
+      setError(e.response?.data?.message || 'Error submitting review');
+    } finally {
+      setReviewSubmitting(false);
     }
   };
 
@@ -109,6 +145,8 @@ const CourseDetails = () => {
   const price = isFree ? 'FREE' : `$${Number(course.price || 0).toFixed(2)}`;
   const originalPrice = isFree ? null : course.originalPrice ? `$${Number(course.originalPrice).toFixed(2)}` : null;
   const discount = course.discount?.percentage;
+  const previewUrl = course.videoUrl || course.sections?.flatMap(sec => sec.lessons || []).find(lesson => lesson.type === 'video')?.content;
+  const isPreviewVideo = previewUrl && /\.(mp4|webm|ogg|mov|m4v)(\?.*)?$/i.test(previewUrl);
 
   const includes = [
     { icon: <FaPlayCircle />, text: `${fmt(course.totalDuration)} on-demand video` },
@@ -143,11 +181,20 @@ const CourseDetails = () => {
       ══════════════════════════════════════════ */}
       <div className="cd-header-card">
         {/* Left: thumbnail */}
-        <div className="cd-header-thumb">
-          <img
-            src={getMediaUrl(course.thumbnail) || require('../../assets/image/cours/cours.jpg')}
-            alt={course.title}
-          />
+        <div className="cd-header-thumb" onClick={handleStartLearning}>
+          {previewUrl ? (
+            <video
+              className="cd-header-video"
+              controls
+              src={getMediaUrl(previewUrl)}
+              poster={getMediaUrl(course.thumbnail)}
+            />
+          ) : (
+            <img
+              src={getMediaUrl(course.thumbnail) || require('../../assets/image/cours/cours.jpg')}
+              alt={course.title}
+            />
+          )}
           <div className="cd-header-thumb-overlay">
             <FaPlayCircle className="cd-play-icon" />
           </div>
@@ -229,6 +276,13 @@ const CourseDetails = () => {
             disabled={enrolling}
           >
             {enrolling ? 'Enrolling...' : 'Enroll Now'}
+          </button>
+          <button
+            type="button"
+            className="cd-start-learning-btn"
+            onClick={handleStartLearning}
+          >
+            Start Learning
           </button>
 
           {/* Includes */}
@@ -362,6 +416,45 @@ const CourseDetails = () => {
           </div>
         </div>
       )}
+
+      {/* ══════════════════════════════════════════
+          REVIEW SECTION
+      ══════════════════════════════════════════ */}
+      <div id="review" className="cd-section-card">
+        <h2 className="cd-section-h2">Leave a Review</h2>
+
+        <form className="cd-comment-form" onSubmit={handleSubmitReview}>
+          <div className="cd-form-group">
+            <label>Rating</label>
+            <div className="cd-review-stars">
+              {[1, 2, 3, 4, 5].map(star => (
+                <button
+                  key={star}
+                  type="button"
+                  className={`cd-review-star${reviewRating >= star ? ' filled' : ''}`}
+                  onClick={() => setReviewRating(star)}
+                  aria-label={`${star} star${star > 1 ? 's' : ''}`}
+                >
+                  <FaStar />
+                </button>
+              ))}
+            </div>
+          </div>
+          <div className="cd-form-group">
+            <label>Your review</label>
+            <textarea
+              rows={5}
+              value={reviewText}
+              onChange={e => setReviewText(e.target.value)}
+              placeholder="Share your experience with this course"
+              required
+            />
+          </div>
+          <button type="submit" className="cd-submit-btn" disabled={reviewSubmitting}>
+            {reviewSubmitting ? 'Submitting review...' : 'Submit review'}
+          </button>
+        </form>
+      </div>
 
       {/* ══════════════════════════════════════════
           COMMENTS SECTION

@@ -37,6 +37,10 @@ export const enrollInCourse = (courseId) => {
   return API.post(`courses/${courseId}/enroll`);
 };
 
+export const completeLesson = (courseId, lessonId) => {
+  return API.post(`courses/${courseId}/lessons/${lessonId}/complete`);
+};
+
 export const getEnrolledCourses = () => {
   return API.get("courses/student/my-courses");
 };
@@ -93,6 +97,10 @@ export const getCourseComments = (courseId) => {
 
 export const postCourseComment = (courseId, data) => {
   return API.post(`courses/${courseId}/comments`, data);
+};
+
+export const postCourseReview = (courseId, data) => {
+  return API.post(`courses/${courseId}/reviews`, data);
 };
 
 export const deleteCourseComment = (courseId, commentId) => {

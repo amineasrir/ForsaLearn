@@ -336,7 +336,10 @@ courseSchema.pre('save', function(next) {
 
   if (this.isModified('sections')) {
     const lessons = (this.sections || []).flatMap((section) => section.lessons || []);
-    this.totalDuration = lessons.reduce((sum, lesson) => sum + Number(lesson.duration || 0), 0);
+    this.totalDuration = lessons.reduce((sum, lesson) => {
+      const duration = Number(lesson.duration) || 0;
+      return sum + (isNaN(duration) ? 0 : duration);
+    }, 0);
   }
 
   next();
