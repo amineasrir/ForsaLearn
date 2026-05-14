@@ -4,6 +4,7 @@ import SidebarF from '../../components/formateur/sidebarF';
 import logo_rem from '../../assets/image/home_page/logo_rem.png';
 import axios from 'axios';
 import { FaEye, FaDownload, FaFilter, FaChartBar } from 'react-icons/fa';
+import { useTranslation } from 'react-i18next';
 
 const FormateurQuizResult = () => {
   const [quizzes, setQuizzes] = useState([]);
@@ -14,6 +15,7 @@ const FormateurQuizResult = () => {
   const [filterStatus, setFilterStatus] = useState('all'); // all, passed, failed
   const [searchStudent, setSearchStudent] = useState('');
   const [stats, setStats] = useState(null);
+  const { t } = useTranslation();
 
   const API_URL = 'http://localhost:5000/api';
 
@@ -47,7 +49,7 @@ const FormateurQuizResult = () => {
       }
     } catch (error) {
       console.error('Error fetching quizzes:', error);
-      alert('Error fetching quizzes');
+      alert(t('formateur.quizResults.errorFetchingQuizzes'));
     } finally {
       setLoading(false);
     }
@@ -158,7 +160,7 @@ const FormateurQuizResult = () => {
     return (
       <div className="formateur-page">
         <div className="loading-container">
-          <p>Loading quiz results...</p>
+          <p>{t('formateur.quizResults.loadingQuizResults')}</p>
         </div>
       </div>
     );
@@ -187,10 +189,10 @@ const FormateurQuizResult = () => {
           <div className="quiz-results-container">
             {/* Quiz Selection */}
             <div className="quiz-selection-section">
-              <h2>Select Quiz to View Results</h2>
+              <h2>{t('formateur.quizResults.selectQuizTitle')}</h2>
               <div className="quiz-selection-tabs">
                 {quizzes.length === 0 ? (
-                  <p className="no-quizzes">No quizzes found</p>
+                  <p className="no-quizzes">{t('formateur.quizResults.noQuizzes')}</p>
                 ) : (
                   quizzes.map(quiz => (
                     <button
@@ -241,7 +243,7 @@ const FormateurQuizResult = () => {
                   <div className="filter-group">
                     <input
                       type="text"
-                      placeholder="Search student name..."
+                      placeholder={t('formateur.quizResults.searchStudentPlaceholder')}
                       value={searchStudent}
                       onChange={(e) => setSearchStudent(e.target.value)}
                       className="search-input"
@@ -254,9 +256,9 @@ const FormateurQuizResult = () => {
                       onChange={(e) => setFilterStatus(e.target.value)}
                       className="filter-select"
                     >
-                      <option value="all">All Results</option>
-                      <option value="passed">Passed Only</option>
-                      <option value="failed">Failed Only</option>
+                      <option value="all">{t('formateur.quizResults.allResults')}</option>
+                      <option value="passed">{t('formateur.quizResults.passedOnly')}</option>
+                      <option value="failed">{t('formateur.quizResults.failedOnly')}</option>
                     </select>
                   </div>
 
@@ -264,42 +266,42 @@ const FormateurQuizResult = () => {
                     onClick={downloadResultsCSV}
                     className="btn-download-results"
                   >
-                    <FaDownload /> Download CSV
+                    <FaDownload /> {t('formateur.quizResults.downloadCSV')}
                   </button>
                 </div>
 
                 {/* Results Table */}
                 <div className="results-table-section">
-                  <h3>Student Results ({filteredResults.length})</h3>
+                  <h3>{t('formateur.quizResults.studentResults', { count: filteredResults.length })}</h3>
 
                   {filteredResults.length === 0 ? (
-                    <p className="no-results">No student results found</p>
+                    <p className="no-results">{t('formateur.quizResults.noResults')}</p>
                   ) : (
                     <div className="results-table-wrapper">
                       <table className="results-table">
                         <thead>
                           <tr>
-                            <th>Student Name</th>
-                            <th>Email</th>
-                            <th>Score</th>
-                            <th>Percentage</th>
-                            <th>Status</th>
-                            <th>Attempts</th>
-                            <th>Completed At</th>
-                            <th>Action</th>
+                            <th>{t('formateur.quizResults.studentNameHeader')}</th>
+                            <th>{t('formateur.quizResults.emailHeader')}</th>
+                            <th>{t('formateur.quizResults.scoreHeader')}</th>
+                            <th>{t('formateur.quizResults.percentageHeader')}</th>
+                            <th>{t('formateur.quizResults.statusHeader')}</th>
+                            <th>{t('formateur.quizResults.attemptsHeader')}</th>
+                            <th>{t('formateur.quizResults.completedAtHeader')}</th>
+                            <th>{t('formateur.quizResults.actionHeader')}</th>
                           </tr>
                         </thead>
                         <tbody>
                           {filteredResults.map((result, idx) => {
-                            const resultStatus = result.percentageScore >= passingScore ? 'Passed' : 'Failed';
+                            const resultStatus = result.percentageScore >= passingScore ? t('formateur.quizResults.status.passed') : t('formateur.quizResults.status.failed');
                             const scoreColor = getScoreColor(result.percentageScore, passingScore);
                             return (
                               <tr key={result._id || idx} className="result-row">
                                 <td className="student-name">
-                                  {result.student?.firstName || 'Unknown'}{' '}
+                                  {result.student?.firstName || t('formateur.quizResults.unknown')}{' '}
                                   {result.student?.lastName || ''}
                                 </td>
-                                <td className="student-email">{result.student?.email || 'N/A'}</td>
+                                <td className="student-email">{result.student?.email || t('formateur.na')}</td>
                                 <td className="score">
                                   {result.score}/{currentQuiz?.settings?.totalPoints || 0}
                                 </td>
@@ -318,19 +320,19 @@ const FormateurQuizResult = () => {
                                     {resultStatus}
                                   </span>
                                 </td>
-                                <td className="attempts">{result.status || 'submitted'}</td>
+                                <td className="attempts">{result.status || t('formateur.quizResults.status.submitted')}</td>
                                 <td className="completed-date">
                                   {result.completedAt
                                     ? new Date(result.completedAt).toLocaleDateString()
-                                    : 'In Progress'}
+                                    : t('formateur.quizResults.status.inProgress')}
                                 </td>
                                 <td className="action-cell">
                                   <button
                                     onClick={() => setSelectedResult(result)}
                                     className="btn-view-details"
-                                    title="View detailed answers"
+                                    title={t('formateur.quizResults.viewDetailedAnswers')}
                                   >
-                                    <FaEye /> Details
+                                    <FaEye /> {t('formateur.quizResults.details')}
                                   </button>
                                 </td>
                               </tr>
@@ -352,7 +354,7 @@ const FormateurQuizResult = () => {
         <div className="result-modal-overlay">
           <div className="result-modal-content">
             <div className="modal-header">
-              <h3>Student Answer Review</h3>
+              <h3>{t('formateur.quizResults.studentAnswerReview')}</h3>
               <button
                 onClick={() => setSelectedResult(null)}
                 className="btn-close-modal"
@@ -364,41 +366,41 @@ const FormateurQuizResult = () => {
             <div className="student-info-section">
               <div className="student-info">
                 <h4>
-                  {selectedResult.student?.firstName || 'Unknown'}{' '}
+                  {selectedResult.student?.firstName || t('formateur.quizResults.unknown')}{' '}
                   {selectedResult.student?.lastName || ''}
                 </h4>
-                <p>{selectedResult.student?.email || 'N/A'}</p>
+                <p>{selectedResult.student?.email || t('formateur.na')}</p>
               </div>
               <div className="result-summary">
                 <div className="summary-item">
-                  <label>Score</label>
+                  <label>{t('formateur.quizResults.scoreLabel')}</label>
                   <p>
                     <strong>{selectedResult.score}/{currentQuiz?.settings?.totalPoints || 0}</strong>
                   </p>
                 </div>
                 <div className="summary-item">
-                  <label>Percentage</label>
+                  <label>{t('formateur.quizResults.percentageLabel')}</label>
                   <p>
                     <strong>{selectedResult.percentageScore}%</strong>
                   </p>
                 </div>
                 <div className="summary-item">
-                  <label>Status</label>
+                  <label>{t('formateur.quizResults.statusLabel')}</label>
                   <p>
                     <strong>
                       {selectedResult.percentageScore >= passingScore
-                        ? 'Passed'
-                        : 'Failed'}
+                        ? t('formateur.quizResults.status.passed')
+                        : t('formateur.quizResults.status.failed')}
                     </strong>
                   </p>
                 </div>
                 <div className="summary-item">
-                  <label>Completed</label>
+                  <label>{t('formateur.quizResults.completedLabel')}</label>
                   <p>
                     <strong>
                       {selectedResult.completedAt
                         ? new Date(selectedResult.completedAt).toLocaleString()
-                        : 'In Progress'}
+                        : t('formateur.quizResults.status.inProgress')}
                     </strong>
                   </p>
                 </div>
@@ -406,7 +408,7 @@ const FormateurQuizResult = () => {
             </div>
 
             <div className="answers-review-section">
-              <h4>Answer Review</h4>
+              <h4>{t('formateur.quizResults.answerReview')}</h4>
               {selectedResult.answers && selectedResult.answers.length > 0 ? (
                 <div className="answers-list">
                   {selectedResult.answers.map((answer, idx) => {
@@ -422,36 +424,36 @@ const FormateurQuizResult = () => {
                       >
                         <div className="answer-header">
                           <h5>
-                            {idx + 1}. {question?.title || 'Question'}
+                            {idx + 1}. {question?.title || t('formateur.quizResults.questionLabel')}
                           </h5>
                           <span
                             className={`answer-status ${
                               answer.isCorrect ? 'correct' : 'incorrect'
                             }`}
                           >
-                            {answer.isCorrect ? '✓ Correct' : '✗ Incorrect'}
+                            {answer.isCorrect ? t('formateur.quizResults.correct') : t('formateur.quizResults.incorrect')}
                           </span>
                         </div>
 
                         <div className="answer-content">
                           <div className="student-answer">
-                            <label>Student's Answer:</label>
-                            <p className="answer-text">{answer.selectedAnswer || 'No answer'}</p>
+                            <label>{t('formateur.quizResults.studentsAnswer')}</label>
+                            <p className="answer-text">{answer.selectedAnswer || t('formateur.quizResults.noAnswer')}</p>
                             <span className="points-earned">
-                              Points: {answer.pointsEarned || 0}/{question?.points || 0}
+                              {t('formateur.quizResults.points')}: {answer.pointsEarned || 0}/{question?.points || 0}
                             </span>
                           </div>
 
                           {!answer.isCorrect && question?.correctAnswer && (
                             <div className="correct-answer">
-                              <label>Correct Answer:</label>
+                              <label>{t('formateur.quizResults.correctAnswer')}</label>
                               <p className="answer-text">{question.correctAnswer}</p>
                             </div>
                           )}
 
                           {question?.explanation && (
                             <div className="answer-explanation">
-                              <label>Explanation:</label>
+                              <label>{t('formateur.quizResults.explanation')}</label>
                               <p>{question.explanation}</p>
                             </div>
                           )}
@@ -461,7 +463,7 @@ const FormateurQuizResult = () => {
                   })}
                 </div>
               ) : (
-                <p className="no-answers">No answers recorded</p>
+                <p className="no-answers">{t('formateur.quizResults.noAnswersRecorded')}</p>
               )}
             </div>
 
@@ -470,7 +472,7 @@ const FormateurQuizResult = () => {
                 onClick={() => setSelectedResult(null)}
                 className="btn-close-review"
               >
-                Close Review
+                {t('formateur.quizResults.closeReview')}
               </button>
             </div>
           </div>

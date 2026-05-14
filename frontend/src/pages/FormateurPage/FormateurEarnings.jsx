@@ -3,6 +3,7 @@ import '../../styles/formateur.css';
 import logo_rem from '../../assets/image/home_page/logo_rem.png';
 import SidebarF from '../../components/formateur/sidebarF';
 import { FaDollarSign, FaStar, FaUsers } from 'react-icons/fa';
+import { useTranslation } from 'react-i18next';
 import {
   getFormateurDashboardStats,
   getFormateurEarnings,
@@ -21,6 +22,7 @@ const FormateurEarnings = () => {
   const [payments, setPayments] = useState([]);
   const [dashboardStats, setDashboardStats] = useState(null);
   const [error, setError] = useState('');
+  const { t } = useTranslation();
 
   useEffect(() => {
     const loadEarnings = async () => {
@@ -36,7 +38,7 @@ const FormateurEarnings = () => {
         setPayments(earningsResponse.data?.payments || []);
         setDashboardStats(statsResponse.data?.data || null);
       } catch (err) {
-        setError(err.response?.data?.message || 'Failed to load earnings.');
+        setError(err.response?.data?.message || t('formateur.earnings.failedToLoadEarnings'));
       }
     };
 
@@ -46,26 +48,26 @@ const FormateurEarnings = () => {
   const stats = useMemo(() => ([
     {
       icon: <FaDollarSign />,
-      label: 'Revenue',
+      label: t('formateur.earnings.revenue'),
       value: formatCurrency(summary?.totalEarnings),
-      sub: `${summary?.totalTransactions || 0} completed transactions`,
+      sub: t('formateur.earnings.completedTransactions', { count: summary?.totalTransactions || 0 }),
       color: '#10B981'
     },
     {
       icon: <FaStar />,
-      label: 'Course Ratings',
+      label: t('formateur.earnings.courseRatings'),
       value: dashboardStats?.overview?.averageRating || 0,
-      sub: 'Average rating from students',
+      sub: t('formateur.earnings.averageRating'),
       color: '#FFB020'
     },
     {
       icon: <FaUsers />,
-      label: 'Students Enrolled',
+      label: t('formateur.earnings.studentsEnrolled'),
       value: dashboardStats?.overview?.totalEnrollments || 0,
-      sub: 'Across all active courses',
+      sub: t('formateur.earnings.acrossCourses'),
       color: '#4F46E5'
     }
-  ]), [dashboardStats?.overview?.averageRating, dashboardStats?.overview?.totalEnrollments, summary?.totalEarnings, summary?.totalTransactions]);
+  ]), [dashboardStats?.overview?.averageRating, dashboardStats?.overview?.totalEnrollments, summary?.totalEarnings, summary?.totalTransactions, t]);
 
   return (
     <div className="formateur-page">
@@ -85,7 +87,7 @@ const FormateurEarnings = () => {
 
           <div className="earnings-section">
             <div style={{ marginBottom: '1rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <h2>Earnings</h2>
+              <h2>{t('formateur.earnings.title')}</h2>
             </div>
 
             <div className="stats-grid">
@@ -103,8 +105,8 @@ const FormateurEarnings = () => {
 
             <div style={{ marginTop: '1.5rem' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
-                <h3>Orders</h3>
-                <div style={{ color: '#6b7280', fontSize: '0.9rem' }}>{payments.length} transactions</div>
+                <h3>{t('formateur.earnings.orders')}</h3>
+                <div style={{ color: '#6b7280', fontSize: '0.9rem' }}>{t('formateur.earnings.transactionsCount', { count: payments.length })}</div>
               </div>
 
               <div className="courses-table" style={{ background: '#fff', borderRadius: 8, padding: '1rem' }}>

@@ -1,10 +1,12 @@
 import React, { useState } from 'react'
-import { FaChartBar, FaUser, FaBook, FaUsers, FaPlus, FaQuestionCircle, FaClipboardList, FaTrophy, FaDollarSign, FaEnvelope, FaHeadset, FaCog, FaSignOutAlt } from 'react-icons/fa';
+import { FaChartBar, FaUser, FaBook, FaUsers, FaPlus, FaClipboardList, FaTrophy, FaDollarSign, FaEnvelope, FaHeadset, FaCog, FaSignOutAlt } from 'react-icons/fa';
 import { useNavigate, useLocation } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { clearUserSession } from '../../utils/authStorage';
 import '../../styles/formateur.css';  
 
 const SidebarF = ({ activeMenu: propActive, setActiveMenu: propSetActive }) => {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const location = useLocation();
   const [internalActive, setInternalActive] = useState('dashboard');
@@ -20,16 +22,16 @@ const SidebarF = ({ activeMenu: propActive, setActiveMenu: propSetActive }) => {
   };
 
   const menuItems = [
-    { id: 'dashboard', label: 'Dashboard', icon: FaChartBar, path: '/formateur/dashboard' },
-    { id: 'profile', label: 'Profile', icon: FaUser, path: '/formateur/profile' },
-    { id: 'mycourses', label: 'My Courses', icon: FaBook, path: '/formateur/courses' },
-    { id: 'addcourse', label: 'Add Course', icon: FaPlus, path: '/formateur/add-course' },
-    { id: 'students', label: 'Students', icon: FaUsers, path: '/formateur/students' },
-    { id: 'quizResults', label: 'Quiz Results', icon: FaClipboardList, path: '/formateur/quiz-results' },
-    { id: 'certificates', label: 'Certificates', icon: FaTrophy, path: '/formateur/certificates' },
-    { id: 'earnings', label: 'Earnings', icon: FaDollarSign, path: '/formateur/earnings' },
-    { id: 'messages', label: 'Messages', icon: FaEnvelope, path: '/formateur/messages' },
-    { id: 'support', label: 'Support', icon: FaHeadset, path: '/formateur/support' },
+    { id: 'dashboard', label: t('formateur.sidebar.dashboard'), icon: FaChartBar, path: '/formateur/dashboard' },
+    { id: 'profile', label: t('formateur.sidebar.profile'), icon: FaUser, path: '/formateur/profile' },
+    { id: 'mycourses', label: t('formateur.sidebar.myCourses'), icon: FaBook, path: '/formateur/courses' },
+    { id: 'addcourse', label: t('formateur.sidebar.addCourse'), icon: FaPlus, path: '/formateur/add-course' },
+    { id: 'students', label: t('formateur.sidebar.students'), icon: FaUsers, path: '/formateur/students' },
+    { id: 'quizResults', label: t('formateur.sidebar.quizResults'), icon: FaClipboardList, path: '/formateur/quiz-results' },
+    { id: 'certificates', label: t('formateur.sidebar.certificates'), icon: FaTrophy, path: '/formateur/certificates' },
+    { id: 'earnings', label: t('formateur.sidebar.earnings'), icon: FaDollarSign, path: '/formateur/earnings' },
+    { id: 'messages', label: t('formateur.sidebar.messages'), icon: FaEnvelope, path: '/formateur/messages' },
+    { id: 'support', label: t('formateur.sidebar.support'), icon: FaHeadset, path: '/formateur/support' },
   ];
 
   const computeActive = () => {
@@ -47,7 +49,7 @@ const SidebarF = ({ activeMenu: propActive, setActiveMenu: propSetActive }) => {
     <div>
         <aside className="formateur-sidebar">
                 <div className="sidebar-section">
-                  <h3>View Menu</h3>
+                  <h3>{t('formateur.sidebar.viewMenu')}</h3>
                   <ul className="menu-list">
                     {menuItems.map((item) => {
                       const IconComponent = item.icon;
@@ -70,7 +72,7 @@ const SidebarF = ({ activeMenu: propActive, setActiveMenu: propSetActive }) => {
                 </div>
       
                 <div className="sidebar-section account-settings">
-                  <h3>Account Settings</h3>
+                  <h3>{t('formateur.sidebar.accountSettings')}</h3>
                   <ul className="menu-list">
                     <li>
                       <button 
@@ -81,7 +83,7 @@ const SidebarF = ({ activeMenu: propActive, setActiveMenu: propSetActive }) => {
                         }}
                       >
                         <span className="menu-icon"><FaCog /></span>
-                        <span className="menu-label">Setting</span>
+                        <span className="menu-label">{t('formateur.sidebar.settings')}</span>
                       </button>
                     </li>
                     <li>
@@ -90,7 +92,7 @@ const SidebarF = ({ activeMenu: propActive, setActiveMenu: propSetActive }) => {
                         onClick={handleLogout}
                       >
                         <span className="menu-icon"><FaSignOutAlt /></span>
-                        <span className="menu-label">Logout</span>
+                        <span className="menu-label">{t('formateur.sidebar.logout')}</span>
                       </button>
                     </li>
                   </ul>

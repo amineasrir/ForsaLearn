@@ -88,7 +88,7 @@ body {
 }
 
 .navbar-dashboard-logo {
-  height: 45px;
+  height: 100px;
   object-fit: contain;
 }
 
@@ -104,7 +104,7 @@ body {
   height: 42px;
   border: none;
   border-radius: 50%;
-  background: #ffffff;
+  background: transparent;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -378,12 +378,20 @@ body {
 }
 
 /* ================= STATS GRID ================= */
-.stats-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 1.5rem;
+.formateur-page .stats-grid,
+.formateur-page .earnings-section .stats-grid {
+  display: flex !important;
+  justify-content: flex-start !important;
+  flex-wrap: nowrap !important;
+  gap: 0.5rem !important;
   margin-top: 1rem;
   margin-bottom: 2rem;
+  overflow-x: auto;
+}
+
+.formateur-page .stats-grid .stat-card,
+.formateur-page .earnings-section .stats-grid .stat-card {
+  flex: 0 0 260px;
 }
 
 .stat-card {
@@ -396,6 +404,8 @@ body {
   box-shadow: 0 6px 18px rgba(15, 23, 42, 0.04);
   transition: 0.3s;
   border-left: none;
+  min-width: 260px;
+  max-width: 300px;
 }
 
 .stat-card:hover {
@@ -2354,8 +2364,9 @@ body {
     padding: 1.5rem;
   }
 
-  .stats-grid {
-    grid-template-columns: repeat(2, 1fr);
+  .formateur-page .stats-grid {
+    display: flex !important;
+    flex-wrap: nowrap !important;
   }
 
   .quiz-results-header {
@@ -2390,8 +2401,9 @@ body {
 
   .profile-details div:last-child { grid-column: auto; }
 
-  .stats-grid {
-    grid-template-columns: 1fr;
+  .formateur-page .stats-grid {
+    display: flex !important;
+    flex-wrap: nowrap !important;
   }
 
   .sett-form-grid,

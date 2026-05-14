@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import '../../styles/formateur.css';
 import SidebarF from '../../components/formateur/sidebarF';
 import logo_rem from '../../assets/image/home_page/logo_rem.png';
+import { useTranslation } from 'react-i18next';
 import { FaDownload, FaEye } from 'react-icons/fa';
 import {
   getFormateurCertificates,
@@ -9,6 +10,7 @@ import {
 } from '../../services/formateurService';
 
 const FormateurCertificats = () => {
+  const { t } = useTranslation();
   const [profile, setProfile] = useState(null);
   const [certificates, setCertificates] = useState([]);
   const [error, setError] = useState('');
@@ -61,20 +63,20 @@ const FormateurCertificats = () => {
           {error && <div className="alert alert-error">{error}</div>}
 
           <div className="profile-details">
-            <h2>All Issued Certificates</h2>
-            <p>Below is the list of certificates issued for your courses. You can view or download each certificate.</p>
+            <h2>{t('formateur.certificates.title')}</h2>
+            <p>{t('formateur.certificates.description')}</p>
 
             <div className="courses-table" style={{ marginTop: '1rem' }}>
               <div className="table-header formateur-cert-header" style={{ fontWeight: 700, padding: '0.75rem 1rem', borderBottom: '1px solid #eef2f7' }}>
-                <div>Certificate ID</div>
-                <div>Student</div>
-                <div>Course</div>
-                <div>Date</div>
-                <div style={{ textAlign: 'right' }}>Actions</div>
+                <div>{t('formateur.certificates.certificateId')}</div>
+                <div>{t('formateur.certificates.student')}</div>
+                <div>{t('formateur.certificates.course')}</div>
+                <div>{t('formateur.certificates.date')}</div>
+                <div style={{ textAlign: 'right' }}>{t('formateur.certificates.actions')}</div>
               </div>
               {certificates.length === 0 ? (
                 <div className="table-row formateur-cert-row" style={{ alignItems: 'center', padding: '0.75rem 1rem', borderBottom: '1px solid #f3f4f6' }}>
-                  <div>No certificates yet</div>
+                  <div>{t('formateur.certificates.noCertificatesYet')}</div>
                   <div>-</div>
                   <div>-</div>
                   <div>-</div>
@@ -89,11 +91,11 @@ const FormateurCertificats = () => {
                   <div style={{ textAlign: 'right' }}>
                     <button className="menu-item" style={{ marginRight: 8 }} onClick={() => handleViewCertificate(certificate)}>
                       <FaEye />
-                      <span style={{ marginLeft: 8 }}>View</span>
+                      <span style={{ marginLeft: 8 }}>{t('formateur.certificates.view')}</span>
                     </button>
                     <button className="menu-item" onClick={() => handleDownloadCertificate(certificate)}>
                       <FaDownload />
-                      <span style={{ marginLeft: 8 }}>Download</span>
+                      <span style={{ marginLeft: 8 }}>{t('formateur.certificates.download')}</span>
                     </button>
                   </div>
                 </div>

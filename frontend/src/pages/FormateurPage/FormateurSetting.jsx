@@ -21,7 +21,7 @@ import {
 } from '../../services/formateurService';
 
 const FormateurSetting = () => {
-  const { i18n } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [activeTab, setActiveTab] = useState('account');
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState({ type: '', text: '' });
@@ -82,7 +82,7 @@ const FormateurSetting = () => {
       } catch (error) {
         setMessage({
           type: 'error',
-          text: error.response?.data?.message || 'Failed to load settings'
+          text: error.response?.data?.message || t('formateur.settings.failedToLoadSettings')
         });
       }
     };
@@ -111,6 +111,19 @@ const FormateurSetting = () => {
 
   const currentLang = (i18n && i18n.language) ? i18n.language : 'en';
 
+  const notificationLabelMap = {
+    emailNotifications: t('formateur.settings.notificationLabels.emailNotifications'),
+    courseUpdates: t('formateur.settings.notificationLabels.courseUpdates'),
+    studentMessages: t('formateur.settings.notificationLabels.studentMessages'),
+    paymentAlerts: t('formateur.settings.notificationLabels.paymentAlerts')
+  };
+
+  const privacyLabelMap = {
+    profilePublic: t('formateur.settings.privacyLabels.profilePublic'),
+    showEarnings: t('formateur.settings.privacyLabels.showEarnings'),
+    allowMessages: t('formateur.settings.privacyLabels.allowMessages')
+  };
+
   const handleAccountSettingsSave = async () => {
     try {
       setLoading(true);
@@ -118,7 +131,7 @@ const FormateurSetting = () => {
       setProfile(response.data?.data || profile);
       setMessage({
         type: 'success',
-        text: 'Account settings updated successfully'
+        text: t('formateur.settings.accountSettingsSaved')
       });
 
       if (accountSettings.language !== currentLang) {
@@ -130,7 +143,7 @@ const FormateurSetting = () => {
     } catch (error) {
       setMessage({
         type: 'error',
-        text: error.response?.data?.message || 'Failed to update settings'
+        text: error.response?.data?.message || t('formateur.settings.failedToUpdateSettings')
       });
     } finally {
       setLoading(false);
@@ -144,7 +157,7 @@ const FormateurSetting = () => {
       setProfile(response.data?.data || profile);
       setMessage({
         type: 'success',
-        text: 'Profile settings updated successfully'
+        text: t('formateur.settings.profileSettingsSaved')
       });
     } catch (error) {
       setMessage({
@@ -159,7 +172,7 @@ const FormateurSetting = () => {
   const saveUnsupportedSettings = (label) => {
     setMessage({
       type: 'success',
-      text: `${label} saved locally in the interface. No backend endpoint is available yet.`
+      text: t('formateur.settings.unsupportedSavedNotice', { label })
     });
   };
 
@@ -211,51 +224,51 @@ const FormateurSetting = () => {
           <div className="settings-container">
             <div className="settings-tabs">
               <button className={`settings-tab ${activeTab === 'account' ? 'active' : ''}`} onClick={() => setActiveTab('account')}>
-                <FaCog /> Account
+                <FaCog /> {t('formateur.settings.accountTab')}
               </button>
               <button className={`settings-tab ${activeTab === 'profile' ? 'active' : ''}`} onClick={() => setActiveTab('profile')}>
-                <FaFileAlt /> Profile
+                <FaFileAlt /> {t('formateur.settings.profileTab')}
               </button>
               <button className={`settings-tab ${activeTab === 'notifications' ? 'active' : ''}`} onClick={() => setActiveTab('notifications')}>
-                <FaBell /> Notifications
+                <FaBell /> {t('formateur.settings.notificationsTab')}
               </button>
               <button className={`settings-tab ${activeTab === 'privacy' ? 'active' : ''}`} onClick={() => setActiveTab('privacy')}>
-                <FaLock /> Privacy
+                <FaLock /> {t('formateur.settings.privacyTab')}
               </button>
               <button className={`settings-tab ${activeTab === 'billing' ? 'active' : ''}`} onClick={() => setActiveTab('billing')}>
-                <FaCreditCard /> Billing
+                <FaCreditCard /> {t('formateur.settings.billingTab')}
               </button>
             </div>
 
             {activeTab === 'account' && (
               <div className="settings-panel">
-                <h2>Account Settings</h2>
+                <h2>{t('formateur.settings.accountSettingsTitle')}</h2>
                 <div className="settings-form">
                   <div className="form-group">
-                    <label>Full Name</label>
+                    <label>{t('formateur.profile.fullName')}</label>
                     <input type="text" value={accountSettings.fullName} onChange={(e) => setAccountSettings({ ...accountSettings, fullName: e.target.value })} className="form-input" />
                   </div>
 
                   <div className="form-group">
-                    <label>Email Address</label>
+                    <label>{t('formateur.settings.emailAddress')}</label>
                     <input type="email" value={accountSettings.email} onChange={(e) => setAccountSettings({ ...accountSettings, email: e.target.value })} className="form-input" />
                   </div>
 
                   <div className="form-group">
-                    <label>Phone Number</label>
+                    <label>{t('formateur.settings.phoneNumber')}</label>
                     <input type="tel" value={accountSettings.phoneNumber} onChange={(e) => setAccountSettings({ ...accountSettings, phoneNumber: e.target.value })} className="form-input" />
                   </div>
 
                   <div className="form-group">
-                    <label>Language</label>
+                    <label>{t('formateur.settings.language')}</label>
                     <select value={accountSettings.language} onChange={(e) => setAccountSettings({ ...accountSettings, language: e.target.value })} className="form-input">
-                      <option value="en">English</option>
-                      <option value="fr">Francais</option>
+                      <option value="en">{t('formateur.settings.english')}</option>
+                      <option value="fr">{t('formateur.settings.french')}</option>
                     </select>
                   </div>
 
                   <button className="btn-save-settings" onClick={handleAccountSettingsSave} disabled={loading}>
-                    <FaSave /> {loading ? 'Saving...' : 'Save Changes'}
+                    <FaSave /> {loading ? t('formateur.profile.saving') : t('formateur.settings.saveChanges')}
                   </button>
                 </div>
               </div>
@@ -263,23 +276,23 @@ const FormateurSetting = () => {
 
             {activeTab === 'profile' && (
               <div className="settings-panel">
-                <h2>Profile Settings</h2>
+                <h2>{t('formateur.settings.profileSettingsTitle')}</h2>
                 <div className="settings-form">
                   <div className="form-group">
-                    <label>Expertise Field</label>
-                    <input type="text" value={profileSettings.field} onChange={(e) => setProfileSettings({ ...profileSettings, field: e.target.value })} placeholder="e.g., Web Development, Data Science" className="form-input" />
+                    <label>{t('formateur.settings.expertiseField')}</label>
+                    <input type="text" value={profileSettings.field} onChange={(e) => setProfileSettings({ ...profileSettings, field: e.target.value })} placeholder={t('formateur.settings.expertiseField')} className="form-input" />
                   </div>
 
                   <div className="form-group">
-                    <label>Bio</label>
-                    <textarea value={profileSettings.bio} onChange={(e) => setProfileSettings({ ...profileSettings, bio: e.target.value })} placeholder="Tell students about yourself..." className="form-textarea" rows="5" />
+                    <label>{t('formateur.settings.bio')}</label>
+                    <textarea value={profileSettings.bio} onChange={(e) => setProfileSettings({ ...profileSettings, bio: e.target.value })} placeholder={t('formateur.settings.bio')} className="form-textarea" rows="5" />
                   </div>
 
                   <div className="form-group">
-                    <label>Skills</label>
+                    <label>{t('formateur.settings.skills')}</label>
                     <div className="skills-input-wrapper">
-                      <input type="text" value={newSkill} onChange={(e) => setNewSkill(e.target.value)} onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); addSkill(); } }} placeholder="Add a skill and press Enter" className="form-input" />
-                      <button type="button" onClick={addSkill} className="btn-add-skill">Add</button>
+                      <input type="text" value={newSkill} onChange={(e) => setNewSkill(e.target.value)} onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); addSkill(); } }} placeholder={t('formateur.settings.add')} className="form-input" />
+                      <button type="button" onClick={addSkill} className="btn-add-skill">{t('formateur.settings.add')}</button>
                     </div>
                     <div className="skills-list">
                       {profileSettings.skills.map((skill, index) => (
@@ -292,7 +305,7 @@ const FormateurSetting = () => {
                   </div>
 
                   <button className="btn-save-settings" onClick={handleProfileSettingsSave} disabled={loading}>
-                    <FaSave /> {loading ? 'Saving...' : 'Save Changes'}
+                    <FaSave /> {loading ? t('formateur.profile.saving') : t('formateur.settings.saveChanges')}
                   </button>
                 </div>
               </div>
@@ -300,21 +313,21 @@ const FormateurSetting = () => {
 
             {activeTab === 'notifications' && (
               <div className="settings-panel">
-                <h2>Notification Settings</h2>
+                <h2>{t('formateur.settings.notificationSettingsTitle')}</h2>
                 <div className="settings-form">
                   {Object.entries(notificationSettings).map(([key, value]) => (
                     <div key={key} className="toggle-setting">
                       <div>
-                        <label>{key}</label>
-                        <p>Toggle this preference in the interface.</p>
+                        <label>{notificationLabelMap[key] || key}</label>
+                        <p>{t('formateur.settings.saveLocallyNotice')}</p>
                       </div>
                       <button className="toggle-btn" onClick={() => setNotificationSettings({ ...notificationSettings, [key]: !value })}>
                         {value ? <FaToggleOn /> : <FaToggleOff />}
                       </button>
                     </div>
                   ))}
-                  <button className="btn-save-settings" onClick={() => saveUnsupportedSettings('Notification settings')}>
-                    <FaSave /> Save Changes
+                  <button className="btn-save-settings" onClick={() => saveUnsupportedSettings(t('formateur.settings.notificationSettingsTitle'))}>
+                    <FaSave /> {t('formateur.settings.saveChanges')}
                   </button>
                 </div>
               </div>
@@ -322,21 +335,21 @@ const FormateurSetting = () => {
 
             {activeTab === 'privacy' && (
               <div className="settings-panel">
-                <h2>Privacy Settings</h2>
+                <h2>{t('formateur.settings.privacySettingsTitle')}</h2>
                 <div className="settings-form">
                   {Object.entries(privacySettings).map(([key, value]) => (
                     <div key={key} className="toggle-setting">
                       <div>
-                        <label>{key}</label>
-                        <p>Adjust this preference locally until backend support is added.</p>
+                        <label>{privacyLabelMap[key] || key}</label>
+                        <p>{t('formateur.settings.privacyNotice')}</p>
                       </div>
                       <button className="toggle-btn" onClick={() => setPrivacySettings({ ...privacySettings, [key]: !value })}>
                         {value ? <FaToggleOn /> : <FaToggleOff />}
                       </button>
                     </div>
                   ))}
-                  <button className="btn-save-settings" onClick={() => saveUnsupportedSettings('Privacy settings')}>
-                    <FaSave /> Save Changes
+                  <button className="btn-save-settings" onClick={() => saveUnsupportedSettings(t('formateur.settings.privacySettingsTitle'))}>
+                    <FaSave /> {t('formateur.settings.saveChanges')}
                   </button>
                 </div>
               </div>
@@ -344,34 +357,34 @@ const FormateurSetting = () => {
 
             {activeTab === 'billing' && (
               <div className="settings-panel">
-                <h2>Billing Settings</h2>
+                <h2>{t('formateur.settings.billingSettingsTitle')}</h2>
                 <div className="settings-form">
                   <div className="form-group">
-                    <label>Payment Method</label>
+                    <label>{t('formateur.settings.paymentMethod')}</label>
                     <select value={billingSettings.paymentMethod} onChange={(e) => setBillingSettings({ ...billingSettings, paymentMethod: e.target.value })} className="form-input">
-                      <option value="bank_transfer">Bank Transfer</option>
-                      <option value="stripe">Stripe</option>
-                      <option value="paypal">PayPal</option>
+                      <option value="bank_transfer">{t('formateur.settings.bankTransfer')}</option>
+                      <option value="stripe">{t('formateur.settings.stripe')}</option>
+                      <option value="paypal">{t('formateur.settings.paypal')}</option>
                     </select>
                   </div>
                   <div className="form-group">
-                    <label>Bank Account / IBAN</label>
+                    <label>{t('formateur.settings.bankAccount')}</label>
                     <input type="text" value={billingSettings.bankAccount} onChange={(e) => setBillingSettings({ ...billingSettings, bankAccount: e.target.value })} className="form-input" />
                   </div>
                   <div className="form-group">
-                    <label>Tax ID / Company Number</label>
+                    <label>{t('formateur.settings.taxId')}</label>
                     <input type="text" value={billingSettings.taxId} onChange={(e) => setBillingSettings({ ...billingSettings, taxId: e.target.value })} className="form-input" />
                   </div>
                   <div className="form-group">
-                    <label>Billing Address</label>
+                    <label>{t('formateur.settings.billingAddress')}</label>
                     <textarea value={billingSettings.billingAddress} onChange={(e) => setBillingSettings({ ...billingSettings, billingAddress: e.target.value })} className="form-textarea" rows="4" />
                   </div>
-                  <button className="btn-save-settings" onClick={() => saveUnsupportedSettings('Billing settings')}>
-                    <FaSave /> Save Changes
+                  <button className="btn-save-settings" onClick={() => saveUnsupportedSettings(t('formateur.settings.billingSettingsTitle'))}>
+                    <FaSave /> {t('formateur.settings.saveChanges')}
                   </button>
                   <div className="billing-info" style={{ marginTop: '2rem' }}>
-                    <h3>Payout Information</h3>
-                    <p>Current earnings are loaded from the backend, while payout preferences are still frontend-only for now.</p>
+                    <h3>{t('formateur.settings.payoutInfoTitle')}</h3>
+                    <p>{t('formateur.settings.payoutInfoDescription')}</p>
                   </div>
                 </div>
               </div>
