@@ -6,7 +6,6 @@ import { useTranslation } from 'react-i18next';
 import 'flag-icons/css/flag-icons.min.css';
 import { FaEdit } from 'react-icons/fa';
 import SidebarF from '../../components/formateur/sidebarF';
-import ProfilSection from '../../components/formateur/profilSection';
 import {
   getFormateurProfile,
   updateFormateurProfile
@@ -109,13 +108,7 @@ const FormateurProfile = () => {
           <div className="navbar-dashboard-left">
             <img src={logo_rem} alt="ForsaLearn" className="navbar-dashboard-logo" />
           </div>
-          
-          <div className="navbar-dashboard-center">
-            <h1>Profile</h1>
-            <a href="/">Home</a>
-            <span style={{color:"#6b7280"}}>/Profile</span>
-          </div>
-          
+ 
           <div className="navbar-dashboard-right">
             <button className="lang-btn-dashboard" onClick={changeLanguage}>
               <span className={getFlagClass(currentLang)} style={{ fontSize: '20px' }}></span>
@@ -129,15 +122,6 @@ const FormateurProfile = () => {
         <SidebarF />
 
         <main className="formateur-main">
-          <ProfilSection
-            formateur={{
-              avatar: formateur?.profilePicture || 'https://via.placeholder.com/60',
-              name: formateur?.fullName || 'Instructor'
-            }}
-            actionLabel="Edit Profile"
-            onAction={() => setEditing(true)}
-          />
-
           {error && <div className="alert alert-error">{error}</div>}
 
           <div className="profile-details">

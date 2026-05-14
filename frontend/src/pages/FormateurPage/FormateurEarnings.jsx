@@ -2,7 +2,6 @@ import React, { useEffect, useMemo, useState } from 'react';
 import '../../styles/formateur.css';
 import logo_rem from '../../assets/image/home_page/logo_rem.png';
 import SidebarF from '../../components/formateur/sidebarF';
-import ProfilSection from '../../components/formateur/profilSection';
 import { FaDollarSign, FaStar, FaUsers } from 'react-icons/fa';
 import {
   getFormateurDashboardStats,
@@ -75,11 +74,6 @@ const FormateurEarnings = () => {
           <div className="navbar-dashboard-left">
             <img src={logo_rem} alt="ForsaLearn" className="navbar-dashboard-logo" />
           </div>
-          <div className="navbar-dashboard-center">
-            <h1>Earnings</h1>
-            <a href="/">Home</a>
-            <span style={{ color: '#6b7280' }}>/ Earnings</span>
-          </div>
           <div className="navbar-dashboard-right" />
         </div>
       </nav>
@@ -87,14 +81,6 @@ const FormateurEarnings = () => {
       <div className="formateur-container">
         <SidebarF />
         <main className="formateur-main">
-          <ProfilSection
-            formateur={{
-              avatar: profile?.profilePicture || 'https://via.placeholder.com/80',
-              name: profile?.fullName || 'Instructor'
-            }}
-            actionLabel="View Certificates"
-          />
-
           {error && <div className="alert alert-error">{error}</div>}
 
           <div className="earnings-section">

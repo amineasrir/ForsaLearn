@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import '../../styles/formateur.css';
 import SidebarF from '../../components/formateur/sidebarF';
-import ProfilSection from '../../components/formateur/profilSection';
 import logo_rem from '../../assets/image/home_page/logo_rem.png';
 import axios from 'axios';
 import { FaEye, FaDownload, FaFilter, FaChartBar } from 'react-icons/fa';
@@ -175,11 +174,7 @@ const FormateurQuizResult = () => {
           <div className="navbar-dashboard-left">
             <img src={logo_rem} alt="ForsaLearn" className="navbar-dashboard-logo" />
           </div>
-          <div className="navbar-dashboard-center">
-            <h1>Quiz Results</h1>
-            <a href="/">Home</a>
-            <span style={{ color: '#6b7280' }}>/ Quiz Results</span>
-          </div>
+
           <div className="navbar-dashboard-right" />
         </div>
       </nav>
@@ -188,7 +183,6 @@ const FormateurQuizResult = () => {
         <SidebarF />
 
         <div className="main-content">
-          <ProfilSection />
 
           <div className="quiz-results-container">
             {/* Quiz Selection */}

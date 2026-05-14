@@ -102,12 +102,6 @@ const FormateurDashboard = () => {
             <img src={logo_rem} alt="ForsaLearn" className="navbar-dashboard-logo" />
           </div>
 
-          <div className="navbar-dashboard-center">
-            <h1>{t('dashboard.title')}</h1>
-            <a href="/">{t('dashboard.home')}</a>
-            <span style={{ color: '#6b7280' }}>/ {t('dashboard.title')}</span>
-          </div>
-
           <div className="navbar-dashboard-right">
             <button className="lang-btn-dashboard" onClick={changeLanguage}>
               <span className={getFlagClass(currentLang)} style={{ fontSize: '20px' }}></span>

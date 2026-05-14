@@ -11,7 +11,6 @@ import FormateurEarnings from './pages/FormateurPage/FormateurEarnings';
 import FormateurCertificats from './pages/FormateurPage/FormateurCertificats';
 import FormateurMessage from './pages/FormateurPage/FormateurMessage';
 import FormateurSupport from './pages/FormateurPage/FormateurSupport';
-import FormateurQuiz from './pages/FormateurPage/FormateurQuiz';
 import FormateurQuizResult from './pages/FormateurPage/FormateurQuizResult';
 import FormateurSetting from './pages/FormateurPage/FormateurSetting';
 
@@ -26,12 +25,12 @@ const AppFormateur = () => {
         <Route path="profile" element={<FormateurProfile />} />
         <Route path="courses" element={<FormateurCourses />} />
         <Route path="add-course" element={<AddCourses />} />
+        <Route path="edit-course/:courseId" element={<AddCourses />} />
         <Route path="students" element={<FormateurStudent />} />
         <Route path="earnings" element={<FormateurEarnings />} />
         <Route path="certificates" element={<FormateurCertificats />} />
         <Route path="messages" element={<FormateurMessage />} />
         <Route path="support" element={<FormateurSupport />} />
-        <Route path="quiz" element={<FormateurQuiz />} />
         <Route path="quiz-results" element={<FormateurQuizResult />} />
         <Route path="settings" element={<FormateurSetting />} />
         {/* redirect any unknown path to dashboard */}

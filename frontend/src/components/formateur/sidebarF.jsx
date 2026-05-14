@@ -25,7 +25,6 @@ const SidebarF = ({ activeMenu: propActive, setActiveMenu: propSetActive }) => {
     { id: 'mycourses', label: 'My Courses', icon: FaBook, path: '/formateur/courses' },
     { id: 'addcourse', label: 'Add Course', icon: FaPlus, path: '/formateur/add-course' },
     { id: 'students', label: 'Students', icon: FaUsers, path: '/formateur/students' },
-    { id: 'quiz', label: 'Quiz', icon: FaQuestionCircle, path: '/formateur/quiz' },
     { id: 'quizResults', label: 'Quiz Results', icon: FaClipboardList, path: '/formateur/quiz-results' },
     { id: 'certificates', label: 'Certificates', icon: FaTrophy, path: '/formateur/certificates' },
     { id: 'earnings', label: 'Earnings', icon: FaDollarSign, path: '/formateur/earnings' },

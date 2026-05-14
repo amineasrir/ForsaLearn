@@ -1,7 +1,6 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import '../../styles/formateur.css';
 import SidebarF from '../../components/formateur/sidebarF';
-import ProfilSection from '../../components/formateur/profilSection';
 import logo_rem from '../../assets/image/home_page/logo_rem.png';
 import {
   getFormateurConversationMessages,
@@ -179,11 +178,7 @@ const FormateurMessage = () => {
           <div className="navbar-dashboard-left">
             <img src={logo_rem} alt="ForsaLearn" className="navbar-dashboard-logo" />
           </div>
-          <div className="navbar-dashboard-center">
-            <h1>Messages</h1>
-            <a href="/">Home</a>
-            <span style={{ color: '#6b7280' }}>/ Messages</span>
-          </div>
+         
           <div className="navbar-dashboard-right" />
         </div>
       </nav>
@@ -191,13 +186,6 @@ const FormateurMessage = () => {
       <div className="formateur-container message-page">
         <SidebarF />
         <main className="formateur-main message-main">
-          <ProfilSection
-            formateur={{
-              name: user?.fullName || 'Instructor',
-              avatar: user?.profilePicture || 'https://via.placeholder.com/80'
-            }}
-            actionLabel="Support"
-          />
 
           {error && <div className="alert alert-error">{error}</div>}
 

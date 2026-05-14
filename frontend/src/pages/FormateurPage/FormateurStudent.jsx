@@ -1,6 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import SidebarF from '../../components/formateur/sidebarF';
-import ProfilSection from '../../components/formateur/profilSection';
 import '../../styles/formateur.css';
 import logo_rem from '../../assets/image/home_page/logo_rem.png';
 import i18nInstance from '../../i18n';
@@ -79,13 +78,6 @@ const FormateurStudent = () => {
           <div className="navbar-dashboard-left">
             <img src={logo_rem} alt="ForsaLearn" className="navbar-dashboard-logo" />
           </div>
-
-          <div className="navbar-dashboard-center">
-            <h1>Students</h1>
-            <a href="/">Home</a>
-            <span style={{ color: '#6b7280' }}>/Students</span>
-          </div>
-
           <div className="navbar-dashboard-right">
             <button className="lang-btn-dashboard" onClick={changeLanguage}>
               <span className={getFlagClass(currentLang)} style={{ fontSize: '20px' }}></span>
@@ -99,14 +91,6 @@ const FormateurStudent = () => {
         <SidebarF />
 
         <main className="formateur-main">
-          <ProfilSection
-            formateur={{
-              avatar: profile?.profilePicture || 'https://via.placeholder.com/60',
-              name: profile?.fullName || 'Instructor'
-            }}
-            actionLabel="My Courses"
-          />
-
           {error && <div className="alert alert-error">{error}</div>}
 
           <div className="students-toolbar">

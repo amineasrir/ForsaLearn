@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import '../../styles/formateur.css';
 import SidebarF from '../../components/formateur/sidebarF';
-import ProfilSection from '../../components/formateur/profilSection';
 import logo_rem from '../../assets/image/home_page/logo_rem.png';
 import { FaDownload, FaEye } from 'react-icons/fa';
 import {
@@ -51,11 +50,6 @@ const FormateurCertificats = () => {
           <div className="navbar-dashboard-left">
             <img src={logo_rem} alt="ForsaLearn" className="navbar-dashboard-logo" />
           </div>
-          <div className="navbar-dashboard-center">
-            <h1>Certificates</h1>
-            <a href="/">Home</a>
-            <span style={{ color: '#6b7280' }}>/ Certificates</span>
-          </div>
           <div className="navbar-dashboard-right" />
         </div>
       </nav>
@@ -63,14 +57,7 @@ const FormateurCertificats = () => {
       <div className="formateur-container">
         <SidebarF />
         <main className="formateur-main">
-          <ProfilSection
-            formateur={{
-              name: profile?.fullName || 'Instructor',
-              avatar: profile?.profilePicture || 'https://via.placeholder.com/80'
-            }}
-            actionLabel="View Earnings"
-          />
-
+        
           {error && <div className="alert alert-error">{error}</div>}
 
           <div className="profile-details">

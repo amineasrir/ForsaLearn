@@ -6,7 +6,6 @@ import i18nInstance from '../../i18n';
 import { useTranslation } from 'react-i18next';
 import 'flag-icons/css/flag-icons.min.css';
 import SidebarF from '../../components/formateur/sidebarF';
-import ProfilSection from '../../components/formateur/profilSection';
 import {
   archiveFormateurCourse,
   deleteFormateurCourse,
@@ -142,13 +141,6 @@ const FormateurCourses = () => {
           <div className="navbar-dashboard-left">
             <img src={logo_rem} alt="ForsaLearn" className="navbar-dashboard-logo" />
           </div>
-
-          <div className="navbar-dashboard-center">
-            <h1>Courses</h1>
-            <a href="/">Home</a>
-            <span style={{ color: '#6b7280' }}>/Courses</span>
-          </div>
-
           <div className="navbar-dashboard-right">
             <button className="lang-btn-dashboard" onClick={changeLanguage}>
               <span className={getFlagClass(currentLang)} style={{ fontSize: '20px' }}></span>
@@ -162,14 +154,6 @@ const FormateurCourses = () => {
         <SidebarF />
 
         <main className="formateur-main">
-          <ProfilSection
-            formateur={{
-              avatar: profile?.profilePicture || 'https://via.placeholder.com/60',
-              name: profile?.fullName || 'Instructor'
-            }}
-            actionLabel="Add New Course"
-            onAction={() => navigate('/formateur/add-course')}
-          />
 
           {error && <div className="alert alert-error">{error}</div>}
 
@@ -225,6 +209,9 @@ const FormateurCourses = () => {
                     <span className="status-badge">{course.status}</span>
                   </div>
                   <div className="col-actions">
+                    <button className="mini-action-btn" onClick={() => navigate(`/formateur/edit-course/${course._id}`)}>
+                      Edit
+                    </button>
                     <button className="mini-action-btn" onClick={() => handleArchive(course._id)}>
                       {course.status === 'archived' ? 'Unarchive' : 'Archive'}
                     </button>

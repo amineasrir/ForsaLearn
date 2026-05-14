@@ -188,11 +188,6 @@ const FormateurSetting = () => {
             <img src={logo_rem} alt="ForsaLearn" className="navbar-dashboard-logo" />
           </div>
 
-          <div className="navbar-dashboard-center">
-            <h1>Settings</h1>
-            <a href="/">Home</a>
-            <span style={{ color: '#6b7280' }}>/Settings</span>
-          </div>
 
           <div className="navbar-dashboard-right">
             <button className="lang-btn-dashboard" onClick={changeLanguage}>
