@@ -56,7 +56,6 @@ const ApprenantCertificates = () => {
   const rightContent = (
     <>
       <div className="notification-icon"></div>
-      <div className="cart-icon"></div>
     </>
   );
 

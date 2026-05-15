@@ -59,6 +59,7 @@ const ApprenantDashboard = () => {
     <>
       <div className="notification-icon"></div>
       <div className="cart-icon"></div>
+      <div className="cart-icon"></div>
     </>
   );
 

@@ -15,7 +15,7 @@ const AUTO_NEXT_DELAY = 5;
 // ─────────────────────────────────────────────────────────────
 // COURSE COMPLETION MODAL
 // ─────────────────────────────────────────────────────────────
-const CourseCompletionModal = ({ course, nextCourse, onGoNext, onReview, onClose }) => (
+const CourseCompletionModal = ({ course, nextCourse, onGoNext, onClose }) => (
   <div style={{
     position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.7)',
     display: 'flex', alignItems: 'center', justifyContent: 'center',
@@ -23,7 +23,7 @@ const CourseCompletionModal = ({ course, nextCourse, onGoNext, onReview, onClose
   }}>
     <div style={{
       background: '#fff', borderRadius: '20px', padding: '2.5rem',
-      maxWidth: '520px', width: '100%', textAlign: 'center',
+      maxWidth: '480px', width: '100%', textAlign: 'center',
       boxShadow: '0 20px 60px rgba(0,0,0,0.3)'
     }}>
       <div style={{ fontSize: '3.5rem', marginBottom: '1rem' }}>🎉</div>
@@ -47,16 +47,6 @@ const CourseCompletionModal = ({ course, nextCourse, onGoNext, onReview, onClose
       )}
 
       <div style={{ display: 'flex', gap: '0.75rem', justifyContent: 'center', flexWrap: 'wrap' }}>
-        <button
-          onClick={onReview}
-          style={{
-            padding: '0.75rem 1.75rem', background: '#10b981', color: '#fff',
-            border: 'none', borderRadius: '10px', fontWeight: 700,
-            fontSize: '0.9rem', cursor: 'pointer'
-          }}
-        >
-          Review this course
-        </button>
         {nextCourse && (
           <button
             onClick={onGoNext}
@@ -77,7 +67,7 @@ const CourseCompletionModal = ({ course, nextCourse, onGoNext, onReview, onClose
             fontSize: '0.9rem', cursor: 'pointer'
           }}
         >
-          Not now
+          Stay Here
         </button>
       </div>
     </div>
@@ -366,11 +356,6 @@ const CoursePlayer = () => {
     }
   };
 
-  const handleReviewCourse = () => {
-    setShowCompletionModal(false);
-    navigate(`/apprenant/course/${id}#review`);
-  };
-
   if (loading) {
     return (
       <div className="cp-fullpage-loading">
@@ -395,7 +380,6 @@ const CoursePlayer = () => {
           course={course}
           nextCourse={nextCourseInfo}
           onGoNext={handleGoNextCourse}
-          onReview={handleReviewCourse}
           onClose={() => setShowCompletionModal(false)}
         />
       )}

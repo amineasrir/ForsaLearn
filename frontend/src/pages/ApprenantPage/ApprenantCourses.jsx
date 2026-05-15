@@ -216,7 +216,6 @@ const ApprenantCourses = () => {
                     src={getMediaUrl(course.thumbnail) || require('../../assets/image/cours/cours.jpg')}
                     alt={course.title}
                   />
-                  <span className="cg-play"><FaPlayCircle /></span>
                   <button
                     className={`cg-fav ${isInWishlist(course.id) ? 'active' : ''}`}
                     onClick={e => { e.stopPropagation(); toggleItem(course); }}

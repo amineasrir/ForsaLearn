@@ -4,7 +4,7 @@ import { Link, useLocation } from 'react-router-dom';
 import {
   FaHome, FaUser, FaBook, FaTrophy, FaHeart,
   FaClipboardList, FaHistory, FaEnvelope, FaHeadset,
-  FaCog, FaSignOutAlt, FaTimes,
+  FaCog, FaSignOutAlt, FaTimes, 
 } from 'react-icons/fa';
 import '../../pages/ApprenantPage/dashboard.css';
 

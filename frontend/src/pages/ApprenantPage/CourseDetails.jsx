@@ -52,6 +52,20 @@ const CourseDetails = () => {
   }, [id]);
 
   const handleEnroll = async () => {
+    if (!course) return;
+
+    const isFree = course.priceType === 'free' || Number(course.price || 0) === 0;
+    if (!isFree) {
+      navigate(`/apprenant/course/${id}/checkout`, {
+        state: {
+          isPaid: true,
+          price: course.price,
+          title: course.title,
+        },
+      });
+      return;
+    }
+
     try {
       setEnrolling(true);
       setError('');
@@ -67,6 +81,18 @@ const CourseDetails = () => {
   };
 
   const handleStartLearning = () => {
+    const isFree = course?.priceType === 'free' || Number(course?.price || 0) === 0;
+    if (!isFree) {
+      navigate(`/apprenant/course/${id}/checkout`, {
+        state: {
+          isPaid: true,
+          price: course?.price,
+          title: course?.title,
+        },
+      });
+      return;
+    }
+
     navigate(`/apprenant/course/${id}/learn`);
   };
 
@@ -176,32 +202,17 @@ const CourseDetails = () => {
         <FaArrowLeft /> Back to Courses
       </button>
 
-      {/* ══════════════════════════════════════════
-          TOP SECTION: Header card (like screenshot)
-      ══════════════════════════════════════════ */}
-      <div className="cd-header-card">
-        {/* Left: thumbnail */}
-        <div className="cd-header-thumb" onClick={handleStartLearning}>
-          {previewUrl ? (
-            <video
-              className="cd-header-video"
-              controls
-              src={getMediaUrl(previewUrl)}
-              poster={getMediaUrl(course.thumbnail)}
-            />
-          ) : (
-            <img
-              src={getMediaUrl(course.thumbnail) || require('../../assets/image/cours/cours.jpg')}
-              alt={course.title}
-            />
-          )}
-          <div className="cd-header-thumb-overlay">
-            <FaPlayCircle className="cd-play-icon" />
-          </div>
+
+<div className="cd-header-card">
+        <div className="cd-header-hero" onClick={handleStartLearning}>
+          <img
+            src={getMediaUrl(course.thumbnail) || require('../../assets/image/cours/cours.jpg')}
+            alt={course.title}
+          />
         </div>
 
-        {/* Right: info */}
-        <div className="cd-header-info">
+        <div className="cd-header-grid">
+          <div className="cd-header-info">
           {/* badges row */}
           <div className="cd-badges-row">
             {course.category && <span className="cd-badge-cat">{course.category}</span>}
@@ -312,6 +323,7 @@ const CourseDetails = () => {
           </div>
         </div>
       </div>
+    </div>
 
       {/* ══════════════════════════════════════════
           OVERVIEW SECTION
@@ -420,7 +432,7 @@ const CourseDetails = () => {
       {/* ══════════════════════════════════════════
           REVIEW SECTION
       ══════════════════════════════════════════ */}
-      <div id="review" className="cd-section-card">
+      <div className="cd-section-card">
         <h2 className="cd-section-h2">Leave a Review</h2>
 
         <form className="cd-comment-form" onSubmit={handleSubmitReview}>

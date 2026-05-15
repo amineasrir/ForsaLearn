@@ -1,34 +1,28 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { Link } from 'react-router-dom';
 import ApprenantLayout from '../../components/apprenant/ApprenantLayout';
-import CardP from '../../components/apprenant/CardP';
-import './dashboard.css';
 import { useWishlist } from '../../context/WishlistContext';
+import { getMediaUrl } from '../../utils/mediaUrl';
 import { FaHeart, FaPlayCircle, FaStar } from 'react-icons/fa';
+import './wishlist.css';
 
 const ApprenantWishlist = () => {
   const { t } = useTranslation();
   const { items, toggleItem } = useWishlist();
-
-  const rightContent = (
-    <>
-      <div className="notification-icon"></div>
-      <div className="cart-icon"></div>
-    </>
-  );
 
   return (
     <ApprenantLayout>
 
           <div className="wishlist-grid">
             {items.length === 0 ? (
-              <p>{t('apprenant.wishlistEmpty')}</p>
+              <div className="wishlist-empty-message">
+                <p>{t('apprenant.wishlistEmpty')}</p>
+              </div>
             ) : (
               items.map(course => (
                 <div key={course.id} className="course-card">
                   <div className="card-media">
-                    <img src={course.image} alt={course.title} />
+                    <img src={getMediaUrl(course.thumbnail) || require('../../assets/image/cours/cours.jpg')} alt={course.title} />
                     <span
                       className={`fav-badge active`}
                       onClick={() => toggleItem(course)}
@@ -44,7 +38,7 @@ const ApprenantWishlist = () => {
                     <div className="course-rating">
                       <FaStar /> <span>{course.rating} ({course.reviews} Reviews)</span>
                     </div>
-                    <p className="price">{course.price}</p>
+                    <p className="price">{course.price}$</p>
                     <button className="view-course-btn">{t('apprenant.viewCourse')}</button>
                   </div>
                 </div>
