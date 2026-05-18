@@ -12,7 +12,6 @@ const Sidebar = () => {
 
   const handleLogout = () => {
     const token = localStorage.getItem('adminToken');
-    const user = localStorage.getItem('adminUser');
     if (token) {
       localStorage.removeItem('adminToken');
       localStorage.removeItem('adminUser');

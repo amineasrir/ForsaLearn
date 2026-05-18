@@ -73,6 +73,10 @@ export const updateFormateurCourse = (courseId, payload) => {
   return API.put(`formateur/courses/${courseId}`, payload);
 };
 
+export const saveFormateurCourseSections = (courseId, sections) => {
+  return API.put(`formateur/courses/${courseId}`, { sections });
+};
+
 export const deleteFormateurCourse = (courseId) => {
   return API.delete(`formateur/courses/${courseId}`);
 };

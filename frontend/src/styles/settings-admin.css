@@ -53,16 +53,17 @@
   }
   
   /* Settings Content */
-  .settings-content {
+.settings-content {
     flex: 1;
     padding: 32px;
     overflow-y: auto;
     background: #f9fafb;
   }
   
-  .settings-section {
+.settings-section {
     max-width: 800px;
-  }
+    width: 100%;
+}
   
   .section-title {
     font-size: 24px;
@@ -81,11 +82,12 @@
   }
   
   /* Settings Form */
-  .settings-form {
+.settings-form {
     background: white;
     border-radius: 12px;
     padding: 24px;
-  }
+    overflow: hidden;
+}
   
   .form-row {
     display: grid;
@@ -387,10 +389,11 @@
   }
   
   /* Font Size Options */
-  .font-size-options {
+.font-size-options {
     display: flex;
     gap: 12px;
-  }
+    flex-wrap: wrap;
+}
   
   .size-option {
     flex: 1;
@@ -664,7 +667,7 @@
   }
   
   /* Responsive Design */
-  @media (max-width: 1024px) {
+@media (max-width: 1024px) {
     .settings-container {
       flex-direction: column;
     }
@@ -678,28 +681,43 @@
     .settings-tabs {
       flex-direction: row;
       overflow-x: auto;
-      padding: 0 24px;
+      padding: 0 24px 12px;
+      gap: 8px;
     }
   
     .settings-tab {
       white-space: nowrap;
       border-left: none;
       border-bottom: 3px solid transparent;
+      border-radius: 10px;
+      background: #f3f4f6;
     }
   
     .settings-tab.active {
       border-left: none;
       border-bottom-color: #6366f1;
     }
-  
-    .tab-label {
-      display: none;
-    }
   }
   
   @media (max-width: 768px) {
     .settings-content {
       padding: 20px;
+    }
+
+    .settings-sidebar {
+      padding: 12px 0;
+    }
+
+    .settings-tabs {
+      flex-wrap: wrap;
+      overflow: visible;
+      padding: 0 16px 12px;
+    }
+
+    .settings-tab {
+      flex: 1 1 calc(50% - 8px);
+      justify-content: center;
+      padding: 12px 16px;
     }
   
     .profile-picture-section {
@@ -712,11 +730,17 @@
     }
   
     .theme-options {
-      grid-template-columns: 1fr;
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
     }
   
     .color-schemes {
       grid-template-columns: repeat(2, 1fr);
+    }
+
+    .toggle-item,
+    .security-card-header {
+      flex-direction: column;
+      align-items: flex-start;
     }
   
     .session-item {
@@ -735,5 +759,31 @@
     .btn-secondary {
       width: 100%;
       justify-content: center;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .settings-content {
+      padding: 16px;
+    }
+
+    .settings-form {
+      padding: 16px;
+    }
+
+    .settings-tab {
+      flex: 1 1 100%;
+    }
+
+    .font-size-options {
+      flex-direction: column;
+    }
+
+    .color-schemes {
+      grid-template-columns: 1fr;
+    }
+
+    .toggle-item {
+      gap: 12px;
     }
   }

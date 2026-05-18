@@ -13,7 +13,6 @@ import {
   FaCamera,
   FaSave,
   FaCheck,
-  FaTimes,
   FaEye,
   FaEyeSlash,
   FaKey,

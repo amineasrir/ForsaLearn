@@ -1,38 +1,56 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate, useLocation, Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import logo_rem from "../../assets/image/home_page/logo_rem.png";
 import loginImage from "../../assets/image/login/image.png";
 import AuthSidebar from '../../components/auth/AuthSidebar';
 import '../../styles/auth.css';
+import { resetPasswordWithOtp } from '../../services/authService';
 
 const SetPassword = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const location = useLocation();
   const email = location.state?.email || '';
-  const otpToken = location.state?.otpToken || '';
+  const otp = location.state?.otp || '';
 
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
+  useEffect(() => {
+    if (!email || !otp) {
+      navigate('/forgot-password', { replace: true });
+    }
+  }, [email, otp, navigate]);
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
 
     if (password !== confirmPassword) {
-      setError('Passwords do not match');
+      setError(t('passwordsDontMatch'));
       return;
     }
 
     if (password.length < 6) {
-      setError('Password must be at least 6 characters long');
+      setError(t('passwordTooShort'));
       return;
     }
 
-    navigate('/welcome-back');
+    setLoading(true);
+
+    try {
+      await resetPasswordWithOtp({ email, otp, password });
+      navigate('/welcome-back', { state: { email } });
+    } catch (err) {
+      const backendMessage = err.response?.data?.message;
+      const validationMessage = err.response?.data?.errors?.[0]?.msg;
+      setError(backendMessage || validationMessage || t('errorOccurred'));
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (

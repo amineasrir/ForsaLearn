@@ -5,9 +5,10 @@ import logo_rem from "../../assets/image/home_page/logo_rem.png";
 import loginImage from "../../assets/image/login/image.png";
 import AuthSidebar from '../../components/auth/AuthSidebar';
 import '../../styles/auth.css';
+import { requestPasswordReset, verifyPasswordResetOtp } from '../../services/authService';
 
 const OTPVerification = () => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const navigate = useNavigate();
   const location = useLocation();
   const email = location.state?.email || '';
@@ -15,18 +16,24 @@ const OTPVerification = () => {
   const [otp, setOtp] = useState(['', '', '', '', '', '']);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [success, setSuccess] = useState('');
   const [timer, setTimer] = useState(60);
   const [canResend, setCanResend] = useState(false);
   const inputRefs = useRef([]);
 
   useEffect(() => {
+    if (!email) {
+      navigate('/forgot-password', { replace: true });
+      return;
+    }
+
     if (timer > 0 && !canResend) {
       const interval = setTimeout(() => setTimer(timer - 1), 1000);
       return () => clearTimeout(interval);
     } else if (timer === 0) {
       setCanResend(true);
     }
-  }, [timer, canResend]);
+  }, [timer, canResend, email, navigate]);
 
   const handleChange = (e, index) => {
     const value = e.target.value;
@@ -50,21 +57,49 @@ const OTPVerification = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
+    setSuccess('');
 
     const otpCode = otp.join('');
 
     if (otpCode.length !== 6) {
-      setError('Please enter a valid OTP');
+      setError(t('enterValidOTP'));
       return;
     }
 
-    navigate('/set-password', { state: { email, otpToken: 'temp-token' } });
+    setLoading(true);
+
+    try {
+      await verifyPasswordResetOtp({ email, otp: otpCode });
+      setSuccess('OTP verified successfully');
+      navigate('/set-password', { state: { email, otp: otpCode } });
+    } catch (err) {
+      const backendMessage = err.response?.data?.message;
+      const validationMessage = err.response?.data?.errors?.[0]?.msg;
+      setError(backendMessage || validationMessage || t('errorOccurred'));
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleResendOTP = async () => {
     setError('');
-    setTimer(60);
-    setCanResend(false);
+    setSuccess('');
+    setLoading(true);
+
+    try {
+      await requestPasswordReset({ email, language: i18n.language });
+      setOtp(['', '', '', '', '', '']);
+      setTimer(60);
+      setCanResend(false);
+      setSuccess('A new OTP has been sent to your email');
+      inputRefs.current[0]?.focus();
+    } catch (err) {
+      const backendMessage = err.response?.data?.message;
+      const validationMessage = err.response?.data?.errors?.[0]?.msg;
+      setError(backendMessage || validationMessage || t('errorOccurred'));
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -85,6 +120,7 @@ const OTPVerification = () => {
             </p>
 
             {error && <div className="error-message">{error}</div>}
+            {success && <div className="success-message">{success}</div>}
 
             <form onSubmit={handleSubmit}>
               <div className="otp-input-container">
@@ -102,8 +138,8 @@ const OTPVerification = () => {
                 ))}
               </div>
 
-              <button type="submit" className="btn-signin" disabled={false}>
-                {t('verifyProceed')}
+              <button type="submit" className="btn-signin" disabled={loading}>
+                {loading ? 'Verifying...' : t('verifyProceed')}
               </button>
             </form>
 
@@ -113,8 +149,9 @@ const OTPVerification = () => {
                   <button
                     className="resend-otp-btn"
                     onClick={handleResendOTP}
+                    disabled={loading}
                   >
-                    {t('resendOTP')}
+                    {loading ? 'Sending...' : t('resendOTP')}
                   </button>
                 ) : (
                   <span className="otp-timer">{t('resendOTPIn')} <strong>{timer}s</strong></span>

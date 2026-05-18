@@ -286,7 +286,7 @@ const AddCourses = () => {
           setCurrentStep(2);
           return;
         }
-        if (lesson.type !== 'video' && !lesson.content.trim()) {
+        if (lesson.type !== 'video' && lesson.type !== 'quiz' && !lesson.content.trim()) {
           setError(`Lesson "${lesson.title}" must have content`);
           setCurrentStep(2);
           return;
@@ -317,7 +317,14 @@ const AddCourses = () => {
                 duration: Number(lesson.duration) || 0,
                 isFree: lesson.isFree,
                 order: lesson.order,
-                resources: lesson.resources || []
+                resources: lesson.resources || [],
+                quiz: lesson.type === 'quiz' ? {
+                  instructions: content,
+                  passingScore: 50,
+                  allowRetry: true,
+                  maxAttempts: 0,
+                  questions: []
+                } : undefined
               };
             })
           );
@@ -797,11 +804,11 @@ const AddCourses = () => {
                                   value={lesson.content}
                                   onChange={(e) => updateLesson(sectionIndex, lessonIndex, 'content', e.target.value)}
                                   placeholder={
-                                    lesson.type === 'quiz' ? 'Quiz content will be added later' :
-                                    lesson.type === 'assignment' ? 'Enter assignment description' :
-                                    'Enter file URL'
-                                  }
-                                />
+                                  lesson.type === 'quiz' ? 'Optional quiz instructions' :
+                                  lesson.type === 'assignment' ? 'Enter assignment description' :
+                                  'Enter file URL'
+                                }
+                              />
                               )}
                             </div>
 
