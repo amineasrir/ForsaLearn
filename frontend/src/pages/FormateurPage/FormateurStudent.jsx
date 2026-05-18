@@ -1,6 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import SidebarF from '../../components/formateur/sidebarF';
-import ProfilSection from '../../components/formateur/profilSection';
 import '../../styles/formateur.css';
 import logo_rem from '../../assets/image/home_page/logo_rem.png';
 import i18nInstance from '../../i18n';
@@ -12,7 +11,7 @@ import {
 } from '../../services/formateurService';
 
 const FormateurStudent = () => {
-  const { i18n } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [profile, setProfile] = useState(null);
   const [students, setStudents] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
@@ -79,13 +78,6 @@ const FormateurStudent = () => {
           <div className="navbar-dashboard-left">
             <img src={logo_rem} alt="ForsaLearn" className="navbar-dashboard-logo" />
           </div>
-
-          <div className="navbar-dashboard-center">
-            <h1>Students</h1>
-            <a href="/">Home</a>
-            <span style={{ color: '#6b7280' }}>/Students</span>
-          </div>
-
           <div className="navbar-dashboard-right">
             <button className="lang-btn-dashboard" onClick={changeLanguage}>
               <span className={getFlagClass(currentLang)} style={{ fontSize: '20px' }}></span>
@@ -99,20 +91,12 @@ const FormateurStudent = () => {
         <SidebarF />
 
         <main className="formateur-main">
-          <ProfilSection
-            formateur={{
-              avatar: profile?.profilePicture || 'https://via.placeholder.com/60',
-              name: profile?.fullName || 'Instructor'
-            }}
-            actionLabel="My Courses"
-          />
-
           {error && <div className="alert alert-error">{error}</div>}
 
           <div className="students-toolbar">
             <input
               type="text"
-              placeholder="Search student"
+              placeholder={t('formateur.students.searchPlaceholder')}
               className="search-input"
               value={searchTerm}
               onChange={(event) => setSearchTerm(event.target.value)}
@@ -122,12 +106,12 @@ const FormateurStudent = () => {
           <div className="students-grid">
             {loading ? (
               <div className="student-card">
-                <h3>Loading students...</h3>
+                <h3>{t('formateur.students.loading')}</h3>
               </div>
             ) : filteredStudents.length === 0 ? (
               <div className="student-card">
-                <h3>No students found</h3>
-                <p className="join-date">Students will appear here after enrollment.</p>
+                <h3>{t('formateur.students.noStudentsFound')}</h3>
+                <p className="join-date">{t('formateur.students.noStudentsDescription')}</p>
               </div>
             ) : filteredStudents.map((entry) => (
               <div key={entry.student?._id} className="student-card">
@@ -135,14 +119,14 @@ const FormateurStudent = () => {
                   src={entry.student?.profilePicture || 'https://via.placeholder.com/120'}
                   alt={entry.student?.fullName || 'Student'}
                 />
-                <div className="student-role">Active Student</div>
-                <h3>{entry.student?.fullName || 'Unknown Student'}</h3>
+                <div className="student-role">{t('formateur.students.activeStudent')}</div>
+                <h3>{entry.student?.fullName || t('formateur.students.unknownStudent')}</h3>
                 <p className="join-date">
-                  Joined {entry.enrolledAt ? new Date(entry.enrolledAt).toLocaleDateString() : 'N/A'}
+                  {t('formateur.students.joinedOn')} {entry.enrolledAt ? new Date(entry.enrolledAt).toLocaleDateString() : 'N/A'}
                 </p>
-                <p>{entry.student?.email || 'No email available'}</p>
+                <p>{entry.student?.email || t('formateur.students.noEmailAvailable')}</p>
                 <div className="courses-info">
-                  {entry.coursesEnrolled?.length || 0} Courses • {entry.averageProgress || 0}% Avg Progress
+                  {entry.coursesEnrolled?.length || 0} {t('formateur.students.courses')} • {entry.averageProgress || 0}% {t('formateur.students.avgProgress')}
                 </div>
               </div>
             ))}

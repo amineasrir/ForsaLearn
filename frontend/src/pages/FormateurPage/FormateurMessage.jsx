@@ -1,8 +1,8 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import '../../styles/formateur.css';
 import SidebarF from '../../components/formateur/sidebarF';
-import ProfilSection from '../../components/formateur/profilSection';
 import logo_rem from '../../assets/image/home_page/logo_rem.png';
+import { useTranslation } from 'react-i18next';
 import {
   getFormateurConversationMessages,
   getFormateurConversations,
@@ -38,16 +38,17 @@ const getConversationLabel = (conversation, currentUserId) => {
     (participant) => participant._id !== currentUserId
   );
 
-  return otherParticipant?.fullName || 'Conversation';
+  return otherParticipant?.fullName || '';
 };
 
 const getLastMessagePreview = (conversation) => {
   const content = conversation.lastMessage?.content;
-  if (!content) return 'No messages yet';
+  if (!content) return '';
   return content.length > 45 ? `${content.slice(0, 45)}...` : content;
 };
 
 const FormateurMessage = () => {
+  const { t } = useTranslation();
   const [user, setUser] = useState(null);
   const [conversations, setConversations] = useState([]);
   const [activeConvId, setActiveConvId] = useState(null);
@@ -179,11 +180,7 @@ const FormateurMessage = () => {
           <div className="navbar-dashboard-left">
             <img src={logo_rem} alt="ForsaLearn" className="navbar-dashboard-logo" />
           </div>
-          <div className="navbar-dashboard-center">
-            <h1>Messages</h1>
-            <a href="/">Home</a>
-            <span style={{ color: '#6b7280' }}>/ Messages</span>
-          </div>
+         
           <div className="navbar-dashboard-right" />
         </div>
       </nav>
@@ -191,13 +188,6 @@ const FormateurMessage = () => {
       <div className="formateur-container message-page">
         <SidebarF />
         <main className="formateur-main message-main">
-          <ProfilSection
-            formateur={{
-              name: user?.fullName || 'Instructor',
-              avatar: user?.profilePicture || 'https://via.placeholder.com/80'
-            }}
-            actionLabel="Support"
-          />
 
           {error && <div className="alert alert-error">{error}</div>}
 
@@ -206,16 +196,16 @@ const FormateurMessage = () => {
               <div className="chat-search-box">
                 <input
                   type="text"
-                  placeholder="Search conversations..."
+                  placeholder={t('formateur.messages.conversationsSearch')}
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                 />
               </div>
 
               {loadingConversations ? (
-                <div className="conv-empty-state">Loading conversations...</div>
+                <div className="conv-empty-state">{t('formateur.messages.loadingConversations')}</div>
               ) : filteredConversations.length === 0 ? (
-                <div className="conv-empty-state">No conversations found.</div>
+                <div className="conv-empty-state">{t('formateur.messages.noConversations')}</div>
               ) : filteredConversations.map((conv) => (
                 <div
                   key={conv._id}
@@ -230,7 +220,7 @@ const FormateurMessage = () => {
                     <span className="conv-time">{formatConversationTime(conv.lastMessageAt)}</span>
                   </div>
                   <div className="conv-item-bottom">
-                    <span className="conv-preview">{getLastMessagePreview(conv)}</span>
+                    <span className="conv-preview">{getLastMessagePreview(conv) || t('formateur.messages.noMessagesYet')}</span>
                     {conv.unreadCount > 0 && <span className="conv-unread">{conv.unreadCount}</span>}
                   </div>
                 </div>
@@ -240,16 +230,16 @@ const FormateurMessage = () => {
             <div className="chat-window">
               <div className="chat-header">
                 <div>
-                  <h3>{activeConversation ? getConversationLabel(activeConversation, user?._id) : 'Messages'}</h3>
-                  <p>{activeConversation?.type || 'direct conversation'}</p>
+                  <h3>{activeConversation ? getConversationLabel(activeConversation, user?._id) : t('formateur.messages.messages')}</h3>
+                  <p>{activeConversation?.type || t('formateur.messages.directConversation')}</p>
                 </div>
               </div>
 
               <div className="chat-body">
                 {loadingMessages ? (
-                  <div className="chat-empty-state">Loading messages...</div>
+                  <div className="chat-empty-state">{t('formateur.messages.loadingMessages')}</div>
                 ) : messages.length === 0 ? (
-                  <div className="chat-empty-state">Start the conversation by sending a message.</div>
+                  <div className="chat-empty-state">{t('formateur.messages.startConversation')}</div>
                 ) : messages.map((message) => (
                   <div
                     key={message._id}
@@ -269,14 +259,14 @@ const FormateurMessage = () => {
               <div className="chat-input">
                 <input
                   type="text"
-                  placeholder={activeConvId ? 'Write a message...' : 'Select a conversation first'}
+                  placeholder={activeConvId ? t('formateur.messages.writeMessage') : t('formateur.messages.selectConversationFirst')}
                   value={newMessage}
                   onChange={(e) => setNewMessage(e.target.value)}
                   onKeyDown={(e) => { if (e.key === 'Enter') sendMessage(); }}
                   disabled={!activeConvId || sending}
                 />
                 <button onClick={sendMessage} disabled={!activeConvId || sending || !newMessage.trim()}>
-                  {sending ? 'Sending...' : 'Send'}
+                  {sending ? t('formateur.messages.sending') : t('formateur.messages.send')}
                 </button>
               </div>
             </div>

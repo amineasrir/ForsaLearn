@@ -1,0 +1,173 @@
+/* ================= WISHLIST PAGE STYLES ================= */
+/* Matches enrolled-courses style */
+
+.wishlist-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1.5rem;
+  margin-top: 2rem;
+  padding: 1.5rem 1.5rem 1.25rem;
+}
+
+.wishlist-grid .course-card {
+  background: var(--card);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.wishlist-grid .card-media {
+  position: relative;
+  width: 100%;
+  height: 190px;
+  overflow: hidden;
+}
+
+.wishlist-grid .card-media img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.wishlist-grid .play-overlay {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: rgba(0, 0, 0, 0.7);
+  color: white;
+  border-radius: 50%;
+  width: 50px;
+  height: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2rem;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.wishlist-grid .course-card:hover .play-overlay {
+  opacity: 1;
+}
+
+.wishlist-grid .fav-badge {
+  position: absolute;
+  top: 0.75rem;
+  right: 0.75rem;
+  background: rgba(255, 255, 255, 0.9);
+  color: #dc2626;
+  border-radius: 50%;
+  width: 35px;
+  height: 35px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.wishlist-grid .fav-badge.active {
+  background: var(--primary);
+  color: white;
+}
+
+.wishlist-grid .fav-badge:hover {
+  transform: scale(1.1);
+}
+
+.wishlist-grid .course-details {
+  padding: 1.2rem;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.wishlist-grid .course-details h4 {
+  font-size: 1.05rem;
+  margin: 0;
+  font-weight: 700;
+  line-height: 1.4;
+  color: var(--text);
+}
+
+.wishlist-grid .category {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--muted);
+  margin: 0.625rem 0 0 0;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.wishlist-grid .instructor {
+  font-size: 0.82rem;
+  color: var(--muted);
+  margin: 0;
+}
+
+.wishlist-grid .course-rating {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.82rem;
+  color: var(--muted);
+  margin: 0.65rem 0 0 0;
+}
+
+.wishlist-grid .course-rating svg {
+  color: #fbbf24;
+}
+
+.wishlist-grid .price {
+  font-weight: 800;
+  color: var(--primary);
+  margin: 0;
+}
+
+.wishlist-grid .view-course-btn {
+  background: #392C7D;
+  color: #fff;
+  border: none;
+  padding: 0.65rem 1rem;
+  border-radius: 18px;
+  font-size: 0.78rem;
+  cursor: pointer;
+  font-weight: 700;
+  transition: transform 0.2s ease, background 0.2s ease;
+  margin-top: auto;
+  text-transform: uppercase;
+}
+
+.wishlist-grid .view-course-btn:hover {
+  transform: translateY(-1px);
+  background: rgb(57, 44, 141);
+}
+
+/* Empty Wishlist Message */
+.wishlist-empty-message {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: 3rem 2rem;
+}
+
+.wishlist-empty-message p {
+  font-size: 1rem;
+  color: var(--muted);
+  margin: 0;
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+  .wishlist-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 640px) {
+  .wishlist-grid {
+    grid-template-columns: 1fr;
+  }
+}

@@ -6,7 +6,6 @@ import i18nInstance from '../../i18n';
 import { useTranslation } from 'react-i18next';
 import 'flag-icons/css/flag-icons.min.css';
 import SidebarF from '../../components/formateur/sidebarF';
-import ProfilSection from '../../components/formateur/profilSection';
 import {
   archiveFormateurCourse,
   deleteFormateurCourse,
@@ -26,7 +25,7 @@ const labelToStatus = {
 
 const FormateurCourses = () => {
   const navigate = useNavigate();
-  const { i18n } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [profile, setProfile] = useState(null);
   const [courses, setCourses] = useState([]);
   const [statusFilter, setStatusFilter] = useState('Published');
@@ -109,12 +108,12 @@ const FormateurCourses = () => {
   }, [courses]);
 
   const statusOptions = [
-    { label: 'Published', key: 'Published' },
-    { label: 'Pending', key: 'Pending' },
-    { label: 'Draft', key: 'Draft' },
-    { label: 'Archived', key: 'Archived' },
-    { label: 'Rejected', key: 'Rejected' },
-    { label: 'All', key: 'All' }
+    { label: t('formateur.courses.published'), key: 'Published' },
+    { label: t('formateur.courses.pending'), key: 'Pending' },
+    { label: t('formateur.courses.draft'), key: 'Draft' },
+    { label: t('formateur.courses.archived'), key: 'Archived' },
+    { label: t('formateur.courses.rejected'), key: 'Rejected' },
+    { label: t('formateur.courses.all'), key: 'All' }
   ];
 
   const handleArchive = async (courseId) => {
@@ -142,13 +141,6 @@ const FormateurCourses = () => {
           <div className="navbar-dashboard-left">
             <img src={logo_rem} alt="ForsaLearn" className="navbar-dashboard-logo" />
           </div>
-
-          <div className="navbar-dashboard-center">
-            <h1>Courses</h1>
-            <a href="/">Home</a>
-            <span style={{ color: '#6b7280' }}>/Courses</span>
-          </div>
-
           <div className="navbar-dashboard-right">
             <button className="lang-btn-dashboard" onClick={changeLanguage}>
               <span className={getFlagClass(currentLang)} style={{ fontSize: '20px' }}></span>
@@ -162,14 +154,6 @@ const FormateurCourses = () => {
         <SidebarF />
 
         <main className="formateur-main">
-          <ProfilSection
-            formateur={{
-              avatar: profile?.profilePicture || 'https://via.placeholder.com/60',
-              name: profile?.fullName || 'Instructor'
-            }}
-            actionLabel="Add New Course"
-            onAction={() => navigate('/formateur/add-course')}
-          />
 
           {error && <div className="alert alert-error">{error}</div>}
 
@@ -188,21 +172,21 @@ const FormateurCourses = () => {
           <div className="courses-section">
             <div className="courses-table">
               <div className="table-header formateur-courses-header">
-                <div className="col-title">Course</div>
-                <div className="col-students">Students</div>
-                <div className="col-status">Status</div>
-                <div className="col-actions">Actions</div>
+                <div className="col-title">{t('formateur.courses.course')}</div>
+                <div className="col-students">{t('formateur.courses.students')}</div>
+                <div className="col-status">{t('formateur.courses.status')}</div>
+                <div className="col-actions">{t('formateur.courses.actions')}</div>
               </div>
               {loading ? (
                 <div className="table-row formateur-courses-row">
-                  <div className="col-title">Loading courses...</div>
+                  <div className="col-title">{t('formateur.courses.loading')}</div>
                   <div className="col-students">...</div>
                   <div className="col-status">...</div>
                   <div className="col-actions">...</div>
                 </div>
               ) : courses.length === 0 ? (
                 <div className="table-row formateur-courses-row">
-                  <div className="col-title">No courses found for this filter.</div>
+                  <div className="col-title">{t('formateur.courses.noCoursesFound')}</div>
                   <div className="col-students">0</div>
                   <div className="col-status">-</div>
                   <div className="col-actions">-</div>
@@ -225,11 +209,14 @@ const FormateurCourses = () => {
                     <span className="status-badge">{course.status}</span>
                   </div>
                   <div className="col-actions">
+                    <button className="mini-action-btn" onClick={() => navigate(`/formateur/edit-course/${course._id}`)}>
+                      {t('formateur.courses.edit')}
+                    </button>
                     <button className="mini-action-btn" onClick={() => handleArchive(course._id)}>
-                      {course.status === 'archived' ? 'Unarchive' : 'Archive'}
+                      {course.status === 'archived' ? t('formateur.courses.unarchive') : t('formateur.courses.archive')}
                     </button>
                     <button className="mini-action-btn danger" onClick={() => handleDelete(course._id)}>
-                      Delete
+                      {t('formateur.courses.delete')}
                     </button>
                   </div>
                 </div>

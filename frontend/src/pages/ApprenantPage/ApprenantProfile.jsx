@@ -34,17 +34,7 @@ const ApprenantProfile = () => {
   };
 
   return (
-    <ApprenantLayout
-      title={t('apprenant.myProfile')}
-      breadcrumb={[{ to: '/', label: t('home') }, { label: t('apprenant.myProfile') }]}
-      rightContent={
-        <>
-          <div className="notification-icon"></div>
-          <div className="cart-icon"></div>
-        </>
-      }
-    >
-      <CardP user={user} />
+    <ApprenantLayout>
 
           {error && <div className="error-message">{error}</div>}
           <div className="profile-page-content">

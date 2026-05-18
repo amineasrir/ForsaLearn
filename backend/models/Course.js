@@ -472,31 +472,6 @@ courseSchema.pre('save', function(next) {
 
   if (this.isModified('sections')) {
     const lessons = (this.sections || []).flatMap((section) => section.lessons || []);
-
-    lessons.forEach((lesson) => {
-      if (lesson.type !== 'quiz') {
-        lesson.quiz = undefined;
-        return;
-      }
-
-      if (!lesson.quiz) {
-        lesson.quiz = { questions: [] };
-      }
-
-      lesson.quiz.questions = (lesson.quiz.questions || []).map((question, index) => {
-        if (question.type === 'true-false' && (!question.options || question.options.length === 0)) {
-          question.options = [
-            { text: 'True', isCorrect: String(question.correctAnswer || '').trim().toLowerCase() === 'true' },
-            { text: 'False', isCorrect: String(question.correctAnswer || '').trim().toLowerCase() === 'false' }
-          ];
-        }
-
-        question.order = Number(question.order || index + 1);
-        question.points = Number(question.points || 1);
-        return question;
-      });
-    });
-
     this.totalDuration = lessons.reduce((sum, lesson) => sum + Number(lesson.duration || 0), 0);
   }
 

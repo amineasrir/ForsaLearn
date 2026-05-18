@@ -6,14 +6,13 @@ import { useTranslation } from 'react-i18next';
 import 'flag-icons/css/flag-icons.min.css';
 import { FaEdit } from 'react-icons/fa';
 import SidebarF from '../../components/formateur/sidebarF';
-import ProfilSection from '../../components/formateur/profilSection';
 import {
   getFormateurProfile,
   updateFormateurProfile
 } from '../../services/formateurService';
 
 const FormateurProfile = () => {
-  const { i18n } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [formateur, setFormateur] = useState(null);
   const [editing, setEditing] = useState(false);
   const [saving, setSaving] = useState(false);
@@ -109,13 +108,7 @@ const FormateurProfile = () => {
           <div className="navbar-dashboard-left">
             <img src={logo_rem} alt="ForsaLearn" className="navbar-dashboard-logo" />
           </div>
-          
-          <div className="navbar-dashboard-center">
-            <h1>Profile</h1>
-            <a href="/">Home</a>
-            <span style={{color:"#6b7280"}}>/Profile</span>
-          </div>
-          
+ 
           <div className="navbar-dashboard-right">
             <button className="lang-btn-dashboard" onClick={changeLanguage}>
               <span className={getFlagClass(currentLang)} style={{ fontSize: '20px' }}></span>
@@ -129,68 +122,59 @@ const FormateurProfile = () => {
         <SidebarF />
 
         <main className="formateur-main">
-          <ProfilSection
-            formateur={{
-              avatar: formateur?.profilePicture || 'https://via.placeholder.com/60',
-              name: formateur?.fullName || 'Instructor'
-            }}
-            actionLabel="Edit Profile"
-            onAction={() => setEditing(true)}
-          />
-
           {error && <div className="alert alert-error">{error}</div>}
 
           <div className="profile-details">
             <h2>
-              Basic Information
+              {t('formateur.profile.basicInformation')}
               <FaEdit className="section-edit-icon" onClick={() => setEditing(true)} />
             </h2>
             {editing ? (
               <div className="edit-form">
                 <label>
-                  Full Name
+                  {t('formateur.profile.fullName')}
                   <input type="text" value={formData.fullName} onChange={(e) => setFormData({ ...formData, fullName: e.target.value })} />
                 </label>
                 <label>
-                  Phone
+                  {t('formateur.profile.phone')}
                   <input type="text" value={formData.phoneNumber} onChange={(e) => setFormData({ ...formData, phoneNumber: e.target.value })} />
                 </label>
                 <label>
-                  Email
+                  {t('formateur.profile.email')}
                   <input type="email" value={formData.email} onChange={(e) => setFormData({ ...formData, email: e.target.value })} />
                 </label>
                 <label>
-                  Expertise Field
+                  {t('formateur.profile.expertiseField')}
                   <input type="text" value={formData.field} onChange={(e) => setFormData({ ...formData, field: e.target.value })} />
                 </label>
                 <label>
-                  Bio
+                  {t('formateur.profile.bio')}
                   <textarea value={formData.bio} onChange={(e) => setFormData({ ...formData, bio: e.target.value })} />
                 </label>
                 <label>
-                  Skills
-                  <input type="text" value={formData.skills} onChange={(e) => setFormData({ ...formData, skills: e.target.value })} placeholder="React, Node.js, UI Design" />
+                  {t('formateur.profile.skills')}
+                  <input type="text" value={formData.skills} onChange={(e) => setFormData({ ...formData, skills: e.target.value })} placeholder={t('formateur.profile.skills') + ' - React, Node.js, UI Design'} />
                 </label>
                 <div className="form-actions">
-                  <button onClick={handleSave} disabled={saving}>{saving ? 'Saving...' : 'Save'}</button>
-                  <button onClick={() => setEditing(false)}>Cancel</button>
+                  <button onClick={handleSave} disabled={saving}>{saving ? t('formateur.profile.saving') : t('formateur.profile.save')}</button>
+                  <button onClick={() => setEditing(false)}>{t('formateur.profile.cancel')}</button>
                 </div>
               </div>
             ) : (
               <>
-                <p><strong>Full Name:</strong> {formateur?.fullName || '-'}</p>
-                <p><strong>Phone Number:</strong> {formateur?.phoneNumber || '-'}</p>
-                <p><strong>Email:</strong> {formateur?.email || '-'}</p>
-                <p><strong>Expertise Field:</strong> {formateur?.field || '-'}</p>
-                <p><strong>Bio:</strong> {formateur?.bio || 'No bio added yet.'}</p>
+                <p><strong>{t('formateur.profile.fullName')}:</strong> {formateur?.fullName || '-'}</p>
+                <p><strong>{t('formateur.profile.phone')}:</strong> {formateur?.phoneNumber || '-'}</p>
+                <p><strong>{t('formateur.profile.email')}:</strong> {formateur?.email || '-'}</p>
+                <p><strong>{t('formateur.profile.expertiseField')}:</strong> {formateur?.field || '-'}</p>
+                <p><strong>{t('formateur.profile.bio')}:</strong> {formateur?.bio || t('formateur.profile.noBioYet')}</p>
               </>
             )}
           </div>
 
           <div className="profile-details">
-            <h2>Skills</h2>
+            <h2>{t('formateur.profile.skills')}</h2>
             {(formateur?.skills || []).length === 0 ? (
-              <p>No skills added yet.</p>
+              <p>{t('formateur.profile.noSkillsYet')}</p>
             ) : (
               (formateur.skills || []).map((skill, idx) => (
                 <p key={idx}>&#8226; {skill}</p>
@@ -199,10 +183,10 @@ const FormateurProfile = () => {
           </div>
 
           <div className="profile-details">
-            <h2>Account Status</h2>
-            <p><strong>Role:</strong> {formateur?.role || 'formateur'}</p>
-            <p><strong>Approved:</strong> {formateur?.isApproved ? 'Yes' : 'Pending review'}</p>
-            <p><strong>Language:</strong> {formateur?.language || 'en'}</p>
+            <h2>{t('formateur.profile.accountStatus')}</h2>
+            <p><strong>{t('formateur.profile.role')}:</strong> {formateur?.role || 'formateur'}</p>
+            <p><strong>{t('formateur.profile.approved')}:</strong> {formateur?.isApproved ? t('formateur.profile.yes') : t('formateur.profile.pendingReview')}</p>
+            <p><strong>{t('formateur.profile.language')}:</strong> {formateur?.language || 'en'}</p>
           </div>
         </main>
       </div>

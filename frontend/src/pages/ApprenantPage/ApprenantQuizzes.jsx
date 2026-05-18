@@ -32,17 +32,11 @@ const ApprenantQuizzes = () => {
   const rightContent = (
     <>
       <div className="notification-icon"></div>
-      <div className="cart-icon"></div>
     </>
   );
 
   return (
-    <ApprenantLayout
-      title={t('apprenant.myQuizAttempts')}
-      breadcrumb={[{ to: '/', label: t('home') }, { label: t('apprenant.myQuizAttempts') }]}
-      rightContent={rightContent}
-    >
-      <CardP />
+    <ApprenantLayout>
 
       <section className="quizzes-list-section">
         <h2>{t('apprenant.myQuizAttempts')}</h2>

@@ -1,12 +1,12 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useEffect, useState } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
 import '../../styles/formateur.css';
 import logo_rem from '../../assets/image/home_page/logo_rem.png';
 import { useTranslation } from 'react-i18next';
 import i18nInstance from '../../i18n';
 import SidebarF from '../../components/formateur/sidebarF';
-import ProfilSection from '../../components/formateur/profilSection';
-import { createFormateurCourse, uploadCourseVideo, uploadCourseThumbnail } from '../../services/formateurService';
+import { getFormateurCourse, createFormateurCourse, updateFormateurCourse, uploadCourseVideo, uploadCourseThumbnail } from '../../services/formateurService';
+import { getMediaUrl } from '../../utils/mediaUrl';
 
 const categories = [
   'Web Development',
@@ -55,9 +55,12 @@ const initialData = {
 
 const AddCourses = () => {
   const navigate = useNavigate();
+  const { courseId } = useParams();
+  const isEditMode = Boolean(courseId);
   const { t, i18n } = useTranslation();
   const [currentStep, setCurrentStep] = useState(1);
   const [formData, setFormData] = useState(initialData);
+  const [existingThumbnailUrl, setExistingThumbnailUrl] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
@@ -121,6 +124,56 @@ const AddCourses = () => {
     const file = event.target.files && event.target.files[0];
     setFormData((prev) => ({ ...prev, thumbnail: file || null }));
   };
+
+  const fetchCourse = async (id) => {
+    try {
+      setLoading(true);
+      const response = await getFormateurCourse(id);
+      const course = response.data?.data;
+      if (course) {
+        setFormData({
+          title: course.title || '',
+          description: course.description || '',
+          category: course.category || '',
+          level: course.level || 'Beginner',
+          language: course.language || 'English',
+          priceType: course.priceType || 'paid',
+          price: course.price != null ? String(course.price) : '0',
+          thumbnail: null,
+          requirements: course.requirements?.length > 0 ? course.requirements : [''],
+          learningOutcomes: course.learningOutcomes?.length > 0 ? course.learningOutcomes : [''],
+          targetAudience: course.targetAudience?.length > 0 ? course.targetAudience : [''],
+          sections: course.sections?.map((section) => ({
+            title: section.title || '',
+            description: section.description || '',
+            order: section.order || 0,
+            lessons: section.lessons?.map((lesson) => ({
+              title: lesson.title || '',
+              description: lesson.description || '',
+              type: lesson.type || 'video',
+              content: lesson.content || '',
+              videoFile: null,
+              duration: lesson.duration || 0,
+              isFree: lesson.isFree || false,
+              order: lesson.order || 0,
+              resources: lesson.resources || []
+            })) || []
+          })) || []
+        });
+        setExistingThumbnailUrl(course.thumbnail || '');
+      }
+    } catch (err) {
+      setError(err.response?.data?.message || 'Failed to load course for editing.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (isEditMode) {
+      fetchCourse(courseId);
+    }
+  }, [courseId, isEditMode]);
 
   const handleLessonFileChange = (sectionIndex, lessonIndex, file) => {
     setFormData((prev) => {
@@ -358,10 +411,18 @@ const AddCourses = () => {
         payload.thumbnail = thumbnailResponse.data?.data?.url;
       }
 
-      await createFormateurCourse(payload);
-      setSuccess(t('addCourse.courseCreatedSuccess') || 'Course created successfully!');
-      setFormData(initialData);
-      setCurrentStep(1);
+      if (isEditMode) {
+        await updateFormateurCourse(courseId, payload);
+        setSuccess(t('addCourse.courseUpdatedSuccess') || 'Course updated successfully!');
+      } else {
+        await createFormateurCourse(payload);
+        setSuccess(t('addCourse.courseCreatedSuccess') || 'Course created successfully!');
+      }
+
+      if (!isEditMode) {
+        setFormData(initialData);
+        setCurrentStep(1);
+      }
     } catch (err) {
       const responseData = err.response?.data;
       if (responseData?.errors && Array.isArray(responseData.errors) && responseData.errors.length > 0) {
@@ -381,11 +442,6 @@ const AddCourses = () => {
           <div className="navbar-dashboard-left">
             <img src={logo_rem} alt="ForsaLearn" className="navbar-dashboard-logo" />
           </div>
-          <div className="navbar-dashboard-center">
-            <h1>{t('addCourse.title') || 'Add Course'}</h1>
-            <a href="/">{t('dashboard.home') || 'Home'}</a>
-            <span style={{ color: '#6b7280' }}>/ {t('addCourse.title') || 'Add Course'}</span>
-          </div>
           <div className="navbar-dashboard-right">
             <button className="lang-btn-dashboard" onClick={changeLanguage}>
               <span className={getFlagClass(i18n?.language || 'en')} style={{ fontSize: '20px' }}></span>
@@ -399,11 +455,6 @@ const AddCourses = () => {
         <SidebarF />
 
         <main className="formateur-main">
-          <ProfilSection
-            formateur={{ avatar: 'https://via.placeholder.com/60', name: 'Instructor' }}
-            actionLabel={t('addCourse.backToCourses') || 'Back to Courses'}
-            onAction={() => navigate('/formateur/courses')}
-          />
 
           {error && <div className="alert alert-error">{error}</div>}
           {success && <div className="alert alert-success">{success}</div>}
@@ -553,17 +604,18 @@ const AddCourses = () => {
                       className="form-input"
                       onChange={handleFileChange}
                     />
-                    {formData.thumbnail && (
+                    {(formData.thumbnail || existingThumbnailUrl) && (
                       <div style={{ marginTop: '0.5rem', padding: '0.5rem', border: '1px solid #d1d5db', borderRadius: '4px', backgroundColor: '#f9fafb' }}>
                         <p style={{ color: '#374151', marginBottom: '0.5rem', fontWeight: 'bold' }}>
-                          🖼️ Thumbnail Selected: {formData.thumbnail.name}
+                          🖼️ Thumbnail Selected: {formData.thumbnail ? formData.thumbnail.name : 'Current image'}
                         </p>
                         <p style={{ color: '#6b7280', marginBottom: '0.5rem', fontSize: '0.85rem' }}>
-                          Size: {(formData.thumbnail.size / 1024 / 1024).toFixed(2)} MB | 
-                          Type: {formData.thumbnail.type || 'Unknown'}
+                          {formData.thumbnail
+                            ? `Size: ${(formData.thumbnail.size / 1024 / 1024).toFixed(2)} MB | Type: ${formData.thumbnail.type || 'Unknown'}`
+                            : 'Current thumbnail from course'}
                         </p>
                         <img
-                          src={URL.createObjectURL(formData.thumbnail)}
+                          src={formData.thumbnail ? URL.createObjectURL(formData.thumbnail) : getMediaUrl(existingThumbnailUrl)}
                           alt="Thumbnail preview"
                           style={{ maxWidth: '200px', maxHeight: '150px', border: '1px solid #d1d5db', borderRadius: '4px', display: 'block' }}
                         />
@@ -884,7 +936,7 @@ const AddCourses = () => {
                   </button>
                 ) : (
                   <button type="submit" className="add-course-btn" disabled={loading}>
-                    {loading ? 'Creating Course...' : 'Create Course'}
+                    {loading ? (isEditMode ? 'Updating Course...' : 'Creating Course...') : (isEditMode ? 'Update Course' : 'Create Course')}
                   </button>
                 )}
               </div>

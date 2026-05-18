@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useNavigate } from 'react-router-dom';
 import ApprenantLayout from '../../components/apprenant/ApprenantLayout';
 import CardP from '../../components/apprenant/CardP';
 import { FaBook, FaClock } from 'react-icons/fa';
@@ -51,13 +52,10 @@ const ApprenantEnrolled = () => {
     notstarted: courses.filter(c => Number(c.myProgress||0) === 0).length,
   };
 
+  const navigate = useNavigate();
+
   return (
-    <ApprenantLayout
-      title={t('apprenant.enrolledCourses')}
-      breadcrumb={[{ to: '/', label: t('home') }, { label: t('apprenant.enrolledCourses') }]}
-      rightContent={<><div className="notification-icon"></div><div className="cart-icon"></div></>}
-    >
-      <CardP user={user} />
+    <ApprenantLayout>
 
       {error && <div className="error-message">{error}</div>}
 
@@ -131,7 +129,7 @@ const ApprenantEnrolled = () => {
                     <span className="ec-card__progress-pct">{progress}%</span>
                   </div>
 
-                  <button className="ec-card__btn">
+                  <button className="ec-card__btn" onClick={() => navigate(`/apprenant/course/${course._id}/learn`)}>
                     <span className="ec-card__btn-icon">▶</span>
                     Start Learning
                   </button>
