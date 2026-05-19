@@ -10,14 +10,16 @@ import { getMediaUrl } from '../../utils/mediaUrl';
 import './apprenant.css';
 
 const CATEGORIES = [
-  { id: 'backend',     label: 'Backend',              count: 3 },
-  { id: 'css',         label: 'CSS',                  count: 2 },
-  { id: 'frontend',   label: 'Frontend',              count: 2 },
-  { id: 'general',    label: 'General',               count: 2 },
-  { id: 'it',         label: 'IT & Software',         count: 2 },
-  { id: 'photography',label: 'Photography',           count: 2 },
-  { id: 'programming',label: 'Programming Language',  count: 3 },
-  { id: 'technology', label: 'Technology',            count: 2 },
+  { id: 'backend',     label: 'Web Development'        },
+  { id: 'css',         label: 'Mobile Development'                  },
+  { id: 'frontend',   label: 'Data Science'},
+  { id: 'general',    label: 'Machine Learning'},
+  { id: 'it',         label: 'Design' },
+  { id: 'photography',label: 'Photography'},
+  { id: 'programming',label: 'Marketing' },
+  { id: 'technology', label: 'Business' },
+  { id: 'technology', label: 'Music' },
+  { id: 'technology', label: 'Language Learning' },
 ];
 
 const SORT_OPTIONS = [

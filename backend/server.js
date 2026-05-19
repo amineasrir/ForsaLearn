@@ -110,6 +110,11 @@ const uploadRoutes = require('./routes/upload');
 console.log('upload:', typeof uploadRoutes);
 app.use('/api/upload', uploadRoutes);
 
+// // Quiz Routes
+const quizRoutes = require('./routes/quiz');
+console.log('quiz:', typeof quizRoutes);
+app.use('/api/quiz', quizRoutes);
+
 // // Payment Routes
 const paymentRoutes = require('./routes/payment');
 console.log('payment:', typeof paymentRoutes);

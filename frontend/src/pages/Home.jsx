@@ -8,6 +8,7 @@ import Navbar from "../components/home_c/Navbar";
 import Hero from "../components/home_c/Hero";
 import Blog from "../components/home_c/Blog";
 import Footer from "../components/home_c/Footer";
+import Testimonials from "../components/home_c/Testimonials";
 
 const Home = () => {
   return (
@@ -19,6 +20,7 @@ const Home = () => {
       <div id="courses"><Courses /></div>
       <div id="blog"><Blog /></div>
       <Mentor />
+      <Testimonials />
       <div id="footer"><Footer /></div>
      
       

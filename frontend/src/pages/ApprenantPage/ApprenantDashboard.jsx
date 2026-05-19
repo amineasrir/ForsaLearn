@@ -74,7 +74,7 @@ const ApprenantDashboard = () => {
               <h3>{t('apprenant.learningProgress')}</h3>
               <p>{t('apprenant.enrolledIn', { count: courses.length })}</p>
             </div>
-            <button className="apprenant-continue-button">{t('apprenant.keepLearning')}</button>
+            <button className="apprenant-continue-button" to="/apprenant/enrolled">{t('apprenant.keepLearning')}</button>
           </div>
 
           <div className="apprenant-stats-cards">

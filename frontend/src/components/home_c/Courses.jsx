@@ -1,5 +1,6 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
+import { useNavigate } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faClock, faUsers } from '@fortawesome/free-solid-svg-icons';
 import { faHeart } from '@fortawesome/free-regular-svg-icons';
@@ -7,6 +8,7 @@ import cours from '../../assets/image/cours/cours.jpg'
 import cours1 from '../../assets/image/cours/cours1.jpg'
 import cours2 from '../../assets/image/cours/cours2.jpg'
 import cours3 from '../../assets/image/cours/cours3.jpg'
+
 const courses = [
   {
     category: 'Web Design',
@@ -48,19 +50,34 @@ const courses = [
 
 const Courses = () => {
   const { t } = useTranslation();
+  const navigate = useNavigate();
+
+  const handleViewAll = () => {
+    navigate("/courses");
+  };
+
+  const handleCourseClick = (course) => {
+    navigate("/courses", { state: { filter: course.category } });
+  };
+
   return (
-    <section className="courses">
+    <section className="courses" id="courses">
       <h1>{t('homePage.courses.title')}</h1>
 
       <div className="course-grid">
         {courses.map((course, index) => (
-          <div className="course-card" key={index}>
+          <div 
+            className="course-card" 
+            key={index}
+            onClick={() => handleCourseClick(course)}
+            style={{ cursor: 'pointer', transition: 'transform 0.3s ease' }}
+          >
             <div className="card-media">
               <img src={course.image.src} alt={course.title} />
               <span className="fav-badge"><FontAwesomeIcon icon={faHeart} /></span>
             </div>
             <div className="course-info">
-              <a href="#" className="course-category">{t(course.category)}</a>
+              <a href="#" onClick={(e) => { e.preventDefault(); e.stopPropagation(); }} className="course-category">{t(course.category)}</a>
               <h3>{course.title}</h3>
               <div className="course-students">
                 <FontAwesomeIcon icon={faUsers} /> <span className="students-count">{t('homePage.courses.students', { count: course.students })}</span>
@@ -79,7 +96,7 @@ const Courses = () => {
         ))}
       </div>
 
-      <button className="view-all-btn">{t('homePage.courses.view_all')}</button>
+      <button className="view-all-btn" onClick={handleViewAll}>{t('homePage.courses.view_all')}</button>
     </section>
   );
 };

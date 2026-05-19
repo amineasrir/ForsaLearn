@@ -40,11 +40,7 @@ const ApprenantProfile = () => {
           <div className="profile-page-content">
             <h2 className="profile-title">
               {t('apprenant.myProfile')}
-              <button
-                className="title-edit-btn"
-                onClick={() => setEditMode(v => !v)}
-                title={editMode ? t('apprenant.close') : t('apprenant.settings')}
-              >✎</button>
+             
             </h2>
             <div className="profile-details">
               <div>

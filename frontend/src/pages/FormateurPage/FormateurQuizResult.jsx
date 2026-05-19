@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import '../../styles/formateur.css';
 import SidebarF from '../../components/formateur/sidebarF';
 import logo_rem from '../../assets/image/home_page/logo_rem.png';
-import axios from 'axios';
+import API from '../../api/axios';
 import { FaEye, FaDownload, FaFilter, FaChartBar } from 'react-icons/fa';
 import { useTranslation } from 'react-i18next';
 
@@ -16,8 +16,6 @@ const FormateurQuizResult = () => {
   const [searchStudent, setSearchStudent] = useState('');
   const [stats, setStats] = useState(null);
   const { t } = useTranslation();
-
-  const API_URL = 'http://localhost:5000/api';
 
   // Fetch quizzes on mount
   useEffect(() => {
@@ -35,11 +33,7 @@ const FormateurQuizResult = () => {
   const fetchQuizzes = async () => {
     try {
       setLoading(true);
-      const response = await axios.get(`${API_URL}/quiz`, {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem('token')}`
-        }
-      });
+      const response = await API.get('/quiz');
 
       if (response.data?.data) {
         setQuizzes(response.data.data);
@@ -57,11 +51,7 @@ const FormateurQuizResult = () => {
 
   const fetchStudentResults = async (quizId) => {
     try {
-      const response = await axios.get(`${API_URL}/quiz/${quizId}`, {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem('token')}`
-        }
-      });
+      const response = await API.get(`/quiz/${quizId}`);
 
       if (response.data?.data?.attempts) {
         setStudentResults(response.data.data.attempts);
@@ -73,11 +63,7 @@ const FormateurQuizResult = () => {
 
   const fetchQuizStats = async (quizId) => {
     try {
-      const response = await axios.get(`${API_URL}/quiz/${quizId}/statistics`, {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem('token')}`
-        }
-      });
+      const response = await API.get(`/quiz/${quizId}/statistics`);
 
       if (response.data?.data) {
         setStats(response.data.data);
