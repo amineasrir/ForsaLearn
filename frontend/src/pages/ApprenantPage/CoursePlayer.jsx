@@ -6,7 +6,7 @@ import {
   FaTrophy
 } from 'react-icons/fa';
 import ApprenantLayout from '../../components/apprenant/ApprenantLayout';
-import { getCourseDetails, completeLesson, getApprenantProfile } from '../../services/apprenentService';
+import { getCourseDetails, completeLesson, getApprenantProfile, submitQuizAttempt } from '../../services/apprenentService';
 import { getMediaUrl } from '../../utils/mediaUrl';
 import './CourseDetails.css';
 
@@ -103,6 +103,11 @@ const CoursePlayer = () => {
 
   // ✅ FIX: local state pour les leçons complétées — mis à jour immédiatement
   const [localCompletedIds, setLocalCompletedIds] = useState([]);
+  const [quizAnswers, setQuizAnswers] = useState({});
+  const [quizResult, setQuizResult] = useState(null);
+  const [submittingQuiz, setSubmittingQuiz] = useState(false);
+  const [quizError, setQuizError] = useState('');
+  const [quizMessage, setQuizMessage] = useState('');
 
   // ─── LOAD ───
   useEffect(() => {
@@ -204,6 +209,13 @@ const CoursePlayer = () => {
     setAutoNextCancelled(false);
     if (countdownRef.current) clearInterval(countdownRef.current);
   }, [activeSection, activeLesson]);
+
+  useEffect(() => {
+    setQuizAnswers({});
+    setQuizResult(null);
+    setQuizError('');
+    setQuizMessage('');
+  }, [currentLesson?._id]);
 
   const goToNextLesson = useCallback(() => {
     if (!nextLessonInfo) return;
@@ -322,6 +334,73 @@ const CoursePlayer = () => {
 
     setShowNextBanner(true);
   };
+
+  const handleQuizAnswerChange = (questionId, value) => {
+    setQuizAnswers((prev) => ({ ...prev, [questionId]: value }));
+  };
+
+  const handleSubmitQuiz = useCallback(async () => {
+    if (!course || !currentLesson) return;
+    const lessonId = (currentLesson._id || currentLesson.id)?.toString();
+    const questions = currentLesson.quiz?.questions || [];
+    if (!questions.length) {
+      setQuizError('This quiz has no questions yet.');
+      return;
+    }
+
+    const answers = questions.map((question) => ({
+      questionId: question._id || question.id,
+      selectedAnswer: String(quizAnswers[question._id || question.id] || '').trim()
+    }));
+
+    setSubmittingQuiz(true);
+    setQuizError('');
+    setQuizMessage('');
+    try {
+      const response = await submitQuizAttempt(course._id, lessonId, answers);
+      const data = response.data?.data || {};
+      setQuizResult(data);
+      setQuizMessage(response.data?.message || 'Quiz submitted.');
+
+      if (data.passed) {
+        setLocalCompletedIds((prev) => (
+          prev.includes(lessonId) ? prev : [...prev, lessonId]
+        ));
+
+        setCourse((prevCourse) => {
+          if (!prevCourse) return prevCourse;
+          return {
+            ...prevCourse,
+            enrolledStudents: (prevCourse.enrolledStudents || []).map((entry) => {
+              const studentId = entry.student?._id || entry.student;
+              if (studentId?.toString() === user?._id?.toString()) {
+                const completedLessons = Array.from(new Set([
+                  ...(entry.completedLessons || []).map((item) => item.toString()),
+                  lessonId
+                ]));
+                return {
+                  ...entry,
+                  progress: data.progress,
+                  completedLessons,
+                  certificateIssued: data.certificateIssued || entry.certificateIssued,
+                  certificateUrl: data.certificateUrl || entry.certificateUrl
+                };
+              }
+              return entry;
+            })
+          };
+        });
+
+        if (data.progress >= 100) {
+          setShowCompletionModal(true);
+        }
+      }
+    } catch (err) {
+      setQuizError(err.response?.data?.message || 'Unable to submit quiz.');
+    } finally {
+      setSubmittingQuiz(false);
+    }
+  }, [course, currentLesson, quizAnswers, user]);
 
   // ✅ FIX: isLessonLocked utilise localCompletedIds
   const isLessonLocked = useCallback((flatIndex) => {
@@ -480,9 +559,100 @@ const CoursePlayer = () => {
                 <div className="cp-article-body">{currentLesson.content}</div>
               </div>
             ) : currentLesson?.type === 'quiz' ? (
-              <div className="cp-placeholder">
-                <FaBookOpen className="cp-placeholder-icon" />
-                <p>Quiz — review the material then mark it complete.</p>
+              <div className="cp-quiz-card">
+                <div className="cp-quiz-header">
+                  <h3>{currentLesson.title || 'Quiz'}</h3>
+                  <p>{currentLesson.description || currentLesson.quiz?.instructions || 'Answer the questions below and submit when you are ready.'}</p>
+                  {currentLesson.quiz?.passingScore != null && (
+                    <p className="cp-quiz-meta">Passing score: {currentLesson.quiz.passingScore}%</p>
+                  )}
+                  {currentLesson.quiz?.instructions && (
+                    <p className="cp-quiz-instructions">{currentLesson.quiz.instructions}</p>
+                  )}
+                </div>
+
+                {quizError && <div className="cp-quiz-error">{quizError}</div>}
+                {quizMessage && <div className="cp-quiz-success">{quizMessage}</div>}
+
+                {(quizResult || currentLesson.quizSummary?.latestAttempt) && (
+                  <div className="cp-quiz-result">
+                    <div className="cp-quiz-result-row">
+                      <span>Score</span>
+                      <strong>{(quizResult?.score ?? currentLesson.quizSummary.latestAttempt?.score) || 0}/
+                        {(quizResult?.totalPoints ?? currentLesson.quizSummary.latestAttempt?.totalPoints) || 0}
+                      </strong>
+                    </div>
+                    <div className="cp-quiz-result-row">
+                      <span>Percentage</span>
+                      <strong>{(quizResult?.percentageScore ?? currentLesson.quizSummary.latestAttempt?.percentageScore) || 0}%</strong>
+                    </div>
+                    <div className="cp-quiz-result-row">
+                      <span>Status</span>
+                      <strong>{(quizResult?.passed ?? currentLesson.quizSummary.latestAttempt?.passed) ? 'Passed' : 'Failed'}</strong>
+                    </div>
+                    <div className="cp-quiz-result-row">
+                      <span>Attempt</span>
+                      <strong>{(quizResult?.attemptNumber ?? currentLesson.quizSummary.latestAttempt?.attemptNumber) || 1}</strong>
+                    </div>
+                  </div>
+                )}
+
+                {currentLesson.quiz?.questions?.length ? (
+                  <div className="cp-quiz-questions">
+                    {currentLesson.quiz.questions.map((question, index) => {
+                      const questionId = question._id || question.id;
+                      const selected = quizAnswers[questionId] || '';
+                      const isMultiple = question.type === 'multiple-choice';
+                      const isTrueFalse = question.type === 'true-false';
+                      const options = question.options || [];
+
+                      return (
+                        <div key={questionId} className="cp-quiz-question">
+                          <div className="cp-quiz-question-header">
+                            <span className="cp-quiz-question-number">Question {index + 1}</span>
+                            <span className="cp-quiz-question-points">{question.points || 1} pts</span>
+                          </div>
+                          <p className="cp-quiz-question-text">{question.text || question.question || question.prompt || 'No question text provided.'}</p>
+
+                          {isMultiple || isTrueFalse ? (
+                            <div className="cp-quiz-options">
+                              {(isTrueFalse ? [
+                                { text: 'True' },
+                                { text: 'False' }
+                              ] : options).map((option, optionIndex) => {
+                                const optionText = String(option.text || option).trim();
+                                return (
+                                  <label key={optionIndex} className="cp-quiz-option">
+                                    <input
+                                      type="radio"
+                                      name={`quiz-${questionId}`}
+                                      value={optionText}
+                                      checked={selected === optionText}
+                                      onChange={() => handleQuizAnswerChange(questionId, optionText)}
+                                    />
+                                    <span>{optionText}</span>
+                                  </label>
+                                );
+                              })}
+                            </div>
+                          ) : (
+                            <textarea
+                              className="cp-quiz-textarea"
+                              value={selected}
+                              placeholder="Your answer"
+                              onChange={(event) => handleQuizAnswerChange(questionId, event.target.value)}
+                            />
+                          )}
+                        </div>
+                      );
+                    })}
+                  </div>
+                ) : (
+                  <div className="cp-placeholder">
+                    <FaBookOpen className="cp-placeholder-icon" />
+                    <p>This quiz has no questions yet.</p>
+                  </div>
+                )}
               </div>
             ) : (
               <div className="cp-placeholder">
@@ -502,6 +672,15 @@ const CoursePlayer = () => {
               >
                 <FaChevronRight style={{ transform: 'rotate(180deg)' }} /> Previous
               </button>
+              {currentLesson?.type === 'quiz' ? (
+              <button
+                className={`cp-complete-btn${quizResult?.passed || isLessonCompleted ? ' done' : ''}`}
+                onClick={handleSubmitQuiz}
+                disabled={submittingQuiz || saving || !enrollment || quizResult?.passed || isLessonCompleted || !currentLesson}
+              >
+                {submittingQuiz ? <span className="cp-spinner-sm" /> : quizResult?.passed || isLessonCompleted ? <><FaCheck /> Passed</> : 'Submit Quiz'}
+              </button>
+            ) : (
               <button
                 className={`cp-complete-btn${isLessonCompleted ? ' done' : ''}`}
                 onClick={handleCompleteLesson}
@@ -509,6 +688,7 @@ const CoursePlayer = () => {
               >
                 {saving ? <span className="cp-spinner-sm" /> : isLessonCompleted ? <><FaCheck /> Completed</> : 'Mark Complete'}
               </button>
+            )}
               <button
                 className="cp-nav-btn cp-nav-next"
                 disabled={!nextLessonInfo}

@@ -84,6 +84,38 @@ const projectStorage = multer.diskStorage({
   }
 });
 
+// Formateur Signup Assets Storage
+const formateurSignupStorage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    if (file.fieldname === 'profilePicture') {
+      cb(null, './uploads/profiles');
+      return;
+    }
+
+    if (file.fieldname === 'certification') {
+      cb(null, './uploads/certificates');
+      return;
+    }
+
+    cb(new Error('Unsupported upload field'), '');
+  },
+  filename: (req, file, cb) => {
+    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+
+    if (file.fieldname === 'profilePicture') {
+      cb(null, `profile-${uniqueSuffix}${path.extname(file.originalname)}`);
+      return;
+    }
+
+    if (file.fieldname === 'certification') {
+      cb(null, `cert-${uniqueSuffix}${path.extname(file.originalname)}`);
+      return;
+    }
+
+    cb(new Error('Unsupported upload field'), '');
+  }
+});
+
 // Profile Picture Storage
 const profileStorage = multer.diskStorage({
   destination: (req, file, cb) => {
@@ -147,6 +179,20 @@ const documentFilter = (req, file, cb) => {
   }
 };
 
+const formateurSignupFilter = (req, file, cb) => {
+  if (file.fieldname === 'profilePicture') {
+    imageFilter(req, file, cb);
+    return;
+  }
+
+  if (file.fieldname === 'certification') {
+    documentFilter(req, file, cb);
+    return;
+  }
+
+  cb(new Error('File type not allowed for this field'), false);
+};
+
 // NEW - Message attachment filter (images, videos, documents)
 const messageAttachmentFilter = (req, file, cb) => {
   const allowedTypes = /jpeg|jpg|png|gif|webp|mp4|avi|mov|pdf|doc|docx|xls|xlsx|txt|zip|rar/;
@@ -195,6 +241,16 @@ const uploadProject = multer({
   limits: { fileSize: 50 * 1024 * 1024 }, // 50MB
   fileFilter: documentFilter
 }).single('project');
+
+// Formateur signup assets upload
+const uploadFormateurSignupAssets = multer({
+  storage: formateurSignupStorage,
+  limits: { fileSize: 10 * 1024 * 1024 }, // 10MB per file
+  fileFilter: formateurSignupFilter
+}).fields([
+  { name: 'profilePicture', maxCount: 1 },
+  { name: 'certification', maxCount: 1 }
+]);
 
 // Profile Picture Upload (max 5MB)
 const uploadProfile = multer({
@@ -302,6 +358,7 @@ module.exports = {
   uploadCourseResources,
   uploadCertificate,
   uploadProject,
+  uploadFormateurSignupAssets,
   uploadProfile,
   uploadMessageAttachment,
   
@@ -320,6 +377,7 @@ module.exports = {
   courseResourcesStorage,
   certificateStorage,
   projectStorage,
+  formateurSignupStorage,
   profileStorage,
   messageStorage
 };

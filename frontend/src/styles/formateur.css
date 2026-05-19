@@ -1662,7 +1662,8 @@ body {
 }
 
 .message-input,
-.chat-input input {
+.chat-input input,
+.chat-input textarea {
   flex: 1;
   padding: 0.65rem 1rem;
   border: 1.5px solid var(--border);
@@ -1674,7 +1675,8 @@ body {
 }
 
 .message-input:focus,
-.chat-input input:focus {
+.chat-input input:focus,
+.chat-input textarea:focus {
   outline: none;
   border-color: var(--primary);
 }
@@ -1756,6 +1758,92 @@ body {
 
 .btn-cancel { background: var(--bg); color: var(--text); border: 1px solid var(--border); }
 .btn-cancel:hover { background: var(--border); }
+
+.ticket-select-row {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.65rem;
+}
+
+.ticket-select {
+  margin-bottom: 0.65rem;
+}
+
+.ticket-mini-meta,
+.support-ticket-head-meta {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  margin-top: 0.35rem;
+}
+
+.ticket-mini-id {
+  font-size: 0.72rem;
+  color: var(--muted);
+  font-weight: 700;
+  letter-spacing: 0.04em;
+}
+
+.ticket-mini-status {
+  padding: 0.2rem 0.55rem;
+  border-radius: 999px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.ticket-mini-status.open {
+  background: #fef3c7;
+  color: #b45309;
+}
+
+.ticket-mini-status.pending {
+  background: #dbeafe;
+  color: #1d4ed8;
+}
+
+.ticket-mini-status.resolved {
+  background: #d1fae5;
+  color: #047857;
+}
+
+.ticket-mini-status.closed {
+  background: #e5e7eb;
+  color: #4b5563;
+}
+
+.support-chat-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1rem;
+}
+
+.btn-secondary-inline {
+  background: #f3f4f6;
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 0.55rem 0.9rem;
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.btn-secondary-inline:hover {
+  background: #e5e7eb;
+}
+
+.ticket-chat-input {
+  align-items: stretch;
+}
+
+.ticket-chat-input textarea {
+  min-height: 86px;
+  resize: vertical;
+}
 
 /* ================= QUIZ MANAGEMENT ================= */
 .quiz-management-container,
@@ -2442,6 +2530,14 @@ body {
   .message-input-area {
     flex-direction: column;
     gap: 0.6rem;
+  }
+
+  .ticket-select-row {
+    grid-template-columns: 1fr;
+  }
+
+  .support-chat-header {
+    flex-direction: column;
   }
 
   .btn-send-message,

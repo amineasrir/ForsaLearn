@@ -1,0 +1,95 @@
+.support-admin-layout {
+  min-height: 680px;
+}
+
+.support-sidebar-header {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.support-status-filter,
+.support-status-select {
+  width: 100%;
+  padding: 10px 12px;
+  border: 2px solid #e5e7eb;
+  border-radius: 10px;
+  font-size: 14px;
+  color: #1f2937;
+  background: #fff;
+}
+
+.support-ticket-item .conversation-content {
+  width: 100%;
+}
+
+.support-ticket-meta,
+.support-ticket-headline {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  align-items: center;
+  margin: 6px 0;
+}
+
+.support-ticket-id {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  color: #6b7280;
+}
+
+.support-ticket-status {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  padding: 4px 9px;
+  border-radius: 999px;
+}
+
+.support-ticket-status.open {
+  background: #fef3c7;
+  color: #b45309;
+}
+
+.support-ticket-status.pending {
+  background: #dbeafe;
+  color: #1d4ed8;
+}
+
+.support-ticket-status.resolved {
+  background: #d1fae5;
+  color: #047857;
+}
+
+.support-ticket-status.closed {
+  background: #e5e7eb;
+  color: #4b5563;
+}
+
+.support-ticket-requester {
+  font-size: 12px;
+  color: #8b5cf6;
+  margin-bottom: 6px;
+  font-weight: 600;
+}
+
+.support-ticket-chat-header {
+  gap: 14px;
+}
+
+.support-ticket-controls {
+  min-width: 180px;
+}
+
+@media (max-width: 768px) {
+  .support-ticket-chat-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .support-ticket-controls {
+    width: 100%;
+    min-width: 0;
+  }
+}

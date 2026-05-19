@@ -1,15 +1,17 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { FaSearch, FaComment, FaPaperPlane } from 'react-icons/fa';
+import { FaHeadset, FaPaperPlane, FaPlus, FaSearch } from 'react-icons/fa';
 import ApprenantLayout from '../../components/apprenant/ApprenantLayout';
 import '../../styles/formateur.css';
 import './apprenant.css';
 import {
+  createSupportTicket,
   getApprenantProfile,
-  getConversations,
   getConversationMessages,
+  getConversations,
   markConversationAsRead,
-  sendConversationMessage
+  sendConversationMessage,
+  updateSupportTicketStatus
 } from '../../services/apprenentService';
 
 const formatTime = (value) => {
@@ -20,7 +22,7 @@ const formatTime = (value) => {
   });
 };
 
-const formatConversationDate = (value) => {
+const formatDate = (value) => {
   if (!value) return '';
   return new Date(value).toLocaleDateString([], {
     month: 'short',
@@ -28,19 +30,17 @@ const formatConversationDate = (value) => {
   });
 };
 
-const getConversationLabel = (conversation, currentUserId) => {
-  if (conversation.name) return conversation.name;
-  const otherParticipant = (conversation.participants || []).find(
-    (participant) => participant._id !== currentUserId
-  );
-  return otherParticipant?.fullName || 'Support Ticket';
+const getTicketLabel = (conversation) => {
+  return conversation?.supportTicket?.subject || conversation?.name || 'Support Ticket';
 };
 
-const getLastMessagePreview = (conversation) => {
+const getTicketPreview = (conversation) => {
   const content = conversation.lastMessage?.content;
   if (!content) return 'No messages yet';
   return content.length > 45 ? `${content.slice(0, 45)}...` : content;
 };
+
+const getStatusClass = (status = 'open') => status.toLowerCase().replace(/\s+/g, '-');
 
 const ApprenantSupport = () => {
   const { t } = useTranslation();
@@ -49,17 +49,26 @@ const ApprenantSupport = () => {
   const [activeConvId, setActiveConvId] = useState(null);
   const [messages, setMessages] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
+  const [newMessage, setNewMessage] = useState('');
   const [loadingConversations, setLoadingConversations] = useState(true);
   const [loadingMessages, setLoadingMessages] = useState(false);
   const [sendingMessage, setSendingMessage] = useState(false);
-  const [newMessage, setNewMessage] = useState('');
+  const [creatingTicket, setCreatingTicket] = useState(false);
   const [error, setError] = useState('');
+  const [ticketForm, setTicketForm] = useState({
+    subject: '',
+    category: 'technical',
+    priority: 'medium',
+    message: ''
+  });
   const messagesEndRef = useRef(null);
 
   useEffect(() => {
     const loadSupportConversations = async () => {
       try {
         setLoadingConversations(true);
+        setError('');
+
         const [profileResponse, conversationsResponse] = await Promise.all([
           getApprenantProfile(),
           getConversations({ type: 'support' })
@@ -68,7 +77,7 @@ const ApprenantSupport = () => {
         setUser(profileResponse.data?.user || null);
         const supportConversations = conversationsResponse.data?.data || [];
         setConversations(supportConversations);
-        setActiveConvId(supportConversations[0]?._id || null);
+        setActiveConvId((currentId) => currentId || supportConversations[0]?._id || null);
       } catch (err) {
         setError(err.response?.data?.message || t('errorOccurred'));
       } finally {
@@ -120,13 +129,46 @@ const ApprenantSupport = () => {
     if (!normalizedSearch) return conversations;
 
     return conversations.filter((conversation) =>
-      getConversationLabel(conversation, user?._id).toLowerCase().includes(normalizedSearch) ||
-      getLastMessagePreview(conversation).toLowerCase().includes(normalizedSearch)
+      getTicketLabel(conversation).toLowerCase().includes(normalizedSearch) ||
+      (conversation.supportTicket?.ticketId || '').toLowerCase().includes(normalizedSearch) ||
+      getTicketPreview(conversation).toLowerCase().includes(normalizedSearch)
     );
-  }, [conversations, searchTerm, user?._id]);
+  }, [conversations, searchTerm]);
 
-  const sendMessage = async () => {
-    if (!newMessage.trim() || !activeConvId || sendingMessage) return;
+  const handleCreateTicket = async (event) => {
+    event.preventDefault();
+    if (!ticketForm.subject.trim() || !ticketForm.message.trim() || creatingTicket) {
+      return;
+    }
+
+    try {
+      setCreatingTicket(true);
+      setError('');
+
+      const response = await createSupportTicket(ticketForm);
+      const createdConversation = response.data?.data;
+
+      if (createdConversation) {
+        setConversations((prev) => [createdConversation, ...prev]);
+        setActiveConvId(createdConversation._id);
+        setTicketForm({
+          subject: '',
+          category: 'technical',
+          priority: 'medium',
+          message: ''
+        });
+      }
+    } catch (err) {
+      setError(err.response?.data?.message || 'Failed to create support ticket.');
+    } finally {
+      setCreatingTicket(false);
+    }
+  };
+
+  const handleSendMessage = async () => {
+    if (!newMessage.trim() || !activeConvId || sendingMessage || activeConversation?.supportTicket?.status === 'closed') {
+      return;
+    }
 
     try {
       setSendingMessage(true);
@@ -148,6 +190,7 @@ const ApprenantSupport = () => {
             : conversation
         )));
       }
+
       setNewMessage('');
     } catch (err) {
       setError(err.response?.data?.message || t('errorOccurred'));
@@ -156,10 +199,28 @@ const ApprenantSupport = () => {
     }
   };
 
+  const handleCloseTicket = async () => {
+    if (!activeConversation) return;
+
+    try {
+      const response = await updateSupportTicketStatus(activeConversation._id, 'closed');
+      const updatedConversation = response.data?.data;
+      setConversations((prev) => prev.map((conversation) => (
+        conversation._id === activeConversation._id
+          ? updatedConversation
+          : conversation
+      )));
+    } catch (err) {
+      setError(err.response?.data?.message || 'Failed to close the support ticket.');
+    }
+  };
+
   return (
     <ApprenantLayout>
       <div className="support-page">
         <div className="support-container">
+          {error && <div className="error-message">{error}</div>}
+
           <div className="message-wrapper">
             <div className="conv-list">
               <div className="chat-search-box">
@@ -172,39 +233,115 @@ const ApprenantSupport = () => {
                 />
               </div>
 
+              <form className="new-ticket-form" onSubmit={handleCreateTicket}>
+                <h3><FaPlus /> {t('apprenant.createNewTicket')}</h3>
+                <input
+                  type="text"
+                  className="ticket-input"
+                  placeholder={t('apprenant.subject')}
+                  value={ticketForm.subject}
+                  onChange={(e) => setTicketForm((prev) => ({ ...prev, subject: e.target.value }))}
+                />
+
+                <div className="ticket-select-row">
+                  <select
+                    className="ticket-input ticket-select"
+                    value={ticketForm.category}
+                    onChange={(e) => setTicketForm((prev) => ({ ...prev, category: e.target.value }))}
+                  >
+                    <option value="technical">{t('apprenant.technical')}</option>
+                    <option value="billing">{t('apprenant.billing')}</option>
+                    <option value="certificate">{t('apprenant.certificate')}</option>
+                    <option value="other">{t('apprenant.other')}</option>
+                  </select>
+
+                  <select
+                    className="ticket-input ticket-select"
+                    value={ticketForm.priority}
+                    onChange={(e) => setTicketForm((prev) => ({ ...prev, priority: e.target.value }))}
+                  >
+                    <option value="low">{t('apprenant.low')}</option>
+                    <option value="medium">{t('apprenant.medium')}</option>
+                    <option value="high">{t('apprenant.high')}</option>
+                  </select>
+                </div>
+
+                <textarea
+                  className="ticket-textarea"
+                  rows={4}
+                  placeholder={t('apprenant.message')}
+                  value={ticketForm.message}
+                  onChange={(e) => setTicketForm((prev) => ({ ...prev, message: e.target.value }))}
+                />
+
+                <div className="form-buttons">
+                  <button type="submit" className="btn-submit" disabled={creatingTicket}>
+                    {creatingTicket ? t('apprenant.sending') : t('apprenant.submitTicket')}
+                  </button>
+                </div>
+              </form>
+
               {loadingConversations ? (
                 <div className="conv-empty-state">{t('apprenant.loadingTickets')}</div>
               ) : filteredConversations.length === 0 ? (
                 <div className="conv-empty-state">
-                  <FaComment />
+                  <FaHeadset />
                   <p>{t('apprenant.noTicketsFound')}</p>
                 </div>
               ) : (
-                filteredConversations.map((conversation) => (
-                  <div
-                    key={conversation._id}
-                    className={`conv-item ${conversation._id === activeConvId ? 'active' : ''}`}
-                    onClick={() => setActiveConvId(conversation._id)}
-                  >
-                    <div className="conv-item-top">
-                      <span className="conv-student-name">{getConversationLabel(conversation, user?._id)}</span>
-                      <span className="conv-time">{formatConversationDate(conversation.lastMessageAt || conversation.updatedAt || conversation.createdAt)}</span>
+                <div className="conversations-scroll">
+                  {filteredConversations.map((conversation) => (
+                    <div
+                      key={conversation._id}
+                      className={`conv-item ${conversation._id === activeConvId ? 'active' : ''}`}
+                      onClick={() => setActiveConvId(conversation._id)}
+                    >
+                      <div className="conv-item-top">
+                        <span className="conv-student-name">{getTicketLabel(conversation)}</span>
+                        <span className="conv-time">{formatDate(conversation.lastMessageAt || conversation.updatedAt || conversation.createdAt)}</span>
+                      </div>
+
+                      <div className="ticket-mini-meta">
+                        <span className="ticket-mini-id">{conversation.supportTicket?.ticketId || 'SUPPORT'}</span>
+                        <span className={`ticket-mini-status ${getStatusClass(conversation.supportTicket?.status)}`}>
+                          {conversation.supportTicket?.status || t('apprenant.open')}
+                        </span>
+                      </div>
+
+                      <div className="conv-item-bottom">
+                        <span className="conv-preview">{getTicketPreview(conversation)}</span>
+                        {conversation.unreadCount > 0 && <span className="conv-unread">{conversation.unreadCount}</span>}
+                      </div>
                     </div>
-                    <div className="conv-item-bottom">
-                      <span className="conv-preview">{getLastMessagePreview(conversation)}</span>
-                      {conversation.unreadCount > 0 && <span className="conv-unread">{conversation.unreadCount}</span>}
-                    </div>
-                  </div>
-                ))
+                  ))}
+                </div>
               )}
             </div>
 
             <div className="chat-window support-chat-window">
-              <div className="chat-header">
+              <div className="chat-header support-chat-header">
                 <div>
-                  <h3>{activeConversation ? getConversationLabel(activeConversation, user?._id) : t('apprenant.supportTickets')}</h3>
-                  <p>{activeConversation ? t('apprenant.supportTickets') : t('apprenant.noTicketsMessage')}</p>
+                  <h3>{activeConversation ? getTicketLabel(activeConversation) : t('apprenant.supportTickets')}</h3>
+                  {activeConversation ? (
+                    <div className="support-ticket-head-meta">
+                      <span>{activeConversation.supportTicket?.ticketId}</span>
+                      <span className={`ticket-mini-status ${getStatusClass(activeConversation.supportTicket?.status)}`}>
+                        {activeConversation.supportTicket?.status || t('apprenant.open')}
+                      </span>
+                      <span className={`priority-badge priority-${activeConversation.supportTicket?.priority || 'medium'}`}>
+                        {activeConversation.supportTicket?.priority || t('apprenant.medium')}
+                      </span>
+                    </div>
+                  ) : (
+                    <p>{t('apprenant.noTicketsMessage')}</p>
+                  )}
                 </div>
+
+                {activeConversation && activeConversation.supportTicket?.status !== 'closed' && (
+                  <button type="button" className="btn-secondary-inline" onClick={handleCloseTicket}>
+                    Close Ticket
+                  </button>
+                )}
               </div>
 
               <div className="chat-body">
@@ -217,7 +354,7 @@ const ApprenantSupport = () => {
                 ) : (
                   messages.map((message) => (
                     <div
-                      key={message._id || `${message.createdAt}-${Math.random()}`}
+                      key={message._id}
                       className={`chat-message ${message.sender?._id === user?._id ? 'sent' : 'received'}`}
                     >
                       <div className="chat-bubble">
@@ -230,27 +367,25 @@ const ApprenantSupport = () => {
                 <div ref={messagesEndRef} />
               </div>
 
-              <div className="chat-input">
+              <div className="chat-input ticket-chat-input">
                 <textarea
                   value={newMessage}
                   onChange={(e) => setNewMessage(e.target.value)}
-                  placeholder={t('apprenant.writeMessage')}
+                  placeholder={activeConversation?.supportTicket?.status === 'closed' ? 'This ticket is closed.' : t('apprenant.writeMessage')}
                   rows={3}
-                  disabled={!activeConversation}
+                  disabled={!activeConversation || activeConversation?.supportTicket?.status === 'closed'}
                 />
                 <button
                   type="button"
                   className="btn-send-message"
-                  onClick={sendMessage}
-                  disabled={!activeConversation || !newMessage.trim() || sendingMessage}
+                  onClick={handleSendMessage}
+                  disabled={!activeConversation || !newMessage.trim() || sendingMessage || activeConversation?.supportTicket?.status === 'closed'}
                 >
                   {sendingMessage ? t('apprenant.sending') : <><FaPaperPlane /> {t('apprenant.send')}</>}
                 </button>
               </div>
             </div>
           </div>
-
-          {error && <div className="error-message">{error}</div>}
         </div>
       </div>
     </ApprenantLayout>

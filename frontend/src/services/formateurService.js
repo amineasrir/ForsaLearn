@@ -1,7 +1,16 @@
 import API from "../api/axios";
 
 export const registerFormateur = (data) => {
-  return API.post("auth/register/formateur", data);
+  const config =
+    typeof FormData !== "undefined" && data instanceof FormData
+      ? {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      : undefined;
+
+  return API.post("auth/register/formateur", data, config);
 };
 
 export const loginFormateur = (data) => {
@@ -120,6 +129,20 @@ export const getFormateurConversations = (params = {}) => {
 
 export const getFormateurConversationMessages = (conversationId) => {
   return API.get(`messages/conversations/${conversationId}/messages`);
+};
+
+export const createFormateurSupportTicket = (payload) => {
+  return API.post('messages/conversations', {
+    type: 'support',
+    subject: payload.subject,
+    category: payload.category,
+    priority: payload.priority,
+    initialMessage: payload.message
+  });
+};
+
+export const updateFormateurSupportTicketStatus = (conversationId, status) => {
+  return API.patch(`messages/support-tickets/${conversationId}/status`, { status });
 };
 
 export const sendFormateurConversationMessage = (conversationId, payload) => {
