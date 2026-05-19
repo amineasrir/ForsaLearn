@@ -628,7 +628,7 @@ body {
   gap: 1rem;
   padding: 1rem 1.25rem;
   align-items: center;
-  grid-template-columns: 2.6fr 0.8fr 0.8fr;
+  grid-template-columns: 2.8fr 0.8fr 0.8fr 1fr;
 }
 
 .courses-table .table-header {
@@ -660,7 +660,7 @@ body {
 
 .formateur-courses-header,
 .formateur-courses-row {
-  grid-template-columns: 2.6fr 0.8fr 0.8fr;
+  grid-template-columns: 2.8fr 0.8fr 0.8fr 1fr;
 }
 
 .formateur-earnings-header,
