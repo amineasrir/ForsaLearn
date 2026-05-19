@@ -15,6 +15,7 @@ import {
   createConversation
 } from '../../services/apprenentService';
 import { getMediaUrl } from '../../utils/mediaUrl';
+import { getUserAvatar } from '../../utils/userAvatar';
 import './CourseDetails.css';
 
 const CourseDetails = () => {
@@ -279,7 +280,7 @@ const CourseDetails = () => {
           {/* Instructor */}
           <div className="cd-instructor-row">
             <img
-              src={getMediaUrl(course.formateur?.profileImage) || require('../../assets/image/student/ava.jpg')}
+              src={getUserAvatar(course.formateur)}
               alt={course.formateur?.fullName}
               className="cd-inst-avatar"
             />
@@ -438,7 +439,7 @@ const CourseDetails = () => {
           <h2 className="cd-section-h2">{t('apprenant.aboutInstructor')}</h2>
           <div className="cd-instructor-card">
             <img
-              src={getMediaUrl(course.formateur.profileImage) || require('../../assets/image/student/ava.jpg')}
+              src={getUserAvatar(course.formateur)}
               alt={course.formateur.fullName}
               className="cd-inst-big-avatar"
             />

@@ -6,6 +6,7 @@ import CardP from '../../components/apprenant/CardP';
 import { FaBook, FaClock } from 'react-icons/fa';
 import { getApprenantProfile, getEnrolledCourses } from '../../services/apprenentService';
 import { getMediaUrl } from '../../utils/mediaUrl';
+import { getUserAvatar } from '../../utils/userAvatar';
 import './apprenant.css';
 
 const getStatusInfo = (progress, t) => {
@@ -99,7 +100,7 @@ const ApprenantEnrolled = () => {
                 <div className="ec-card__body">
                   <div className="ec-card__meta">
                     <img
-                      src={course.formateur?.profileImage || require('../../assets/image/student/ava.jpg')}
+                      src={getUserAvatar(course.formateur)}
                       alt={course.formateur?.fullName}
                       className="ec-card__avatar"
                     />

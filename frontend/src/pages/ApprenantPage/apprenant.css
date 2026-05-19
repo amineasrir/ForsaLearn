@@ -3206,6 +3206,251 @@ body {
 
 .support-controls {
   display: flex;
+  flex-direction: column;
+  padding: 1rem;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.2s;
+  margin-bottom: 0.5rem;
+}
+
+.conv-item:hover,
+.conv-item.active {
+  background: rgba(255, 70, 103, 0.1);
+}
+
+.conv-item-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+
+.conv-student-name {
+  font-weight: 600;
+  color: var(--text);
+}
+
+.conv-time {
+  font-size: 0.8rem;
+  color: var(--muted);
+}
+
+.conv-preview {
+  font-size: 0.9rem;
+  color: var(--muted);
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.conv-unread {
+  background: var(--primary);
+  color: white;
+  border-radius: 50%;
+  width: 20px;
+  height: 20px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.75rem;
+  font-weight: 600;
+  margin-left: auto;
+}
+
+.chat-window {
+  background: var(--card);
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.chat-header {
+  padding: 1rem 1.5rem;
+  border-bottom: 1px solid var(--border);
+  background: #f9fafb;
+}
+
+.chat-header h3 {
+  margin: 0;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.chat-header p {
+  margin: 0.25rem 0 0;
+  font-size: 0.85rem;
+  color: var(--muted);
+}
+
+.chat-body {
+  flex: 1;
+  padding: 1rem;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.chat-empty-state {
+  text-align: center;
+  color: var(--muted);
+  padding: 2rem;
+  font-style: italic;
+}
+
+.chat-message {
+  display: flex;
+  width: 100%;
+  justify-content: flex-start;
+}
+
+.chat-message.sent {
+  justify-content: flex-end;
+}
+
+.chat-bubble {
+  width: fit-content;
+  max-width: min(70%, 34rem);
+  min-width: 0;
+  padding: 0.75rem 1rem;
+  border-radius: 18px;
+  position: relative;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
+.chat-bubble > div {
+  margin: 0;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
+.chat-message.sent .chat-bubble {
+  background: var(--primary);
+  color: white;
+}
+
+.chat-message.received .chat-bubble {
+  background: #f1f5f9;
+  color: var(--text);
+}
+
+.chat-meta {
+  font-size: 0.75rem;
+  opacity: 0.7;
+  margin-top: 0.25rem;
+  display: block;
+}
+
+.chat-input {
+  padding: 1rem 1.5rem;
+  border-top: 1px solid var(--border);
+  background: #f9fafb;
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+}
+
+.chat-input input {
+  flex: 1;
+  padding: 0.75rem 1rem;
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  font-size: 0.95rem;
+}
+
+.chat-input button {
+  background: var(--primary);
+  color: white;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: 20px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.chat-input button:hover {
+  background: #d83057;
+}
+
+.chat-input button:disabled {
+  background: var(--muted);
+  cursor: not-allowed;
+}
+
+/* ensure the results/content area takes full width */
+.course-grid-section {
+  width: 100%;
+}
+
+/* override dashboard container for course grid page to occupy full width */
+
+
+.course-filters {
+  width: 250px;
+  background: var(--card);
+  padding: 1rem;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+}
+
+.filter-section {
+  margin-bottom: 1rem;
+}
+
+.filter-section h4 {
+  margin-bottom: 0.5rem;
+  font-size: 0.95rem;
+}
+
+.clear-filters {
+  background: transparent;
+  border: none;
+  color: #ff4667;
+  cursor: pointer;
+  font-size: 0.9rem;
+}
+
+.course-grid-section {
+  flex: 1;
+}
+
+.course-grid-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.view-toggle button {
+  background: transparent;
+  border: none;
+  font-size: 1.2rem;
+  cursor: pointer;
+}
+
+.view-toggle .active {
+  color: #ff4667;
+}
+
+.sort-select,
+.course-search {
+  padding: 0.4rem 0.6rem;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+}
+
+.course-cards {
+  display: flex;
+  flex-wrap: wrap;
   gap: 1.5rem;
   margin-bottom: 2rem;
   align-items: center;

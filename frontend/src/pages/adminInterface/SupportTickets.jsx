@@ -21,6 +21,7 @@ import {
   sendAdminConversationMessage,
   updateAdminSupportTicketStatus
 } from '../../services/adminService';
+import { getUserAvatar } from '../../utils/userAvatar';
 
 const formatTime = (value) => {
   if (!value) return '';
@@ -387,7 +388,7 @@ const SupportTickets = () => {
                           <div key={message._id} className={`message ${isOwn ? 'own' : ''}`}>
                             {!isOwn && (
                               <img
-                                src={message.sender?.profilePicture || 'https://via.placeholder.com/32x32?text=U'}
+                                src={getUserAvatar(message.sender)}
                                 alt={message.sender?.fullName || 'User'}
                                 className="message-avatar"
                               />

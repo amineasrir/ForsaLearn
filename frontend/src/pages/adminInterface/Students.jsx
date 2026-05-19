@@ -22,6 +22,7 @@ import Header from '../../components/admin/Header';
 import Sidebar from '../../components/admin/Sidebar';
 import ProfileCard from '../../components/admin/ProfileCard';
 import { getAdminProfile, getAdminUsers } from '../../services/adminService';
+import { getUserAvatar } from '../../utils/userAvatar';
 
 const statusOptions = [
   { value: 'all', label: 'All Status' },
@@ -249,7 +250,7 @@ const Students = () => {
                       <div className="student-header">
                         <div className="student-avatar-wrapper">
                           <img
-                            src={student.profilePicture || 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200'}
+                            src={getUserAvatar(student)}
                             alt={student.fullName}
                             className="student-avatar"
                           />

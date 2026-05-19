@@ -6,6 +6,11 @@ export const AUTH_KEYS = {
 };
 
 export const setAuthSession = ({ token, user }) => {
+  if (user?.role === "admin") {
+    localStorage.setItem(AUTH_KEYS.adminToken, token || "");
+    localStorage.setItem(AUTH_KEYS.adminUser, JSON.stringify(user));
+  }
+
   if (token) {
     localStorage.setItem(AUTH_KEYS.token, token);
   }

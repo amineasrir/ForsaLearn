@@ -4,6 +4,7 @@ import SidebarF from "../../components/formateur/sidebarF";
 import logo_rem from "../../assets/image/home_page/logo_rem.png";
 import { FaDownload, FaEye } from "react-icons/fa";
 import { useTranslation } from "react-i18next";
+import i18nInstance from "../../i18n";
 import {
   getFormateurCourse,
   getFormateurCourses,
@@ -57,8 +58,29 @@ const countQuizAttempts = (course, quizId) => {
 };
 
 const FormateurQuizResult = () => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [courses, setCourses] = useState([]);
+
+  const changeLanguage = () => {
+    const lang = (i18n && i18n.language === 'en') ? 'fr' : 'en';
+    const instance = (i18n && typeof i18n.changeLanguage === 'function') ? i18n : i18nInstance;
+    if (instance && typeof instance.changeLanguage === 'function') {
+      instance.changeLanguage(lang);
+    }
+  };
+
+  const getFlagClass = (lang) => {
+    switch (lang) {
+      case 'en':
+        return 'fi fi-gb';
+      case 'fr':
+        return 'fi fi-fr';
+      default:
+        return 'fi fi-gl';
+    }
+  };
+
+  const currentLang = (i18n && i18n.language) ? i18n.language : 'en';
   const [course, setCourse] = useState(null);
   const [selectedCourse, setSelectedCourse] = useState("");
   const [selectedQuiz, setSelectedQuiz] = useState("");
@@ -264,23 +286,23 @@ const FormateurQuizResult = () => {
     }
 
     const headers = [
-      "Student Name",
-      "Email",
-      "Score",
-      "Percentage",
-      "Status",
-      "Attempt Number",
-      "Completed At",
+      t("formateur.quizResults.studentNameHeader"),
+      t("formateur.quizResults.emailHeader"),
+      t("formateur.quizResults.scoreHeader"),
+      t("formateur.quizResults.percentageHeader"),
+      t("formateur.quizResults.statusHeader"),
+      t("formateur.quizResults.attemptsHeader"),
+      t("formateur.quizResults.completedAtHeader"),
     ];
 
     const rows = filteredResults.map((result) => [
-      getStudentName(result.student) || "Unknown",
-      result.student?.email || "N/A",
+      getStudentName(result.student) || t("formateur.quizResults.unknown"),
+      result.student?.email || t("formateur.na"),
       `${result.score || 0}/${result.totalPoints || 0}`,
       `${result.percentageScore || 0}%`,
-      result.passed ? "Passed" : "Failed",
+      result.passed ? t("formateur.quizResults.status.passed") : t("formateur.quizResults.status.failed"),
       result.attemptNumber || 1,
-      result.completedAt ? new Date(result.completedAt).toLocaleString() : "In Progress",
+      result.completedAt ? new Date(result.completedAt).toLocaleString() : t("formateur.quizResults.status.inProgress"),
     ]);
 
     const csvContent = [
@@ -323,8 +345,12 @@ const FormateurQuizResult = () => {
             <img src={logo_rem} alt="ForsaLearn" className="navbar-dashboard-logo" />
           </div>
 
-          <div className="navbar-dashboard-right" />
-        </div>
+          <div className="navbar-dashboard-right">
+            <button className="lang-btn-dashboard" onClick={changeLanguage}>
+              <span className={getFlagClass(currentLang)} style={{ fontSize: '20px' }}></span>
+              <span>{currentLang.toUpperCase()}</span>
+            </button>
+          </div>        </div>
       </nav>
 
       <div className="dashboard-container">
@@ -408,19 +434,19 @@ const FormateurQuizResult = () => {
 
                       <div className="results-stats-summary">
                         <div className="stat">
-                          <label>Total Attempts</label>
+                          <label>{t("formateur.quizResults.totalAttempts")}</label>
                           <p>{stats.totalAttempts}</p>
                         </div>
                         <div className="stat">
-                          <label>Completed</label>
+                          <label>{t("formateur.quizResults.completed")}</label>
                           <p>{stats.completedAttempts}</p>
                         </div>
                         <div className="stat">
-                          <label>Avg Score</label>
+                          <label>{t("formateur.quizResults.averageScore")}</label>
                           <p>{stats.averageScore}%</p>
                         </div>
                         <div className="stat">
-                          <label>Pass Rate</label>
+                          <label>{t("formateur.quizResults.passRate")}</label>
                           <p>{stats.passRate}%</p>
                         </div>
                       </div>
@@ -490,7 +516,7 @@ const FormateurQuizResult = () => {
 
                                 return (
                                   <tr key={`${result.lessonId}-${result.attemptNumber}-${index}`} className="result-row">
-                                    <td className="student-name">
+                                    <td className="student-name" style={{ fontSize: "0.95rem" }}>
                                       {getStudentName(result.student) ||
                                         t("formateur.quizResults.unknown")}
                                     </td>
@@ -508,7 +534,7 @@ const FormateurQuizResult = () => {
                                         {result.percentageScore || 0}%
                                       </span>
                                     </td>
-                                    <td className="status">
+                                    <td className="status-cell">
                                       <span
                                         className={`status-label ${
                                           result.passed ? "passed" : "failed"

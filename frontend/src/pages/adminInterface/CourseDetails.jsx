@@ -20,6 +20,7 @@ import {
   getAdminCourseDetails,
   getAdminProfile,
 } from '../../services/adminService';
+import { getUserAvatar } from '../../utils/userAvatar';
 
 /* ─────────────────────────── helpers ─────────────────────────── */
 const formatDuration = (minutes = 0) => {
@@ -251,10 +252,7 @@ const CourseDetails = () => {
                     <h3 className="cd-card-title">Instructor</h3>
                     <div className="cd-instr-row">
                       <img
-                        src={
-                          course.formateur?.profilePicture ||
-                          'https://via.placeholder.com/60'
-                        }
+                        src={getUserAvatar(course.formateur)}
                         alt={course.formateur?.fullName || 'Instructor'}
                         className="cd-instr-avatar"
                       />
@@ -322,10 +320,7 @@ const CourseDetails = () => {
                             className="cd-student-row"
                           >
                             <img
-                              src={
-                                en.student?.profilePicture ||
-                                'https://via.placeholder.com/38'
-                              }
+                              src={getUserAvatar(en.student)}
                               alt={en.student?.fullName || 'Student'}
                               className="cd-student-avatar"
                             />

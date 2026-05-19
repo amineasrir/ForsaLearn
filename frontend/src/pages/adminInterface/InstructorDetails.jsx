@@ -28,6 +28,7 @@ import {
   getAdminUserDetails,
   rejectFormateur
 } from '../../services/adminService';
+import { getUserAvatar } from '../../utils/userAvatar';
 
 const formatDate = (value) => {
   if (!value) return 'Not available';
@@ -148,7 +149,7 @@ const InstructorDetails = () => {
                   <div className="aid-hero-panel">
                     <div className="aid-hero-avatar-wrap">
                       <img
-                        src={instructor.profilePicture || 'https://via.placeholder.com/120'}
+                        src={getUserAvatar(instructor)}
                         alt={instructor.fullName}
                         className="aid-hero-avatar"
                       />

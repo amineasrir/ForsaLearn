@@ -303,24 +303,38 @@ router.post('/profile/picture',
         });
       }
       
-      // Update user profile picture
-      const user = await User.findById(req.user.id);
-      
-      // Delete old profile picture if exists
-      if (user.profilePicture && user.profilePicture !== 'default-avatar.jpg') {
-        const oldPath = path.join(__dirname, '..', user.profilePicture);
-        deleteFile(oldPath);
+      // Read current picture first, then update only this field without re-validating
+      // the whole document. This avoids failures on older seeded accounts that may
+      // have legacy missing fields unrelated to profile pictures.
+      const currentUser = await User.findById(req.user.id).select('profilePicture');
+
+      if (!currentUser) {
+        deleteFile(req.file.path);
+        return res.status(404).json({
+          success: false,
+          message: 'User not found'
+        });
       }
       
-      user.profilePicture = `/uploads/profiles/${req.file.filename}`;
-      await user.save();
+      // Delete old profile picture if exists
+      if (currentUser.profilePicture && currentUser.profilePicture !== 'default-avatar.jpg') {
+        const oldPath = path.join(__dirname, '..', currentUser.profilePicture);
+        deleteFile(oldPath);
+      }
+
+      const nextProfilePicture = `/uploads/profiles/${req.file.filename}`;
+      await User.findByIdAndUpdate(
+        req.user.id,
+        { profilePicture: nextProfilePicture },
+        { new: false }
+      );
       
       res.status(200).json({
         success: true,
         message: 'Profile picture updated successfully',
         data: {
           filename: req.file.filename,
-          url: user.profilePicture,
+          url: nextProfilePicture,
           size: formatFileSize(getFileSize(req.file.path))
         }
       });

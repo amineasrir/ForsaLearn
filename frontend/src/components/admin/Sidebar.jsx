@@ -5,18 +5,15 @@ import {
   FaCog, FaSignOutAlt, FaBookReader, FaUserTie 
 } from 'react-icons/fa';
 import '../../styles/sidebar-admin.css';
+import { clearUserSession } from '../../utils/authStorage';
 
 const Sidebar = () => {
   const location = useLocation();
   const path = location.pathname;
 
   const handleLogout = () => {
-    const token = localStorage.getItem('adminToken');
-    if (token) {
-      localStorage.removeItem('adminToken');
-      localStorage.removeItem('adminUser');
-      window.location.href = '/admin/login';
-    }
+    clearUserSession();
+    window.location.href = '/signin';
   };
 
   const makeItem = (to, icon, text) => (

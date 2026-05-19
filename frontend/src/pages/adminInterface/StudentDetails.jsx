@@ -23,6 +23,7 @@ import Header from '../../components/admin/Header';
 import Sidebar from '../../components/admin/Sidebar';
 import ProfileCard from '../../components/admin/ProfileCard';
 import { getAdminProfile, getAdminUserDetails } from '../../services/adminService';
+import { getUserAvatar } from '../../utils/userAvatar';
 
 const formatDate = (value) => {
   if (!value) return 'Not available';
@@ -120,7 +121,7 @@ const StudentDetails = () => {
                   <div className="asd-hero-panel">
                     <div className="asd-avatar-wrap">
                       <img
-                        src={student.profilePicture || 'https://via.placeholder.com/120'}
+                        src={getUserAvatar(student)}
                         alt={student.fullName}
                         className="asd-avatar"
                       />

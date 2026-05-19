@@ -2,9 +2,10 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import '../../styles/formateur.css';
+import { getUserAvatar } from '../../utils/userAvatar';
 
 const ProfilSection = ({
-  formateur = { avatar: 'https://via.placeholder.com/60', name: 'Instructor Name' },
+  formateur = { avatar: '', name: 'Instructor Name' },
   actionLabel,
   onAction
 }) => {
@@ -24,7 +25,7 @@ const ProfilSection = ({
     <div>
       <div className="profile-section" style={{marginTop:"20px"}}>
             <div className="profile-content">
-              <img src={formateur.avatar} alt="Profile" className="profile-avatar" />
+              <img src={getUserAvatar(formateur.avatar)} alt="Profile" className="profile-avatar" />
               <div className="profile-info">
                 <h1>{formateur.name}</h1>
                 <span className="instructor-badge">{t('formateur.profileSection.instructorBadge')}</span>

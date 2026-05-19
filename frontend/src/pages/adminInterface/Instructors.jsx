@@ -28,6 +28,7 @@ import {
   getPendingFormateurs,
   rejectFormateur
 } from '../../services/adminService';
+import { getUserAvatar } from '../../utils/userAvatar';
 
 const fields = [
   'Web Development',
@@ -261,7 +262,7 @@ const Instructors = () => {
                     <div className="instructor-header">
                       <div className="instructor-avatar-wrapper">
                         <img
-                          src={instructor.profilePicture || 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=200'}
+                          src={getUserAvatar(instructor)}
                           alt={instructor.fullName}
                           className="instructor-avatar"
                         />

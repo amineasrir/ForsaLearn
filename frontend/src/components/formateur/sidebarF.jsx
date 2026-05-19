@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { FaChartBar, FaUser, FaBook, FaUsers, FaPlus, FaClipboardList, FaTrophy, FaDollarSign, FaEnvelope, FaHeadset, FaCog, FaSignOutAlt } from 'react-icons/fa';
+import { FaChartBar, FaUser, FaBook, FaUsers, FaPlus, FaClipboardList, FaTrophy, FaDollarSign, FaEnvelope, FaHeadset, FaCog, FaSignOutAlt, FaBars } from 'react-icons/fa';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { clearUserSession } from '../../utils/authStorage';
@@ -10,6 +10,7 @@ const SidebarF = ({ activeMenu: propActive, setActiveMenu: propSetActive }) => {
   const navigate = useNavigate();
   const location = useLocation();
   const [internalActive, setInternalActive] = useState('dashboard');
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   const handleLogout = () => {
     const token = localStorage.getItem('authToken');
@@ -47,10 +48,34 @@ const SidebarF = ({ activeMenu: propActive, setActiveMenu: propSetActive }) => {
 
   return (
     <div>
-        <aside className="formateur-sidebar">
-                <div className="sidebar-section">
-                  <h3>{t('formateur.sidebar.viewMenu')}</h3>
-                  <ul className="menu-list">
+      <button
+        className="mobile-menu-btn"
+        type="button"
+        aria-label={t('formateur.sidebar.openMenu')}
+        onClick={() => setSidebarOpen(true)}
+      >
+        <FaBars />
+      </button>
+
+      <div
+        className={`sidebar-overlay${sidebarOpen ? ' active' : ''}`}
+        onClick={() => setSidebarOpen(false)}
+      />
+
+      <aside className={`formateur-sidebar${sidebarOpen ? ' open' : ''}`}>
+        <div className="sidebar-header">
+          <button
+            type="button"
+            className="sidebar-close-btn"
+            aria-label={t('formateur.sidebar.closeMenu')}
+            onClick={() => setSidebarOpen(false)}
+          >
+            ×
+          </button>
+        </div>
+        <div className="sidebar-section">
+          <h3>{t('formateur.sidebar.viewMenu')}</h3>
+          <ul className="menu-list">
                     {menuItems.map((item) => {
                       const IconComponent = item.icon;
                       return (
@@ -59,6 +84,7 @@ const SidebarF = ({ activeMenu: propActive, setActiveMenu: propSetActive }) => {
                             className={`menu-item ${activeMenu === item.id ? 'active' : ''}`}
                             onClick={() => {
                               setActiveMenu(item.id);
+                              setSidebarOpen(false);
                               if (item.path) navigate(item.path);
                             }}
                           >
@@ -89,7 +115,10 @@ const SidebarF = ({ activeMenu: propActive, setActiveMenu: propSetActive }) => {
                     <li>
                       <button 
                         className="menu-item"
-                        onClick={handleLogout}
+                        onClick={() => {
+                          setSidebarOpen(false);
+                          handleLogout();
+                        }}
                       >
                         <span className="menu-icon"><FaSignOutAlt /></span>
                         <span className="menu-label">{t('formateur.sidebar.logout')}</span>

@@ -1,16 +1,17 @@
 import React from 'react';
+import { getUserAvatar } from '../../utils/userAvatar';
 
 const ProfileCard = ({
   name = 'Administrator',
   role = 'Administrateur',
-  image = 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100&h=100&fit=crop'
+  image
 }) => {
   return (
     <div className="profile-card">
       <div className="profile-content">
         <div className="profile-avatar-wrapper">
           <img
-            src={image}
+            src={getUserAvatar(image)}
             alt={name}
             className="profile-avatar"
           />
