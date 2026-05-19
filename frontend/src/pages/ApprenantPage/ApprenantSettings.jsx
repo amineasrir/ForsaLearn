@@ -10,49 +10,49 @@ import './apprenant.css';
 const TAB_CONFIG = {
   profile: {
     id: 'profile',
-    label: 'Edit Profile',
+    labelKey: 'apprenant.editProfile',
     icon: <FaUser />,
-    title: 'Personal Details',
-    subtitle: 'Edit your personal information',
+    titleKey: 'apprenant.personalDetails',
+    subtitleKey: 'apprenant.editPersonalInformation',
     hasPhoto: true,
     hasDelete: true
   },
   security: {
     id: 'security',
-    label: 'Security',
+    labelKey: 'apprenant.security',
     icon: <FaLock />,
-    title: 'Change Password',
-    subtitle: 'Update your password to keep your account secure'
+    titleKey: 'apprenant.changePassword',
+    subtitleKey: 'apprenant.updatePasswordSecure'
   },
   social: {
     id: 'social',
-    label: 'Social Profiles',
+    labelKey: 'apprenant.socialProfiles',
     icon: <FaShareAlt />,
-    title: 'Social Profiles',
-    subtitle: 'Connect your social media accounts',
+    titleKey: 'apprenant.socialProfiles',
+    subtitleKey: 'apprenant.connectSocialAccounts',
     comingSoon: true
   },
   linked: {
     id: 'linked',
-    label: 'Linked Accounts',
+    labelKey: 'apprenant.linkedAccounts',
     icon: <FaLink />,
-    title: 'Linked Accounts',
-    subtitle: 'Manage your connected accounts',
+    titleKey: 'apprenant.linkedAccounts',
+    subtitleKey: 'apprenant.manageConnectedAccounts',
     comingSoon: true
   },
   notifs: {
     id: 'notifs',
-    label: 'Notifications',
+    labelKey: 'apprenant.notifications',
     icon: <FaBell />,
-    title: 'Notifications',
-    subtitle: 'Choose what notifications you want to receive'
+    titleKey: 'apprenant.notifications',
+    subtitleKey: 'apprenant.chooseNotifications'
   },
   billing: {
     id: 'billing',
-    label: 'Billing Address',
+    labelKey: 'apprenant.billingAddress',
     icon: <FaMapMarkerAlt />,
-    title: 'Billing Address',
-    subtitle: 'Update your billing information',
+    titleKey: 'apprenant.billingAddress',
+    subtitleKey: 'apprenant.updateBillingInformation',
     comingSoon: true
   }
 };
@@ -60,35 +60,35 @@ const TAB_CONFIG = {
 // Dynamic form field configuration
 const FORM_CONFIG = {
   profile: [
-    { name: 'firstName', label: 'First Name', type: 'text', required: true, placeholder: 'First Name', grid: 'half' },
-    { name: 'lastName', label: 'Last Name', type: 'text', required: true, placeholder: 'Last Name', grid: 'half' },
-    { name: 'userName', label: 'User Name', type: 'text', required: true, placeholder: 'Username', grid: 'half' },
-    { name: 'phoneNumber', label: 'Phone Number', type: 'tel', required: true, placeholder: 'Phone', grid: 'half' },
+    { name: 'firstName', labelKey: 'apprenant.firstName', type: 'text', required: true, placeholderKey: 'apprenant.firstName', grid: 'half' },
+    { name: 'lastName', labelKey: 'apprenant.lastName', type: 'text', required: true, placeholderKey: 'apprenant.lastName', grid: 'half' },
+    { name: 'userName', labelKey: 'apprenant.userName', type: 'text', required: true, placeholderKey: 'apprenant.userName', grid: 'half' },
+    { name: 'phoneNumber', labelKey: 'apprenant.phoneNumber', type: 'tel', required: true, placeholderKey: 'apprenant.phone', grid: 'half' },
     {
       name: 'gender',
-      label: 'Gender',
+      labelKey: 'apprenant.gender',
       type: 'select',
       required: true,
       options: [
-        { value: '', label: 'Select' },
-        { value: 'male', label: 'Male' },
-        { value: 'female', label: 'Female' },
-        { value: 'other', label: 'Other' }
+        { value: '', labelKey: 'apprenant.select' },
+        { value: 'male', labelKey: 'apprenant.male' },
+        { value: 'female', labelKey: 'apprenant.female' },
+        { value: 'other', labelKey: 'apprenant.other' }
       ],
       grid: 'half'
     },
-    { name: 'dob', label: 'Date of Birth', type: 'date', required: true, grid: 'half' },
-    { name: 'bio', label: 'Bio', type: 'textarea', required: true, placeholder: 'Tell us about yourself...', rows: 4, grid: 'full' }
+    { name: 'dob', labelKey: 'apprenant.dateOfBirth', type: 'date', required: true, grid: 'half' },
+    { name: 'bio', labelKey: 'apprenant.bio', type: 'textarea', required: true, placeholderKey: 'apprenant.tellUsAboutYourself', rows: 4, grid: 'full' }
   ],
   security: [
-    { name: 'current', label: 'Current Password', type: 'password', required: true, placeholder: 'Current password', grid: 'full' },
-    { name: 'newPass', label: 'New Password', type: 'password', required: true, placeholder: 'New password', grid: 'half' },
-    { name: 'confirm', label: 'Confirm Password', type: 'password', required: true, placeholder: 'Confirm password', grid: 'half' }
+    { name: 'current', labelKey: 'apprenant.currentPassword', type: 'password', required: true, placeholderKey: 'apprenant.currentPassword', grid: 'full' },
+    { name: 'newPass', labelKey: 'apprenant.newPassword', type: 'password', required: true, placeholderKey: 'apprenant.newPassword', grid: 'half' },
+    { name: 'confirm', labelKey: 'apprenant.confirmPassword', type: 'password', required: true, placeholderKey: 'apprenant.confirmPassword', grid: 'half' }
   ],
   notifs: [
-    { name: 'email', label: 'Email Notifications', type: 'checkbox', description: 'Receive notifications via email' },
-    { name: 'sms', label: 'SMS Notifications', type: 'checkbox', description: 'Receive notifications via SMS' },
-    { name: 'push', label: 'Push Notifications', type: 'checkbox', description: 'Receive push notifications' }
+    { name: 'email', labelKey: 'apprenant.emailNotifications', type: 'checkbox', descriptionKey: 'apprenant.receiveNotificationsViaEmail' },
+    { name: 'sms', labelKey: 'apprenant.smsNotifications', type: 'checkbox', descriptionKey: 'apprenant.receiveNotificationsViaSMS' },
+    { name: 'push', labelKey: 'apprenant.pushNotifications', type: 'checkbox', descriptionKey: 'apprenant.receivePushNotifications' }
   ]
 };
 
@@ -187,16 +187,16 @@ const ApprenantSettings = () => {
 
     config.forEach(field => {
       if (field.required && (!data[field.name] || data[field.name].toString().trim() === '')) {
-        newErrors[field.name] = `${field.label} is required`;
+        newErrors[field.name] = `${t(field.labelKey || field.label)} ${t('apprenant.isRequired')}`;
       }
 
       // Special validations
       if (field.name === 'confirm' && data.newPass !== data.confirm) {
-        newErrors.confirm = 'Passwords do not match';
+        newErrors.confirm = t('apprenant.passwordsDoNotMatch');
       }
 
       if (field.name === 'newPass' && data.newPass && data.newPass.length < 6) {
-        newErrors.newPass = 'Password must be at least 6 characters';
+        newErrors.newPass = t('apprenant.passwordMustBeAtLeast6');
       }
     });
 
@@ -250,7 +250,7 @@ const ApprenantSettings = () => {
       setTimeout(() => setSaved(false), 3000);
     } catch (error) {
       console.error('Save failed:', error);
-      setErrors({ general: error.response?.data?.message || 'Failed to save. Please try again.' });
+      setErrors({ general: error.response?.data?.message || t('apprenant.failedToSave') });
     } finally {
       setSaving(false);
     }
@@ -265,7 +265,7 @@ const ApprenantSettings = () => {
     return (
       <div key={field.name} className={fieldClass}>
         <label>
-          {field.label}
+          {t(field.labelKey || field.label)}
           {field.required && <span className="req">*</span>}
         </label>
 
@@ -274,7 +274,7 @@ const ApprenantSettings = () => {
             name={field.name}
             value={value}
             onChange={(e) => handleFieldChange(field.name, e.target.value)}
-            placeholder={field.placeholder}
+            placeholder={field.placeholderKey ? t(field.placeholderKey) : field.placeholder}
             rows={field.rows || 3}
           />
         ) : field.type === 'select' ? (
@@ -285,7 +285,7 @@ const ApprenantSettings = () => {
           >
             {field.options?.map(option => (
               <option key={option.value} value={option.value}>
-                {option.label}
+                {t(option.labelKey || option.label)}
               </option>
             ))}
           </select>
@@ -296,7 +296,7 @@ const ApprenantSettings = () => {
               checked={value || false}
               onChange={(e) => handleFieldChange(field.name, e.target.checked)}
             />
-            <span>{field.description}</span>
+            <span>{field.descriptionKey ? t(field.descriptionKey) : field.description}</span>
           </label>
         ) : (
           <input
@@ -304,7 +304,7 @@ const ApprenantSettings = () => {
             name={field.name}
             value={value}
             onChange={(e) => handleFieldChange(field.name, e.target.value)}
-            placeholder={field.placeholder}
+            placeholder={field.placeholderKey ? t(field.placeholderKey) : field.placeholder}
           />
         )}
 
@@ -319,7 +319,7 @@ const ApprenantSettings = () => {
   if (loading) {
     return (
       <ApprenantLayout>
-        <div className="sett-loading">Loading settings...</div>
+        <div className="sett-loading">{t('apprenant.loadingSettings')}</div>
       </ApprenantLayout>
     );
   }
@@ -337,7 +337,7 @@ const ApprenantSettings = () => {
               onClick={() => handleTabChange(tab.id)}
             >
               {tab.icon}
-              <span>{tab.label}</span>
+              <span>{t(tab.labelKey || tab.label)}</span>
             </button>
           ))}
         </div>
@@ -352,15 +352,15 @@ const ApprenantSettings = () => {
           {/* Success message */}
           {saved && (
             <div className="sett-success-message">
-              <FaCheck /> Settings saved successfully!
+              <FaCheck /> {t('apprenant.settingsSavedSuccessfully')}
             </div>
           )}
 
           {/* Dynamic content based on tab */}
           {currentTabConfig.comingSoon ? (
             <div className="sett-coming-soon">
-              <h3>{currentTabConfig.title}</h3>
-              <p>This feature is coming soon.</p>
+              <h3>{t(currentTabConfig.titleKey || currentTabConfig.title)}</h3>
+              <p>{t('apprenant.featureComingSoon')}</p>
             </div>
           ) : (
             <>
@@ -369,17 +369,17 @@ const ApprenantSettings = () => {
                 <div className="sett-photo-row">
                   <img
                     src={user?.profileImage || require('../../assets/image/student/ava.jpg')}
-                    alt="Profile"
+                    alt={t('apprenant.profilePhoto')}
                     className="sett-avatar"
                   />
                   <div>
-                    <p className="sett-photo-title">Profile Photo</p>
-                    <p className="sett-photo-hint">PNG or JPG no bigger than 800px width and height</p>
+                    <p className="sett-photo-title">{t('apprenant.profilePhoto')}</p>
+                    <p className="sett-photo-hint">{t('apprenant.profilePhotoHint')}</p>
                     <div className="sett-photo-btns">
                       <button className="sett-btn-upload">
-                        <FaUpload /> Upload
+                        <FaUpload /> {t('apprenant.upload')}
                       </button>
-                      <button className="sett-btn-del-photo">Delete</button>
+                      <button className="sett-btn-del-photo">{t('apprenant.delete')}</button>
                     </div>
                   </div>
                 </div>
@@ -387,9 +387,9 @@ const ApprenantSettings = () => {
 
               {/* Dynamic section title */}
               <h3 className="sett-section-title">
-                {currentTabConfig.title}
-                {currentTabConfig.subtitle && (
-                  <span className="sett-section-sub">{currentTabConfig.subtitle}</span>
+                {t(currentTabConfig.titleKey || currentTabConfig.title)}
+                {currentTabConfig.subtitleKey && (
+                  <span className="sett-section-sub">{t(currentTabConfig.subtitleKey)}</span>
                 )}
               </h3>
 
@@ -407,22 +407,22 @@ const ApprenantSettings = () => {
                 disabled={saving}
               >
                 {saving ? (
-                  <>Saving...</>
+                  <>{t('apprenant.saving')}</>
                 ) : saved ? (
-                  <><FaCheck /> Saved!</>
+                  <><FaCheck /> {t('apprenant.saved')}</>
                 ) : (
-                  <><FaSave /> {activeTab === 'security' ? 'Update Password' : 'Save Changes'}</>
+                  <><FaSave /> {activeTab === 'security' ? t('apprenant.updatePassword') : t('apprenant.saveChanges')}</>
                 )}
               </button>
 
               {/* Delete account section for profile tab */}
               {currentTabConfig.hasDelete && (
                 <div className="sett-danger-zone">
-                  <h3>Delete Account</h3>
-                  <p className="sett-danger-title">Are you sure you want to delete your account?</p>
-                  <p className="sett-danger-desc">This action permanently removes your account and all associated data.</p>
+                  <h3>{t('apprenant.deleteAccount')}</h3>
+                  <p className="sett-danger-title">{t('apprenant.deleteAccountConfirmation')}</p>
+                  <p className="sett-danger-desc">{t('apprenant.deleteAccountWarning')}</p>
                   <button className="sett-btn-danger">
-                    <FaTrash /> Delete Account
+                    <FaTrash /> {t('apprenant.deleteAccount')}
                   </button>
                 </div>
               )}

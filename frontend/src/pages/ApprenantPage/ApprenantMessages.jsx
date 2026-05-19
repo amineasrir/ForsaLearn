@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useSearchParams } from 'react-router-dom';
 import ApprenantLayout from '../../components/apprenant/ApprenantLayout';
 import CardP from '../../components/apprenant/CardP';
 import '../../styles/formateur.css';
@@ -54,6 +55,8 @@ const getLastMessagePreview = (conversation) => {
 
 const ApprenantMessages = () => {
   const { t } = useTranslation();
+  const [searchParams] = useSearchParams();
+  const requestedConversationId = searchParams.get('conversationId');
   const [user, setUser] = useState(null);
   const [conversations, setConversations] = useState([]);
   const [activeConvId, setActiveConvId] = useState(null);
@@ -80,7 +83,7 @@ const ApprenantMessages = () => {
 
         setUser(currentUser);
         setConversations(loadedConversations);
-        setActiveConvId(loadedConversations[0]?._id || null);
+        setActiveConvId(requestedConversationId || loadedConversations[0]?._id || null);
       } catch (err) {
         setError(err.response?.data?.message || t('errorOccurred'));
       } finally {

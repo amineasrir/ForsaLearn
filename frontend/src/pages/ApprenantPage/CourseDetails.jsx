@@ -11,7 +11,8 @@ import ApprenantLayout from '../../components/apprenant/ApprenantLayout';
 import CardP from '../../components/apprenant/CardP';
 import {
   getCourseDetails, enrollInCourse,
-  getCourseComments, postCourseComment, postCourseReview
+  getCourseComments, postCourseComment, postCourseReview,
+  createConversation
 } from '../../services/apprenentService';
 import { getMediaUrl } from '../../utils/mediaUrl';
 import './CourseDetails.css';
@@ -24,6 +25,7 @@ const CourseDetails = () => {
   const [course, setCourse] = useState(null);
   const [loading, setLoading] = useState(true);
   const [enrolling, setEnrolling] = useState(false);
+  const [contactingInstructor, setContactingInstructor] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const [comments, setComments] = useState([]);
@@ -52,6 +54,20 @@ const CourseDetails = () => {
   }, [id]);
 
   const handleEnroll = async () => {
+    if (!course) return;
+
+    const isFree = course.priceType === 'free' || Number(course.price || 0) === 0;
+    if (!isFree) {
+      navigate(`/apprenant/course/${id}/checkout`, {
+        state: {
+          isPaid: true,
+          price: course.price,
+          title: course.title,
+        },
+      });
+      return;
+    }
+
     try {
       setEnrolling(true);
       setError('');
@@ -67,7 +83,46 @@ const CourseDetails = () => {
   };
 
   const handleStartLearning = () => {
+    const isFree = course?.priceType === 'free' || Number(course?.price || 0) === 0;
+    if (!isFree) {
+      navigate(`/apprenant/course/${id}/checkout`, {
+        state: {
+          isPaid: true,
+          price: course?.price,
+          title: course?.title,
+        },
+      });
+      return;
+    }
+
     navigate(`/apprenant/course/${id}/learn`);
+  };
+
+  const handleContactInstructor = async () => {
+    if (!course?.formateur?._id) {
+      setError(t('apprenant.instructorUnavailable'));
+      return;
+    }
+
+    try {
+      setContactingInstructor(true);
+      setError('');
+      const response = await createConversation({
+        type: 'direct',
+        participantIds: [course.formateur._id],
+        courseId: id
+      });
+      const conversation = response.data?.data;
+      if (conversation?._id) {
+        navigate(`/apprenant/messages?conversationId=${conversation._id}`);
+      } else {
+        setError(t('apprenant.unableToStartChat'));
+      }
+    } catch (e) {
+      setError(e.response?.data?.message || t('apprenant.contactFailed'));
+    } finally {
+      setContactingInstructor(false);
+    }
   };
 
   const handleSubmitComment = async e => {
@@ -82,10 +137,10 @@ const CourseDetails = () => {
       setFormData({ name: '', email: '', subject: '', comment: '' });
       const r = await getCourseComments(id);
       setComments(r.data?.data || []);
-      setSuccess('Comment added!');
+      setSuccess(t('apprenant.commentAdded'));
       setTimeout(() => setSuccess(''), 2500);
     } catch (e) {
-      setError(e.response?.data?.message || 'Error posting comment');
+      setError(e.response?.data?.message || t('apprenant.commentPostError'));
     } finally {
       setSubmitting(false);
     }
@@ -94,7 +149,7 @@ const CourseDetails = () => {
   const handleSubmitReview = async e => {
     e.preventDefault();
     if (!reviewRating || !reviewText) {
-      setError('Please choose a rating and write a review.');
+      setError(t('apprenant.reviewValidationError'));
       setTimeout(() => setError(''), 3000);
       return;
     }
@@ -111,10 +166,10 @@ const CourseDetails = () => {
       setReviewText('');
       const details = await getCourseDetails(id);
       setCourse(details.data?.data);
-      setSuccess('Review submitted!');
+      setSuccess(t('apprenant.reviewSubmitted'));
       setTimeout(() => setSuccess(''), 2500);
     } catch (e) {
-      setError(e.response?.data?.message || 'Error submitting review');
+      setError(e.response?.data?.message || t('apprenant.reviewSubmitError'));
     } finally {
       setReviewSubmitting(false);
     }
@@ -127,16 +182,16 @@ const CourseDetails = () => {
 
   if (loading) {
     return (
-      <ApprenantLayout title="Course Details" breadcrumb={[{ to: '/', label: 'Home' }]}>
-        <div className="cd-loading">Loading...</div>
+      <ApprenantLayout title={t('apprenant.courseDetails')} breadcrumb={[{ to: '/', label: t('apprenant.home') }]}> 
+        <div className="cd-loading">{t('apprenant.loading')}</div>
       </ApprenantLayout>
     );
   }
 
   if (!course) {
     return (
-      <ApprenantLayout title="Course Details" breadcrumb={[{ to: '/', label: 'Home' }]}>
-        <div className="error-message">Course not found.</div>
+      <ApprenantLayout title={t('apprenant.courseDetails')} breadcrumb={[{ to: '/', label: t('apprenant.home') }]}> 
+        <div className="error-message">{t('apprenant.courseNotFound')}</div>
       </ApprenantLayout>
     );
   }
@@ -173,35 +228,20 @@ const CourseDetails = () => {
 
       {/* ── Back button ── */}
       <button className="cd-back-btn" onClick={() => navigate('/apprenant/courses')}>
-        <FaArrowLeft /> Back to Courses
+        <FaArrowLeft /> {t('apprenant.backToCourses')}
       </button>
 
-      {/* ══════════════════════════════════════════
-          TOP SECTION: Header card (like screenshot)
-      ══════════════════════════════════════════ */}
-      <div className="cd-header-card">
-        {/* Left: thumbnail */}
-        <div className="cd-header-thumb" onClick={handleStartLearning}>
-          {previewUrl ? (
-            <video
-              className="cd-header-video"
-              controls
-              src={getMediaUrl(previewUrl)}
-              poster={getMediaUrl(course.thumbnail)}
-            />
-          ) : (
-            <img
-              src={getMediaUrl(course.thumbnail) || require('../../assets/image/cours/cours.jpg')}
-              alt={course.title}
-            />
-          )}
-          <div className="cd-header-thumb-overlay">
-            <FaPlayCircle className="cd-play-icon" />
-          </div>
+
+<div className="cd-header-card">
+        <div className="cd-header-hero" onClick={handleStartLearning}>
+          <img
+            src={getMediaUrl(course.thumbnail) || require('../../assets/image/cours/cours.jpg')}
+            alt={course.title}
+          />
         </div>
 
-        {/* Right: info */}
-        <div className="cd-header-info">
+        <div className="cd-header-grid">
+          <div className="cd-header-info">
           {/* badges row */}
           <div className="cd-badges-row">
             {course.category && <span className="cd-badge-cat">{course.category}</span>}
@@ -214,13 +254,13 @@ const CourseDetails = () => {
           {/* Meta stats */}
           <div className="cd-meta-row">
             <span className="cd-meta-item">
-              <FaBookOpen /> {course.sections?.length || 0}+ Lesson
+              <FaBookOpen /> {course.sections?.length || 0}+ {t('apprenant.lessons')}
             </span>
             <span className="cd-meta-item">
               <FaClock /> {fmt(course.totalDuration || 0)}
             </span>
             <span className="cd-meta-item">
-              <FaUsers /> {course.totalEnrollments || 0} students enrolled
+              <FaUsers /> {course.totalEnrollments || 0} {t('apprenant.studentsEnrolled')}
             </span>
           </div>
 
@@ -244,8 +284,8 @@ const CourseDetails = () => {
               className="cd-inst-avatar"
             />
             <div>
-              <span className="cd-inst-name">{course.formateur?.fullName || 'Instructor'}</span>
-              <span className="cd-inst-role">Instructor</span>
+              <span className="cd-inst-name">{course.formateur?.fullName || t('apprenant.instructor')}</span>
+              <span className="cd-inst-role">{t('apprenant.instructor')}</span>
             </div>
           </div>
         </div>
@@ -255,7 +295,7 @@ const CourseDetails = () => {
           <div className="cd-price-top">
             <span className={`cd-price-main ${isFree ? 'free' : ''}`}>{price}</span>
             {originalPrice && <span className="cd-price-orig">{originalPrice}</span>}
-            {discount && <span className="cd-discount">{discount}% off</span>}
+            {discount && <span className="cd-discount">{discount}% {t('apprenant.off')}</span>}
           </div>
 
           <div className="cd-price-actions">
@@ -263,10 +303,10 @@ const CourseDetails = () => {
               className={`cd-wishlist-btn ${inWishlist ? 'active' : ''}`}
               onClick={() => setInWishlist(v => !v)}
             >
-              <FaHeart /> {inWishlist ? 'Wishlisted' : 'Add to Wishlist'}
+              <FaHeart /> {inWishlist ? t('apprenant.wishlisted') : t('apprenant.addToWishlist')}
             </button>
             <button className="cd-share-btn">
-              <FaShareAlt /> Share
+              <FaShareAlt /> {t('apprenant.share')}
             </button>
           </div>
 
@@ -275,14 +315,14 @@ const CourseDetails = () => {
             onClick={handleEnroll}
             disabled={enrolling}
           >
-            {enrolling ? 'Enrolling...' : 'Enroll Now'}
+            {enrolling ? t('apprenant.enrolling') : t('apprenant.enrollNow')}
           </button>
           <button
             type="button"
             className="cd-start-learning-btn"
             onClick={handleStartLearning}
           >
-            Start Learning
+            {t('apprenant.startLearning')}
           </button>
 
           {/* Includes */}
@@ -312,17 +352,18 @@ const CourseDetails = () => {
           </div>
         </div>
       </div>
+    </div>
 
       {/* ══════════════════════════════════════════
           OVERVIEW SECTION
       ══════════════════════════════════════════ */}
       <div className="cd-section-card">
-        <h2 className="cd-section-h2">Overview</h2>
+        <h2 className="cd-section-h2">{t('apprenant.overview')}</h2>
 
         {/* Course Description */}
         {course.description && (
           <>
-            <h3 className="cd-section-h3">Course Description</h3>
+            <h3 className="cd-section-h3">{t('apprenant.courseDescription')}</h3>
             <p className="cd-section-text">{course.description}</p>
           </>
         )}
@@ -330,7 +371,7 @@ const CourseDetails = () => {
         {/* What you'll learn */}
         {course.learningOutcomes && course.learningOutcomes.length > 0 && (
           <>
-            <h3 className="cd-section-h3">What you'll learn</h3>
+            <h3 className="cd-section-h3">{t('apprenant.whatYouWillLearn')}</h3>
             <ul className="cd-learn-list">
               {course.learningOutcomes.map((item, i) => (
                 <li key={i} className="cd-learn-item">
@@ -345,7 +386,7 @@ const CourseDetails = () => {
         {/* Requirements */}
         {course.requirements && course.requirements.length > 0 && (
           <>
-            <h3 className="cd-section-h3">Requirements</h3>
+            <h3 className="cd-section-h3">{t('apprenant.requirements')}</h3>
             <ul className="cd-req-list">
               {course.requirements.map((req, i) => (
                 <li key={i}>{req}</li>
@@ -394,7 +435,7 @@ const CourseDetails = () => {
       ══════════════════════════════════════════ */}
       {course.formateur && (
         <div className="cd-section-card">
-          <h2 className="cd-section-h2">About the instructor</h2>
+          <h2 className="cd-section-h2">{t('apprenant.aboutInstructor')}</h2>
           <div className="cd-instructor-card">
             <img
               src={getMediaUrl(course.formateur.profileImage) || require('../../assets/image/student/ava.jpg')}
@@ -408,10 +449,18 @@ const CourseDetails = () => {
               )}
               <div className="cd-inst-stats">
                 <span><FaStar className="cd-star filled" /> {Number(course.formateur.rating || 4.5).toFixed(1)}</span>
-                <span><FaUsers /> {course.formateur.totalStudents || 0} students</span>
-                <span><FaBookOpen /> {course.formateur.totalCourses || 0} Courses</span>
+                <span><FaUsers /> {course.formateur.totalStudents || 0} {t('apprenant.students')}</span>
+                <span><FaBookOpen /> {course.formateur.totalCourses || 0} {t('apprenant.courses')}</span>
               </div>
               {course.formateur.bio && <p className="cd-inst-bio">{course.formateur.bio}</p>}
+              <button
+                type="button"
+                className="cd-contact-instructor-btn"
+                onClick={handleContactInstructor}
+                disabled={contactingInstructor}
+              >
+                {contactingInstructor ? t('apprenant.openingChat') : t('apprenant.contactInstructor')}
+              </button>
             </div>
           </div>
         </div>
@@ -420,12 +469,12 @@ const CourseDetails = () => {
       {/* ══════════════════════════════════════════
           REVIEW SECTION
       ══════════════════════════════════════════ */}
-      <div id="review" className="cd-section-card">
-        <h2 className="cd-section-h2">Leave a Review</h2>
+      <div className="cd-section-card">
+        <h2 className="cd-section-h2">{t('apprenant.leaveReview')}</h2>
 
         <form className="cd-comment-form" onSubmit={handleSubmitReview}>
           <div className="cd-form-group">
-            <label>Rating</label>
+            <label>{t('apprenant.rating')}</label>
             <div className="cd-review-stars">
               {[1, 2, 3, 4, 5].map(star => (
                 <button
@@ -433,7 +482,7 @@ const CourseDetails = () => {
                   type="button"
                   className={`cd-review-star${reviewRating >= star ? ' filled' : ''}`}
                   onClick={() => setReviewRating(star)}
-                  aria-label={`${star} star${star > 1 ? 's' : ''}`}
+                  aria-label={`${star} ${t('apprenant.stars')}`}
                 >
                   <FaStar />
                 </button>
@@ -441,17 +490,17 @@ const CourseDetails = () => {
             </div>
           </div>
           <div className="cd-form-group">
-            <label>Your review</label>
+            <label>{t('apprenant.yourReview')}</label>
             <textarea
               rows={5}
               value={reviewText}
               onChange={e => setReviewText(e.target.value)}
-              placeholder="Share your experience with this course"
+              placeholder={t('apprenant.reviewPlaceholder')}
               required
             />
           </div>
           <button type="submit" className="cd-submit-btn" disabled={reviewSubmitting}>
-            {reviewSubmitting ? 'Submitting review...' : 'Submit review'}
+            {reviewSubmitting ? t('apprenant.submittingReview') : t('apprenant.submitReview')}
           </button>
         </form>
       </div>
@@ -460,61 +509,61 @@ const CourseDetails = () => {
           COMMENTS SECTION
       ══════════════════════════════════════════ */}
       <div className="cd-section-card">
-        <h2 className="cd-section-h2">Post A Comment</h2>
+        <h2 className="cd-section-h2">{t('apprenant.postComment')}</h2>
 
         <form className="cd-comment-form" onSubmit={handleSubmitComment}>
           <div className="cd-form-row">
             <div className="cd-form-group">
-              <label>Name</label>
+              <label>{t('apprenant.name')}</label>
               <input
                 type="text" name="name"
                 value={formData.name}
                 onChange={e => setFormData(p => ({ ...p, name: e.target.value }))}
-                placeholder="Your name"
+                placeholder={t('apprenant.yourName')}
                 required
               />
             </div>
             <div className="cd-form-group">
-              <label>Email</label>
+              <label>{t('apprenant.email')}</label>
               <input
                 type="email" name="email"
                 value={formData.email}
                 onChange={e => setFormData(p => ({ ...p, email: e.target.value }))}
-                placeholder="Your email"
+                placeholder={t('apprenant.yourEmail')}
                 required
               />
             </div>
           </div>
           <div className="cd-form-group">
-            <label>Subject</label>
+            <label>{t('apprenant.subject')}</label>
             <input
               type="text" name="subject"
               value={formData.subject}
               onChange={e => setFormData(p => ({ ...p, subject: e.target.value }))}
-              placeholder="Subject (optional)"
+              placeholder={t('apprenant.subjectOptional')}
             />
           </div>
           <div className="cd-form-group">
-            <label>Comments</label>
+            <label>{t('apprenant.comments')}</label>
             <textarea
               name="comment" rows={5}
               value={formData.comment}
               onChange={e => setFormData(p => ({ ...p, comment: e.target.value }))}
-              placeholder="Write your comment here..."
+              placeholder={t('apprenant.commentPlaceholder')}
               required
             />
           </div>
           <button type="submit" className="cd-submit-btn" disabled={submitting}>
-            {submitting ? 'Submitting...' : 'Submit'}
+            {submitting ? t('apprenant.submitting') : t('apprenant.submit')}
           </button>
         </form>
 
         {/* Comments list */}
         {commentsLoading ? (
-          <p style={{ color: '#9ca3af', marginTop: '1rem' }}>Loading comments...</p>
+          <p style={{ color: '#9ca3af', marginTop: '1rem' }}>{t('apprenant.loadingComments')}</p>
         ) : comments.length > 0 ? (
           <div className="cd-comments-list">
-            <h3 className="cd-section-h3">All Comments ({comments.length})</h3>
+            <h3 className="cd-section-h3">{t('apprenant.allComments', { count: comments.length })}</h3>
             {comments.map(c => (
               <div key={c._id || c.id} className="cd-comment-item">
                 <div className="cd-comment-avatar">
@@ -534,7 +583,7 @@ const CourseDetails = () => {
             ))}
           </div>
         ) : (
-          <p className="cd-no-comments">No comments yet. Be the first!</p>
+          <p className="cd-no-comments">{t('apprenant.noCommentsYet')}</p>
         )}
       </div>
     </ApprenantLayout>

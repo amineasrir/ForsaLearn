@@ -2,9 +2,10 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import logo_rem from '../../assets/image/home_page/logo_rem.png';
 import '../../pages/ApprenantPage/apprenant.css';
+import { FaBars } from 'react-icons/fa';
 import 'flag-icons/css/flag-icons.min.css';
 
-const DashboardNavbar = () => {
+const DashboardNavbar = ({ onMenuClick }) => {
   const { i18n } = useTranslation();
 
   const currentLang = i18n.language || 'en';
@@ -22,6 +23,13 @@ const DashboardNavbar = () => {
       <div className="header-container">
 
         <div className="header-left">
+          <button 
+            className="mobile-menu-btn" 
+            onClick={onMenuClick}
+            aria-label="Open menu"
+          >
+            <FaBars />
+          </button>
           <img
             src={logo_rem}
             alt="ForsaLearn"

@@ -7,7 +7,8 @@ import CardP from '../../components/apprenant/CardP';
 import {
   getApprenantProfile,
   getEnrolledCourses,
-  getMyPayments
+  getMyPayments,
+  getMyQuizAttempts
 } from '../../services/apprenentService';
 import { getMediaUrl } from '../../utils/mediaUrl';
 
@@ -16,20 +17,23 @@ const ApprenantDashboard = () => {
   const [user, setUser] = useState(null);
   const [courses, setCourses] = useState([]);
   const [payments, setPayments] = useState([]);
+  const [quizzes, setQuizzes] = useState([]);
   const [error, setError] = useState('');
 
   useEffect(() => {
     const loadDashboard = async () => {
       try {
-        const [userResponse, coursesResponse, paymentsResponse] = await Promise.all([
+        const [userResponse, coursesResponse, paymentsResponse, quizzesResponse] = await Promise.all([
           getApprenantProfile(),
           getEnrolledCourses(),
-          getMyPayments()
+          getMyPayments(),
+          getMyQuizAttempts()
         ]);
 
         setUser(userResponse.data?.user || null);
         setCourses(coursesResponse.data?.data || []);
         setPayments(paymentsResponse.data?.data || []);
+        setQuizzes(quizzesResponse.data?.data || []);
       } catch (err) {
         setError(err.response?.data?.message || t('errorOccurred'));
       }
@@ -47,7 +51,13 @@ const ApprenantDashboard = () => {
     () => courses.filter((course) => Number(course.myProgress || 0) > 0 && Number(course.myProgress || 0) < 100).length,
     [courses]
   );
-  const latestQuizzes = [];
+  const latestQuizzes = useMemo(() => quizzes.slice(0, 5).map((quiz) => ({
+    id: quiz.id || quiz._id,
+    title: quiz.lessonTitle || quiz.title || 'Quiz',
+    status: quiz.passed ? 'passed' : 'failed',
+    correctAnswers: quiz.score || 0,
+    date: quiz.createdAt ? new Date(quiz.createdAt).toLocaleDateString() : new Date().toLocaleDateString()
+  })), [quizzes]);
   const recentInvoices = payments.slice(0, 5).map((payment, index) => ({
     id: payment._id || `#INV${index + 1}`,
     title: payment.course?.title || 'Course Payment',
@@ -83,7 +93,7 @@ const ApprenantDashboard = () => {
                 <FaBook />
               </div>
               <div className="stat-content">
-                <p>Enrolled Courses</p>
+                <p>{t('apprenant.enrolledCourses')}</p>
                 <h3>{courses.length}</h3>
               </div>
             </div>
@@ -92,7 +102,7 @@ const ApprenantDashboard = () => {
                 <FaBook />
               </div>
               <div className="stat-content">
-                <p>Active Courses</p>
+                <p>{t('apprenant.activeCourses')}</p>
                 <h3>{activeCount}</h3>
               </div>
             </div>
@@ -101,7 +111,7 @@ const ApprenantDashboard = () => {
                 <FaCheckCircle />
               </div>
               <div className="stat-content">
-                <p>Completed Courses</p>
+                <p>{t('apprenant.completedCourses')}</p>
                 <h3>{completedCount}</h3>
               </div>
             </div>

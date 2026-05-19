@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { FaHeadset, FaPaperPlane, FaPlus, FaSearch } from 'react-icons/fa';
+import { FaHeadset, FaPaperPlane, FaPlus, FaSearch, FaBell } from 'react-icons/fa';
 import ApprenantLayout from '../../components/apprenant/ApprenantLayout';
 import '../../styles/formateur.css';
 import './apprenant.css';
@@ -135,6 +135,11 @@ const ApprenantSupport = () => {
     );
   }, [conversations, searchTerm]);
 
+  const totalUnread = useMemo(() => conversations.reduce(
+    (count, conversation) => count + (conversation.unreadCount || 0),
+    0
+  ), [conversations]);
+
   const handleCreateTicket = async (event) => {
     event.preventDefault();
     if (!ticketForm.subject.trim() || !ticketForm.message.trim() || creatingTicket) {
@@ -221,8 +226,20 @@ const ApprenantSupport = () => {
         <div className="support-container">
           {error && <div className="error-message">{error}</div>}
 
-          <div className="message-wrapper">
-            <div className="conv-list">
+          <div className="support-page-header">
+            <div>
+              <h2>{t('apprenant.supportCenter')}</h2>
+              <p className="support-page-subtitle">{t('apprenant.supportSubtitle')}</p>
+            </div>
+            {totalUnread > 0 && (
+              <div className="support-notification-pill">
+                <FaBell /> {totalUnread} {t('apprenant.unread')}
+              </div>
+            )}
+          </div>
+
+          <div className="message-wrapper support-grid">
+            <div className="conv-list support-list-panel">
               <div className="chat-search-box">
                 <FaSearch className="search-icon" />
                 <input
@@ -318,7 +335,7 @@ const ApprenantSupport = () => {
               )}
             </div>
 
-            <div className="chat-window support-chat-window">
+            <div className="chat-window support-chat-panel">
               <div className="chat-header support-chat-header">
                 <div>
                   <h3>{activeConversation ? getTicketLabel(activeConversation) : t('apprenant.supportTickets')}</h3>

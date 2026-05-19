@@ -100,10 +100,10 @@ const ApprenantCourses = () => {
       {/* Mobile filter toggle */}
       <div className="cg-mobile-bar">
         <button className="cg-filter-toggle" onClick={() => setSidebarOpen(true)}>
-          <FaFilter /> Filters
+          <FaFilter /> {t('apprenant.filters')}
         </button>
         <span className="cg-result-count">
-          Showing 1–{mappedCourses.length} of {mappedCourses.length} results
+          {t('apprenant.showingResults', { count: mappedCourses.length })}
         </span>
       </div>
 
@@ -117,7 +117,7 @@ const ApprenantCourses = () => {
         {/* ---- Filters sidebar ---- */}
         <aside className={`cg-sidebar ${sidebarOpen ? 'open' : ''}`}>
           <div className="cg-sidebar-head">
-            <span className="cg-sidebar-title"><FaFilter /> Filters</span>
+            <span className="cg-sidebar-title"><FaFilter /> {t('apprenant.filters')}</span>
             <button className="cg-sidebar-close" onClick={() => setSidebarOpen(false)}>
               <FaTimes />
             </button>
@@ -125,7 +125,7 @@ const ApprenantCourses = () => {
 
           {selectedCategories.length > 0 && (
             <button className="cg-clear-btn" onClick={() => setSelectedCategories([])}>
-              Clear
+              {t('apprenant.clear')}
             </button>
           )}
 
@@ -148,7 +148,7 @@ const ApprenantCourses = () => {
               ))}
             </div>
             <button className="cg-seemore" onClick={() => setShowAllCats(v => !v)}>
-              {showAllCats ? 'See Less' : 'See More'}
+              {showAllCats ? t('apprenant.seeLess') : t('apprenant.seeMore')}
             </button>
           </div>
         </aside>
@@ -160,7 +160,7 @@ const ApprenantCourses = () => {
           <div className="cg-topbar">
             <div className="cg-topbar-left">
               <span className="cg-count">
-                Showing 1–{mappedCourses.length} of {mappedCourses.length} results
+                {t('apprenant.showingResults', { count: mappedCourses.length })}
               </span>
             </div>
             <div className="cg-topbar-right">
@@ -193,7 +193,7 @@ const ApprenantCourses = () => {
                 <FaSearch className="cg-search-icon" />
                 <input
                   type="search"
-                  placeholder="Search"
+                  placeholder={t('apprenant.search')}
                   className="cg-search"
                   value={searchTerm}
                   onChange={e => setSearchTerm(e.target.value)}
@@ -205,7 +205,7 @@ const ApprenantCourses = () => {
           {/* Cards */}
           <div className={`cg-cards ${viewMode}`}>
             {mappedCourses.length === 0 ? (
-              <div className="cg-empty">No courses found.</div>
+              <div className="cg-empty">{t('apprenant.noCoursesFound')}</div>
             ) : mappedCourses.map(course => (
               <div
                 key={course.id}
@@ -257,7 +257,7 @@ const ApprenantCourses = () => {
                       className="cg-cta"
                       onClick={e => { e.stopPropagation(); navigate(`/apprenant/course/${course.id}`); }}
                     >
-                      Get Course &rsaquo;
+                      {t('apprenant.viewCourse')}
                     </button>
                   </div>
                 </div>

@@ -82,9 +82,9 @@ const ApprenantCertificates = () => {
                     <tr key={cert._id}>
                       <td>{cert.certificateId}</td>
                       <td>{cert.course?.title || cert.courseName}</td>
-                      <td>{cert.completionDate ? new Date(cert.completionDate).toLocaleDateString() : 'N/A'}</td>
+                      <td>{cert.completionDate ? new Date(cert.completionDate).toLocaleDateString() : t('apprenant.na')}</td>
                       <td>{cert.instructor?.fullName || cert.instructorName}</td>
-                      <td>{cert.status || 'active'}</td>
+                      <td>{cert.status || t('apprenant.active')}</td>
                       <td>
                         <FaEye
                           title={t('apprenant.view')}

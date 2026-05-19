@@ -36,7 +36,7 @@ const ApprenantWishlist = () => {
                     <p className="instructor">{course.instructor || t('instructor')}</p>
                     <p className="category">{course.category}</p>
                     <div className="course-rating">
-                      <FaStar /> <span>{course.rating} ({course.reviews} Reviews)</span>
+                      <FaStar /> <span>{course.rating} ({course.reviews} {t('apprenant.reviews')})</span>
                     </div>
                     <p className="price">{course.price}$</p>
                     <button className="view-course-btn">{t('apprenant.viewCourse')}</button>

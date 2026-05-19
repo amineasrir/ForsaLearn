@@ -1,9 +1,10 @@
 import React, { useEffect, useMemo, useState, useRef, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import {
   FaArrowLeft, FaCheck, FaLock, FaPlayCircle, FaChevronRight,
   FaChevronDown, FaChevronUp, FaBookOpen, FaBars, FaTimes, FaFileAlt,
-  FaTrophy
+  FaTrophy, FaClipboardCheck
 } from 'react-icons/fa';
 import ApprenantLayout from '../../components/apprenant/ApprenantLayout';
 import { getCourseDetails, completeLesson, getApprenantProfile, submitQuizAttempt } from '../../services/apprenentService';
@@ -15,23 +16,27 @@ const AUTO_NEXT_DELAY = 5;
 // ─────────────────────────────────────────────────────────────
 // COURSE COMPLETION MODAL
 // ─────────────────────────────────────────────────────────────
-const CourseCompletionModal = ({ course, nextCourse, onGoNext, onClose }) => (
-  <div style={{
-    position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.7)',
-    display: 'flex', alignItems: 'center', justifyContent: 'center',
-    zIndex: 1000, padding: '1rem'
-  }}>
+const CourseCompletionModal = ({ course, nextCourse, onGoNext, onClose }) => {
+  const { t } = useTranslation();
+  return (
+    <div style={{
+      position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.7)',
+      display: 'flex', alignItems: 'center', justifyContent: 'center',
+      zIndex: 1000, padding: '1rem'
+    }}>
     <div style={{
       background: '#fff', borderRadius: '20px', padding: '2.5rem',
       maxWidth: '480px', width: '100%', textAlign: 'center',
       boxShadow: '0 20px 60px rgba(0,0,0,0.3)'
     }}>
-      <div style={{ fontSize: '3.5rem', marginBottom: '1rem' }}>🎉</div>
+      <div style={{ fontSize: '3.5rem', marginBottom: '1rem' }}>
+        <FaTrophy style={{ color: '#f59e0b' }} />
+      </div>
       <h2 style={{ fontSize: '1.5rem', fontWeight: 800, color: '#111827', marginBottom: '0.5rem' }}>
-        Course Completed!
+        {t('apprenant.courseCompleted')}
       </h2>
       <p style={{ color: '#6b7280', fontSize: '0.9rem', marginBottom: '1.5rem' }}>
-        You've finished <strong>{course?.title}</strong>. Your progress is now 100%!
+        {t('apprenant.youFinished', { title: course?.title })}
       </p>
 
       {nextCourse && (
@@ -40,7 +45,7 @@ const CourseCompletionModal = ({ course, nextCourse, onGoNext, onClose }) => (
           marginBottom: '1.5rem', border: '1.5px solid #e5e7eb', textAlign: 'left'
         }}>
           <p style={{ fontSize: '0.72rem', fontWeight: 700, color: '#9ca3af', textTransform: 'uppercase', marginBottom: '0.4rem' }}>
-            Up Next
+            {t('apprenant.upNext')}
           </p>
           <p style={{ fontWeight: 700, color: '#111827', fontSize: '0.95rem' }}>{nextCourse.title}</p>
         </div>
@@ -56,7 +61,7 @@ const CourseCompletionModal = ({ course, nextCourse, onGoNext, onClose }) => (
               fontSize: '0.9rem', cursor: 'pointer'
             }}
           >
-            Start Next Course →
+            {t('apprenant.startNextCourse')} →
           </button>
         )}
         <button
@@ -67,17 +72,59 @@ const CourseCompletionModal = ({ course, nextCourse, onGoNext, onClose }) => (
             fontSize: '0.9rem', cursor: 'pointer'
           }}
         >
-          Stay Here
+          {t('apprenant.stayHere')}
         </button>
       </div>
     </div>
   </div>
 );
+}
+
+const QuizFeedbackModal = ({ score, onClose }) => {
+  const { t } = useTranslation();
+  return (
+    <div style={{
+      position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.7)',
+      display: 'flex', alignItems: 'center', justifyContent: 'center',
+      zIndex: 1000, padding: '1rem'
+    }}>
+    <div style={{
+      background: '#fff', borderRadius: '20px', padding: '2.5rem',
+      maxWidth: '480px', width: '100%', textAlign: 'center',
+      boxShadow: '0 20px 60px rgba(0,0,0,0.3)'
+    }}>
+      <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>
+        <FaClipboardCheck style={{ color: '#10b981' }} />
+      </div>
+      <h2 style={{ fontSize: '1.5rem', fontWeight: 800, color: '#111827', marginBottom: '0.5rem' }}>
+        {t('apprenant.quizSubmitted')}
+      </h2>
+      <p style={{ color: '#6b7280', fontSize: '1rem', marginBottom: '1.5rem', fontWeight: 600 }}>
+        {t('apprenant.yourScore')}: <strong style={{ color: '#ff3b63', fontSize: '1.25rem' }}>{score || 0}%</strong>
+      </p>
+      <p style={{ color: '#374151', fontSize: '0.95rem', marginBottom: '1.5rem', lineHeight: 1.6 }}>
+        {t('apprenant.quizFeedbackMessage')}
+      </p>
+      <button
+        onClick={onClose}
+        style={{
+          padding: '0.75rem 2rem', background: '#392C7D', color: '#fff',
+          border: 'none', borderRadius: '10px', fontWeight: 700,
+          fontSize: '0.9rem', cursor: 'pointer', width: '100%'
+        }}
+      >
+        {t('apprenant.ok')}
+      </button>
+    </div>
+  </div>
+);
+}
 
 // ─────────────────────────────────────────────────────────────
 // MAIN COMPONENT
 // ─────────────────────────────────────────────────────────────
 const CoursePlayer = () => {
+  const { t } = useTranslation();
   const { id } = useParams();
   const navigate = useNavigate();
   const videoRef = useRef(null);
@@ -108,6 +155,8 @@ const CoursePlayer = () => {
   const [submittingQuiz, setSubmittingQuiz] = useState(false);
   const [quizError, setQuizError] = useState('');
   const [quizMessage, setQuizMessage] = useState('');
+  const [showQuizFeedbackModal, setShowQuizFeedbackModal] = useState(false);
+  const [quizFeedbackScore, setQuizFeedbackScore] = useState(null);
 
   // ─── LOAD ───
   useEffect(() => {
@@ -141,7 +190,7 @@ const CoursePlayer = () => {
         setLocalCompletedIds(initialCompleted);
 
       } catch (err) {
-        setError(err.response?.data?.message || 'Unable to load course.');
+        setError(err.response?.data?.message || t('apprenant.unableToLoadCourse'));
       } finally {
         setLoading(false);
       }
@@ -287,13 +336,13 @@ const CoursePlayer = () => {
         setShowCompletionModal(true);
         setSuccess('');
       } else {
-        setSuccess('Lesson completed! Progress updated.');
+        setSuccess(t('apprenant.lessonCompletedProgress'));
         setTimeout(() => setSuccess(''), 3000);
       }
 
       return true;
     } catch (err) {
-      setError(err.response?.data?.message || 'Unable to update progress.');
+      setError(err.response?.data?.message || t('apprenant.unableToUpdateProgress'));
       return false;
     } finally {
       setSaving(false);
@@ -319,7 +368,7 @@ const CoursePlayer = () => {
   const handleCompleteLesson = async () => {
     if (!course || !currentLesson) return;
     if (!enrollment) {
-      setError('You must enroll to track progress.');
+      setError(t('apprenant.mustEnrollToTrackProgress'));
       setTimeout(() => setError(''), 3000);
       return;
     }
@@ -344,7 +393,7 @@ const CoursePlayer = () => {
     const lessonId = (currentLesson._id || currentLesson.id)?.toString();
     const questions = currentLesson.quiz?.questions || [];
     if (!questions.length) {
-      setQuizError('This quiz has no questions yet.');
+      setQuizError(t('apprenant.quizNoQuestions'));
       return;
     }
 
@@ -361,6 +410,12 @@ const CoursePlayer = () => {
       const data = response.data?.data || {};
       setQuizResult(data);
       setQuizMessage(response.data?.message || 'Quiz submitted.');
+
+      // Show feedback modal if score < 100%
+      if (data.percentageScore != null && data.percentageScore < 100) {
+        setQuizFeedbackScore(data.percentageScore);
+        setShowQuizFeedbackModal(true);
+      }
 
       if (data.passed) {
         setLocalCompletedIds((prev) => (
@@ -396,7 +451,7 @@ const CoursePlayer = () => {
         }
       }
     } catch (err) {
-      setQuizError(err.response?.data?.message || 'Unable to submit quiz.');
+      setQuizError(err.response?.data?.message || t('apprenant.unableToSubmitQuiz'));
     } finally {
       setSubmittingQuiz(false);
     }
@@ -417,7 +472,7 @@ const CoursePlayer = () => {
       (item) => (item.lesson._id || item.lesson.id)?.toString() === (lesson._id || lesson.id)?.toString()
     );
     if (isLessonLocked(flatIndex)) {
-      setError('Complete the previous lesson first.');
+      setError(t('apprenant.completePreviousLesson'));
       setTimeout(() => setError(''), 3000);
       return;
     }
@@ -439,13 +494,13 @@ const CoursePlayer = () => {
     return (
       <div className="cp-fullpage-loading">
         <div className="cp-spinner" />
-        <p>Loading course...</p>
+        <p>{t('apprenant.loadingCourse')}</p>
       </div>
     );
   }
 
   if (!course) {
-    return <div className="cp-fullpage-error">Course not found.</div>;
+    return <div className="cp-fullpage-error">{t('apprenant.courseNotFound')}</div>;
   }
 
   const lessonUrl = currentLesson?.type === 'video' ? getMediaUrl(currentLesson.content) : null;
@@ -463,11 +518,18 @@ const CoursePlayer = () => {
         />
       )}
 
+      {showQuizFeedbackModal && (
+        <QuizFeedbackModal
+          score={quizFeedbackScore}
+          onClose={() => setShowQuizFeedbackModal(false)}
+        />
+      )}
+
       {/* ── TOP BAR ── */}
       <header className="cp-topbar">
         <button className="cp-back-btn" onClick={() => navigate(`/apprenant/course/${id}`)}>
           <FaArrowLeft />
-          <span>Back</span>
+          <span>{t('apprenant.back')}</span>
         </button>
         <div className="cp-topbar-middle">
           <span className="cp-topbar-course">{course.title}</span>
@@ -489,10 +551,10 @@ const CoursePlayer = () => {
           <button
             className="cp-toggle-sidebar"
             onClick={() => setSidebarOpen((v) => !v)}
-            aria-label="Toggle sidebar"
+            aria-label={t('apprenant.toggleSidebar')}
           >
             {sidebarOpen ? <FaTimes /> : <FaBars />}
-            <span>{sidebarOpen ? 'Hide' : 'Content'}</span>
+            <span>{sidebarOpen ? t('apprenant.hide') : t('apprenant.content')}</span>
           </button>
         </div>
       </header>
@@ -521,7 +583,7 @@ const CoursePlayer = () => {
               <text x="18" y="23" textAnchor="middle" fontSize="13" fill="#fff" fontWeight="700">{countdown}</text>
             </svg>
             <div className="cp-autonext-info">
-              <span className="cp-autonext-label">Up next</span>
+              <span className="cp-autonext-label">{t('apprenant.upNext')}</span>
               <span className="cp-autonext-title">{nextLessonInfo.lesson.title}</span>
               <span className="cp-autonext-meta">
                 {sections[nextLessonInfo.sectionIndex]?.title} · {nextLessonInfo.lesson.duration || 0} min
@@ -530,9 +592,9 @@ const CoursePlayer = () => {
           </div>
           <div className="cp-autonext-actions">
             <button className="cp-btn-gonext" onClick={goToNextLesson}>
-              Next lesson <FaChevronRight />
+              {t('apprenant.nextLesson')} <FaChevronRight />
             </button>
-            <button className="cp-btn-cancelauto" onClick={cancelAutoNext}>Cancel</button>
+            <button className="cp-btn-cancelauto" onClick={cancelAutoNext}>{t('apprenant.cancel')}</button>
           </div>
         </div>
       )}
@@ -561,10 +623,10 @@ const CoursePlayer = () => {
             ) : currentLesson?.type === 'quiz' ? (
               <div className="cp-quiz-card">
                 <div className="cp-quiz-header">
-                  <h3>{currentLesson.title || 'Quiz'}</h3>
-                  <p>{currentLesson.description || currentLesson.quiz?.instructions || 'Answer the questions below and submit when you are ready.'}</p>
+                  <h3>{currentLesson.title || t('apprenant.quiz')}</h3>
+                  <p>{currentLesson.description || currentLesson.quiz?.instructions || t('apprenant.quizIntro')}</p>
                   {currentLesson.quiz?.passingScore != null && (
-                    <p className="cp-quiz-meta">Passing score: {currentLesson.quiz.passingScore}%</p>
+                    <p className="cp-quiz-meta">{t('apprenant.passingScore')}: {currentLesson.quiz.passingScore}%</p>
                   )}
                   {currentLesson.quiz?.instructions && (
                     <p className="cp-quiz-instructions">{currentLesson.quiz.instructions}</p>
@@ -577,21 +639,21 @@ const CoursePlayer = () => {
                 {(quizResult || currentLesson.quizSummary?.latestAttempt) && (
                   <div className="cp-quiz-result">
                     <div className="cp-quiz-result-row">
-                      <span>Score</span>
+                      <span>{t('apprenant.score')}</span>
                       <strong>{(quizResult?.score ?? currentLesson.quizSummary.latestAttempt?.score) || 0}/
                         {(quizResult?.totalPoints ?? currentLesson.quizSummary.latestAttempt?.totalPoints) || 0}
                       </strong>
                     </div>
                     <div className="cp-quiz-result-row">
-                      <span>Percentage</span>
+                      <span>{t('apprenant.percentage')}</span>
                       <strong>{(quizResult?.percentageScore ?? currentLesson.quizSummary.latestAttempt?.percentageScore) || 0}%</strong>
                     </div>
                     <div className="cp-quiz-result-row">
-                      <span>Status</span>
-                      <strong>{(quizResult?.passed ?? currentLesson.quizSummary.latestAttempt?.passed) ? 'Passed' : 'Failed'}</strong>
+                      <span>{t('apprenant.status')}</span>
+                      <strong>{(quizResult?.passed ?? currentLesson.quizSummary.latestAttempt?.passed) ? t('apprenant.passed') : t('apprenant.failed')}</strong>
                     </div>
                     <div className="cp-quiz-result-row">
-                      <span>Attempt</span>
+                      <span>{t('apprenant.attempt')}</span>
                       <strong>{(quizResult?.attemptNumber ?? currentLesson.quizSummary.latestAttempt?.attemptNumber) || 1}</strong>
                     </div>
                   </div>
@@ -612,13 +674,13 @@ const CoursePlayer = () => {
                             <span className="cp-quiz-question-number">Question {index + 1}</span>
                             <span className="cp-quiz-question-points">{question.points || 1} pts</span>
                           </div>
-                          <p className="cp-quiz-question-text">{question.text || question.question || question.prompt || 'No question text provided.'}</p>
+                          <span className="cp-quiz-question-text">{question.text || question.question || question.prompt || t('apprenant.noQuestionText')}</span>
 
                           {isMultiple || isTrueFalse ? (
                             <div className="cp-quiz-options">
                               {(isTrueFalse ? [
-                                { text: 'True' },
-                                { text: 'False' }
+                                { text: t('apprenant.true') },
+                                { text: t('apprenant.false') }
                               ] : options).map((option, optionIndex) => {
                                 const optionText = String(option.text || option).trim();
                                 return (
@@ -650,14 +712,14 @@ const CoursePlayer = () => {
                 ) : (
                   <div className="cp-placeholder">
                     <FaBookOpen className="cp-placeholder-icon" />
-                    <p>This quiz has no questions yet.</p>
+                    <p>{t('apprenant.quizNoQuestions')}</p>
                   </div>
                 )}
               </div>
             ) : (
               <div className="cp-placeholder">
                 <FaPlayCircle className="cp-placeholder-icon" />
-                <p>Select a lesson from the sidebar to begin.</p>
+                <p>{t('apprenant.selectLessonFromSidebar')}</p>
               </div>
             )}
           </div>
@@ -670,7 +732,7 @@ const CoursePlayer = () => {
                 disabled={!prevLessonInfo}
                 onClick={() => prevLessonInfo && handleLessonSelect(prevLessonInfo.sectionIndex, prevLessonInfo.lessonIndex)}
               >
-                <FaChevronRight style={{ transform: 'rotate(180deg)' }} /> Previous
+                <FaChevronRight style={{ transform: 'rotate(180deg)' }} /> {t('apprenant.previous')}
               </button>
               {currentLesson?.type === 'quiz' ? (
               <button
@@ -678,7 +740,7 @@ const CoursePlayer = () => {
                 onClick={handleSubmitQuiz}
                 disabled={submittingQuiz || saving || !enrollment || quizResult?.passed || isLessonCompleted || !currentLesson}
               >
-                {submittingQuiz ? <span className="cp-spinner-sm" /> : quizResult?.passed || isLessonCompleted ? <><FaCheck /> Passed</> : 'Submit Quiz'}
+                {submittingQuiz ? <span className="cp-spinner-sm" /> : quizResult?.passed || isLessonCompleted ? <><FaCheck /> {t('apprenant.passed')}</> : t('apprenant.submitQuiz')}
               </button>
             ) : (
               <button
@@ -686,7 +748,7 @@ const CoursePlayer = () => {
                 onClick={handleCompleteLesson}
                 disabled={saving || !enrollment || isLessonCompleted || !currentLesson}
               >
-                {saving ? <span className="cp-spinner-sm" /> : isLessonCompleted ? <><FaCheck /> Completed</> : 'Mark Complete'}
+                {saving ? <span className="cp-spinner-sm" /> : isLessonCompleted ? <><FaCheck /> {t('apprenant.completed')}</> : t('apprenant.markComplete')}
               </button>
             )}
               <button
@@ -700,7 +762,7 @@ const CoursePlayer = () => {
 
             <div className="cp-lesson-info">
               <div className="cp-lesson-breadcrumb">{sections[activeSection]?.title}</div>
-              <h2 className="cp-lesson-heading">{currentLesson?.title || 'Select a lesson'}</h2>
+              <h2 className="cp-lesson-heading">{currentLesson?.title || t('apprenant.selectALesson')}</h2>
               {currentLesson && (
                 <p className="cp-lesson-sub">
                   <span className={`cp-type-badge cp-type-${currentLesson.type}`}>
@@ -718,7 +780,7 @@ const CoursePlayer = () => {
               <div className="cp-progress-bar">
                 <div className="cp-progress-fill" style={{ width: `${progress}%` }} />
               </div>
-              <span>{progress}% complete · {completedCount} of {totalLessons} lessons</span>
+              <span>{progress}% {t('apprenant.complete')} · {completedCount} {t('apprenant.of')} {totalLessons} {t('apprenant.lessons')}</span>
             </div>
           </div>
         </main>
@@ -727,8 +789,8 @@ const CoursePlayer = () => {
         {sidebarOpen && (
           <aside className="cp-sidebar">
             <div className="cp-sidebar-head">
-              <h3>Course content</h3>
-              <span>{completedCount}/{totalLessons} completed</span>
+              <h3>{t('apprenant.courseContent')}</h3>
+              <span>{completedCount}/{totalLessons} {t('apprenant.completed')}</span>
             </div>
             <div className="cp-sidebar-prog">
               <div className="cp-sidebar-prog-fill" style={{ width: `${progress}%` }} />
@@ -793,7 +855,7 @@ const CoursePlayer = () => {
                   background: '#f0fdf4'
                 }}>
                   <p style={{ fontSize: '0.72rem', fontWeight: 700, color: '#059669', textTransform: 'uppercase', marginBottom: '0.4rem' }}>
-                    ✓ Course complete — Next up
+                    ✓ {t('apprenant.courseCompleteNextUp')}
                   </p>
                   <p style={{ fontWeight: 700, fontSize: '0.85rem', color: '#111827', marginBottom: '0.75rem' }}>
                     {nextCourseInfo.title}
@@ -806,7 +868,7 @@ const CoursePlayer = () => {
                       fontWeight: 700, fontSize: '0.82rem', cursor: 'pointer'
                     }}
                   >
-                    Start Next Course →
+                    {t('apprenant.startNextCourse')} →
                   </button>
                 </div>
               )}
@@ -816,6 +878,9 @@ const CoursePlayer = () => {
       </div>
     </div>
   );
+  
+
+
 };
 
 export default CoursePlayer;

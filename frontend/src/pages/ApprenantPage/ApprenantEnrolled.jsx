@@ -8,11 +8,11 @@ import { getApprenantProfile, getEnrolledCourses } from '../../services/apprenen
 import { getMediaUrl } from '../../utils/mediaUrl';
 import './apprenant.css';
 
-const getStatusInfo = (progress) => {
+const getStatusInfo = (progress, t) => {
   const p = Number(progress || 0);
-  if (p >= 100) return { label: 'Completed', cls: 'status-completed' };
-  if (p > 0) return { label: 'Inprogress', cls: 'status-inprogress' };
-  return { label: 'Not Started', cls: 'status-notstarted' };
+  if (p >= 100) return { label: t('apprenant.completed'), cls: 'status-completed' };
+  if (p > 0) return { label: t('apprenant.inProgress'), cls: 'status-inprogress' };
+  return { label: t('apprenant.notStarted'), cls: 'status-notstarted' };
 };
 
 const ApprenantEnrolled = () => {
@@ -64,16 +64,16 @@ const ApprenantEnrolled = () => {
           <h2>{t('apprenant.enrolledCourses')}</h2>
           <div className="courses-tabs">
             <button className={tab === 'enrolled' ? 'active' : ''} onClick={() => setTab('enrolled')}>
-              All Courses ({counts.enrolled})
+              {t('apprenant.allCourses')} ({counts.enrolled})
             </button>
             <button className={tab === 'notstarted' ? 'active' : ''} onClick={() => setTab('notstarted')}>
-              Not Started ({counts.notstarted})
+              {t('apprenant.notStarted')} ({counts.notstarted})
             </button>
             <button className={tab === 'active' ? 'active' : ''} onClick={() => setTab('active')}>
-              Inprogress ({counts.active})
+              {t('apprenant.inProgress')} ({counts.active})
             </button>
             <button className={tab === 'completed' ? 'active' : ''} onClick={() => setTab('completed')}>
-              Completed ({counts.completed})
+              {t('apprenant.completed')} ({counts.completed})
             </button>
           </div>
         </div>
@@ -81,7 +81,7 @@ const ApprenantEnrolled = () => {
         <div className="courses-container">
           {filteredCourses.map(course => {
             const progress = Number(course.myProgress || 0);
-            const { label, cls } = getStatusInfo(progress);
+            const { label, cls } = getStatusInfo(progress, t);
             const totalLessons = course.totalLessons || course.chapters?.length || 0;
             const doneLessons = Math.round((progress / 100) * totalLessons);
             const duration = course.duration || course.totalDuration || 0;
@@ -111,15 +111,15 @@ const ApprenantEnrolled = () => {
 
                   <div className="ec-card__stats">
                     {totalLessons > 0 && (
-                      <span className="ec-stat"><FaBook /> {doneLessons}/{totalLessons} Lesson</span>
+                      <span className="ec-stat"><FaBook /> {t('apprenant.lessonCount', { done: doneLessons, total: totalLessons })}</span>
                     )}
                     {duration > 0 && (
-                      <span className="ec-stat"><FaClock /> {duration}h</span>
+                      <span className="ec-stat"><FaClock /> {t('apprenant.durationHours', { duration })}</span>
                     )}
                   </div>
 
                   <div className="ec-card__progress-row">
-                    <span className="ec-card__progress-label">Progress</span>
+                    <span className="ec-card__progress-label">{t('apprenant.progress', { value: progress })}</span>
                     <div className="ec-card__progress-bar">
                       <div
                         className={`ec-card__progress-fill ${cls}`}
@@ -131,7 +131,7 @@ const ApprenantEnrolled = () => {
 
                   <button className="ec-card__btn" onClick={() => navigate(`/apprenant/course/${course._id}/learn`)}>
                     <span className="ec-card__btn-icon">▶</span>
-                    Start Learning
+                    {t('apprenant.startLearning')}
                   </button>
                 </div>
               </div>

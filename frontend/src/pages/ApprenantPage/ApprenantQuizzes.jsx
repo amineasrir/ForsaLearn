@@ -59,10 +59,10 @@ const ApprenantQuizzes = () => {
                   <p>{t('apprenant.numberOfQuestions', { count: quiz.questionCount < 10 ? `0${quiz.questionCount}` : quiz.questionCount })}</p>
                   <p className="quiz-course-title">{quiz.courseTitle}</p>
                   <p className="quiz-course-title">
-                    Score: {quiz.score}/{quiz.totalPoints} - {quiz.percentageScore}%
+                    {t('apprenant.scoreLabel')}: {quiz.score}/{quiz.totalPoints} - {quiz.percentageScore}%
                   </p>
                   <p className={`quiz-course-title ${quiz.passed ? 'passed' : 'failed'}`}>
-                    {quiz.passed ? 'Passed' : 'Failed'} - Attempt #{quiz.attemptNumber}
+                    {quiz.passed ? t('apprenant.passed') : t('apprenant.failed')} - {t('apprenant.attempt')} #{quiz.attemptNumber}
                   </p>
                 </div>
                 <div className="quiz-action">

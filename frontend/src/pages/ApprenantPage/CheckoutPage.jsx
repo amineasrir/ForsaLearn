@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams, useLocation } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import ApprenantLayout from '../../components/apprenant/ApprenantLayout';
 import { getCourseDetails, enrollInCourse } from '../../services/apprenentService';
 import './CheckoutPage.css';
@@ -22,6 +23,7 @@ const CheckoutPage = () => {
     nameOnCard: '',
   });
   const [plan, setPlan] = useState('yearly'); // 'yearly' or 'monthly'
+  const { t } = useTranslation();
   const [paymentMethod, setPaymentMethod] = useState('credit-card'); // 'credit-card', 'paypal', 'google-pay'
 
   const isPaid = location.state?.isPaid ?? true;
@@ -35,7 +37,7 @@ const CheckoutPage = () => {
       .finally(() => setLoading(false));
   }, [id]);
 
-  const price = course?.priceType === 'free' ? 'FREE' : `$${Number(course?.price || 0).toFixed(2)}`;
+  const price = course?.priceType === 'free' ? 'مجاني' : `$${Number(course?.price || 0).toFixed(2)}`;
   const discount = course?.discount?.percentage;
 
   const handleInput = (field, value) => {
@@ -56,7 +58,7 @@ const CheckoutPage = () => {
     }
     
     if (!valid) {
-      setError('Please fill in all required fields.');
+      setError('يرجى تعبئة جميع الحقول المطلوبة.');
       return;
     }
 
@@ -64,10 +66,10 @@ const CheckoutPage = () => {
       setProcessing(true);
       setError('');
       await enrollInCourse(id);
-      setSuccess('Payment successful! Redirecting to your course...');
+      setSuccess('تم الدفع بنجاح! جاري تحويلك إلى الدورة...');
       setTimeout(() => navigate(`/apprenant/course/${id}/learn`), 1200);
     } catch (e) {
-      setError(e.response?.data?.message || 'Payment failed. Please try again.');
+      setError(e.response?.data?.message || 'فشل الدفع. الرجاء المحاولة مرة أخرى.');
     } finally {
       setProcessing(false);
     }
@@ -77,10 +79,10 @@ const CheckoutPage = () => {
     <ApprenantLayout>
       <div className="checkout-page">
         <div className="checkout-header">
-          <p className="checkout-label">Checkout</p>
-          <h1 className="checkout-title">Complete your enrollment</h1>
+          <p className="checkout-label">الدفع</p>
+          <h1 className="checkout-title">أكمل تسجيلك</h1>
           <p className="checkout-subtitle">
-            {course ? `Secure your spot in ${course.title}` : 'Secure your spot in this course.'}
+            {course ? `احجز مكانك في ${course.title}` : 'احجز مكانك في هذه الدورة.'}
           </p>
         </div>
 
@@ -88,21 +90,21 @@ const CheckoutPage = () => {
           <section className="checkout-form-card">
             {/* Plan Selection */}
             <div className="checkout-plan-card">
-              <h2>Choose your plan</h2>
+              <h2>اختر خطتك</h2>
               <div className="checkout-plans">
                 <div 
                   className={`checkout-plan-option ${plan === 'yearly' ? 'selected' : ''}`}
                   onClick={() => setPlan('yearly')}
                 >
                   <div className="plan-header">
-                    <h3>Yearly Access</h3>
-                    <span className="plan-badge">Most Popular</span>
+                    <h3>الوصول السنوي</h3>
+                    <span className="plan-badge">الأكثر شيوعًا</span>
                   </div>
                   <div className="plan-price">
                     <span className="price-main">{price}</span>
-                    <span className="price-period">/year</span>
+                    <span className="price-period">/سنة</span>
                   </div>
-                  <p className="plan-description">Full access to all course content for one year</p>
+                  <p className="plan-description">وصول كامل إلى محتوى الدورة لمدة عام واحد</p>
                 </div>
                 
                 <div 
@@ -110,20 +112,20 @@ const CheckoutPage = () => {
                   onClick={() => setPlan('monthly')}
                 >
                   <div className="plan-header">
-                    <h3>Monthly Access</h3>
+                    <h3>الوصول الشهري</h3>
                   </div>
                   <div className="plan-price">
                     <span className="price-main">${Number(course?.price || 0).toFixed(0)}</span>
-                    <span className="price-period">/month</span>
+                    <span className="price-period">/شهر</span>
                   </div>
-                  <p className="plan-description">Flexible monthly access to course content</p>
+                  <p className="plan-description">وصول مرن إلى محتوى الدورة شهريًا</p>
                 </div>
               </div>
             </div>
 
             {/* Payment Method Selection */}
             <div className="checkout-payment-method">
-              <h2>Payment method</h2>
+              <h2>طريقة الدفع</h2>
               <div className="payment-methods">
                 <label className="payment-method-option">
                   <input
@@ -134,7 +136,7 @@ const CheckoutPage = () => {
                     onChange={(e) => setPaymentMethod(e.target.value)}
                   />
                   <span className="method-icon">💳</span>
-                  <span>Credit Card</span>
+                  <span>بطاقة ائتمان</span>
                 </label>
                 
                 <label className="payment-method-option">
@@ -146,7 +148,7 @@ const CheckoutPage = () => {
                     onChange={(e) => setPaymentMethod(e.target.value)}
                   />
                   <span className="method-icon">🅿️</span>
-                  <span>PayPal</span>
+                  <span>باي بال</span>
                 </label>
                 
                 <label className="payment-method-option">
@@ -158,7 +160,7 @@ const CheckoutPage = () => {
                     onChange={(e) => setPaymentMethod(e.target.value)}
                   />
                   <span className="method-icon">🇬</span>
-                  <span>Google Pay</span>
+                  <span>جوجل باي</span>
                 </label>
               </div>
             </div>
@@ -167,30 +169,30 @@ const CheckoutPage = () => {
             {paymentMethod === 'credit-card' && (
               <div className="checkout-card-form">
                 <div className="checkout-card-top">
-                  <h2>Card details</h2>
-                  <p>Enter your card information securely.</p>
+                  <h2>بيانات البطاقة</h2>
+                  <p>أدخل معلومات بطاقتك بأمان.</p>
                 </div>
 
                 {loading ? (
-                  <div className="checkout-loading">Loading course details...</div>
+                  <div className="checkout-loading">جارٍ تحميل تفاصيل الدورة...</div>
                 ) : (
                   <form className="checkout-form" onSubmit={handleCompletePayment}>
                     {error && <div className="checkout-error">{error}</div>}
                     {success && <div className="checkout-success">{success}</div>}
 
                     <label>
-                      Name on card
+                      الاسم على البطاقة
                       <input
                         type="text"
                         value={billing.nameOnCard}
                         onChange={e => handleInput('nameOnCard', e.target.value)}
-                        placeholder="John Doe"
+                        placeholder="أحمد محمد"
                         required
                       />
                     </label>
 
                     <label>
-                      Card number
+                      رقم البطاقة
                       <input
                         type="text"
                         value={billing.cardNumber}
@@ -202,7 +204,7 @@ const CheckoutPage = () => {
 
                     <div className="checkout-form-row">
                       <label>
-                        Expiry date
+                        تاريخ الانتهاء
                         <input
                           type="text"
                           value={billing.expiry}
@@ -212,7 +214,7 @@ const CheckoutPage = () => {
                         />
                       </label>
                       <label>
-                        CVC
+                        رمز الأمان
                         <input
                           type="text"
                           value={billing.cvc}
@@ -224,11 +226,11 @@ const CheckoutPage = () => {
                     </div>
 
                     <button type="submit" className="checkout-submit-btn" disabled={processing}>
-                      {processing ? 'Processing payment...' : isPaid ? 'Complete Payment' : 'Continue to Course'}
+                      {processing ? 'جارٍ معالجة الدفع...' : isPaid ? 'أكمل الدفع' : 'تابع إلى الدورة'}
                     </button>
 
                     <p className="checkout-note">
-                      This is a mock checkout experience. Your card will not be charged.
+                      هذه تجربة دفع وهمية. لن يتم خصم أي مبلغ من بطاقتك.
                     </p>
                   </form>
                 )}
@@ -239,8 +241,8 @@ const CheckoutPage = () => {
             {(paymentMethod === 'paypal' || paymentMethod === 'google-pay') && (
               <div className="checkout-alt-payment">
                 <div className="checkout-card-top">
-                  <h2>{paymentMethod === 'paypal' ? 'PayPal' : 'Google Pay'} Payment</h2>
-                  <p>You will be redirected to complete your payment securely.</p>
+                  <h2>{paymentMethod === 'paypal' ? 'دفع باي بال' : 'دفع جوجل باي'}</h2>
+                  <p>سيتم تحويلك لإكمال الدفع بطريقة آمنة.</p>
                 </div>
                 
                 <form className="checkout-form" onSubmit={handleCompletePayment}>
@@ -248,7 +250,7 @@ const CheckoutPage = () => {
                   {success && <div className="checkout-success">{success}</div>}
 
                   <label>
-                    Email address
+                    البريد الإلكتروني
                     <input
                       type="email"
                       value={billing.email}
@@ -259,11 +261,11 @@ const CheckoutPage = () => {
                   </label>
 
                   <button type="submit" className="checkout-submit-btn" disabled={processing}>
-                    {processing ? 'Processing...' : `Pay with ${paymentMethod === 'paypal' ? 'PayPal' : 'Google Pay'}`}
+                    {processing ? 'جارٍ المعالجة...' : paymentMethod === 'paypal' ? 'ادفع عبر باي بال' : 'ادفع عبر جوجل باي'}
                   </button>
 
                   <p className="checkout-note">
-                    This is a mock checkout experience. No real payment will be processed.
+                    هذه تجربة دفع وهمية. لن تتم معالجة أي دفعة حقيقية.
                   </p>
                 </form>
               </div>
@@ -272,27 +274,27 @@ const CheckoutPage = () => {
 
           <aside className="checkout-summary-card">
             <div className="checkout-summary-top">
-              <h2>Order summary</h2>
-              <span className="checkout-badge">{isPaid ? 'Paid course' : 'Free course'}</span>
+              <h2>ملخص الطلب</h2>
+              <span className="checkout-badge">{isPaid ? 'دورة مدفوعة' : 'دورة مجانية'}</span>
             </div>
 
             <div className="checkout-summary-item">
-              <span>Course</span>
-              <strong>{course?.title || 'Loading...'}</strong>
+              <span>الدورة</span>
+              <strong>{course?.title || 'جارٍ التحميل...'}</strong>
             </div>
 
             <div className="checkout-summary-item">
-              <span>Instructor</span>
-              <strong>{course?.formateur?.fullName || 'Instructor'}</strong>
+              <span>المدرب</span>
+              <strong>{course?.formateur?.fullName || t('apprenant.instructor')}</strong>
             </div>
 
             <div className="checkout-summary-item">
-              <span>Duration</span>
-              <strong>{course ? `${Math.round((course.totalDuration || 0) / 60)} hours` : '—'}</strong>
+              <span>المدة</span>
+              <strong>{course ? `${Math.round((course.totalDuration || 0) / 60)} ساعة` : '—'}</strong>
             </div>
 
             <div className="checkout-summary-item">
-              <span>Price</span>
+              <span>السعر</span>
               <strong>{price}</strong>
             </div>
 
@@ -304,12 +306,12 @@ const CheckoutPage = () => {
             )}
 
             <div className="checkout-summary-total">
-              <span>Total due</span>
-              <strong>{isPaid ? price : 'FREE'}</strong>
+              <span>المبلغ المستحق</span>
+              <strong>{isPaid ? price : 'مجاني'}</strong>
             </div>
 
             <div className="checkout-summary-footer">
-              <p>After payment, you will be redirected to the course player where you can start learning immediately.</p>
+              <p>بعد الدفع، سيتم تحويلك إلى مشغل الدورة لتبدأ التعلم فورًا.</p>
             </div>
           </aside>
         </div>

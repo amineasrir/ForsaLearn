@@ -6,7 +6,7 @@ import {
   FaClipboardList, FaHistory, FaEnvelope, FaHeadset,
   FaCog, FaSignOutAlt, FaTimes,
 } from 'react-icons/fa';
-import '../../pages/ApprenantPage/dashboard.css';
+import '../../pages/ApprenantPage/apprenant.css';
 
 const Sidebar = ({ isOpen = false, onClose = () => {} }) => {
   const { t } = useTranslation();

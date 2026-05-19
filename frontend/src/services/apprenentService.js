@@ -78,6 +78,10 @@ export const getConversations = (params = {}) => {
   return API.get(`messages/conversations${query ? `?${query}` : ""}`);
 };
 
+export const createConversation = (data) => {
+  return API.post('messages/conversations', data);
+};
+
 export const getConversationMessages = (conversationId, params = {}) => {
   const searchParams = new URLSearchParams();
 
