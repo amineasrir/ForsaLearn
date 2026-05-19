@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const { body, validationResult } = require('express-validator');
+const jwt = require('jsonwebtoken');
 const Course = require('../models/Course');
 const { protect, authorize, checkFormateurApproval } = require('../middleware/auth');
 const {
@@ -10,6 +11,93 @@ const {
 const { Formateur } = require('../models/User');
 const { User } = require('../models/User');
 const { issueCertificateForCompletion } = require('../utils/issueCertificate');
+
+const getLatestQuizAttempt = (quizAttempts = [], lessonId) => {
+  const attempts = quizAttempts
+    .filter((attempt) => attempt.lessonId.toString() === lessonId.toString())
+    .sort((a, b) => new Date(b.completedAt || 0) - new Date(a.completedAt || 0));
+
+  return attempts[0] || null;
+};
+
+const sanitizeLessonForLearner = (lesson, enrollment = null) => {
+  if (lesson.type !== 'quiz') {
+    return lesson;
+  }
+
+  const latestAttempt = enrollment ? getLatestQuizAttempt(enrollment.quizAttempts || [], lesson._id) : null;
+
+  return {
+    ...lesson,
+    quiz: {
+      instructions: lesson.quiz?.instructions || '',
+      passingScore: lesson.quiz?.passingScore || 50,
+      timeLimit: lesson.quiz?.timeLimit || 0,
+      allowRetry: lesson.quiz?.allowRetry !== false,
+      maxAttempts: lesson.quiz?.maxAttempts || 0,
+      questions: (lesson.quiz?.questions || []).map((question) => ({
+        _id: question._id,
+        prompt: question.prompt,
+        type: question.type,
+        options: (question.options || []).map((option) => ({
+          text: option.text
+        })),
+        explanation: latestAttempt ? question.explanation : '',
+        points: question.points,
+        order: question.order
+      }))
+    },
+    quizSummary: {
+      questionCount: lesson.quiz?.questions?.length || 0,
+      latestAttempt: latestAttempt ? {
+        score: latestAttempt.score,
+        totalPoints: latestAttempt.totalPoints,
+        percentageScore: latestAttempt.percentageScore,
+        passed: latestAttempt.passed,
+        status: latestAttempt.status,
+        completedAt: latestAttempt.completedAt,
+        attemptNumber: latestAttempt.attemptNumber
+      } : null
+    }
+  };
+};
+
+const buildCourseForLearner = (course, enrollment = null) => {
+  const data = course.toObject();
+
+  data.sections = (data.sections || []).map((section) => ({
+    ...section,
+    lessons: (section.lessons || []).map((lesson) => sanitizeLessonForLearner(lesson, enrollment))
+  }));
+
+  return data;
+};
+
+const attachUserIfPresent = async (req, res, next) => {
+  try {
+    const authorization = req.headers.authorization || '';
+
+    if (!authorization.startsWith('Bearer ')) {
+      return next();
+    }
+
+    const token = authorization.split(' ')[1];
+    if (!token) {
+      return next();
+    }
+
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const user = await User.findById(decoded.id).select('-password');
+
+    if (user && user.isActive) {
+      req.user = user;
+    }
+
+    return next();
+  } catch (error) {
+    return next();
+  }
+};
 
 // PUBLIC ROUTES - No authentication required
 
@@ -349,13 +437,15 @@ router.get('/student/my-courses', protect, authorize('visiteur'), async (req, re
       );
       
       return {
-        ...course.toObject(),
+        ...buildCourseForLearner(course, enrollment),
         myProgress: enrollment.progress,
         enrolledAt: enrollment.enrolledAt,
         lastAccessedAt: enrollment.lastAccessedAt,
         completedAt: enrollment.completedAt,
         certificateIssued: enrollment.certificateIssued,
-        certificateUrl: enrollment.certificateUrl
+        certificateUrl: enrollment.certificateUrl,
+        completedLessons: enrollment.completedLessons,
+        myQuizAttempts: enrollment.quizAttempts || []
       };
     });
     
@@ -413,6 +503,123 @@ router.post('/:courseId/lessons/:lessonId/complete', protect, authorize('visiteu
   } catch (error) {
     console.error('Complete lesson error:', error);
     res.status(500).json({ message: error.message || 'Error updating progress' });
+  }
+});
+
+router.post('/:courseId/quizzes/:lessonId/submit', protect, authorize('visiteur'), async (req, res) => {
+  try {
+    const course = await Course.findById(req.params.courseId);
+
+    if (!course) {
+      return res.status(404).json({ message: 'Course not found' });
+    }
+
+    const submittedAnswers = Array.isArray(req.body.answers) ? req.body.answers : [];
+    const { enrollment, attempt, lesson } = course.submitQuizAttempt(
+      req.user.id,
+      req.params.lessonId,
+      submittedAnswers
+    );
+
+    let progress = enrollment.progress;
+    let issuedCertificate = null;
+
+    if (attempt.passed) {
+      const updatedEnrollment = course.updateProgress(req.user.id, req.params.lessonId);
+      progress = updatedEnrollment.progress;
+
+      if (Number(updatedEnrollment.progress || 0) >= 100) {
+        await course.populate('formateur', 'fullName');
+        const student = await User.findById(req.user.id).select('fullName email language');
+
+        const certificateResult = await issueCertificateForCompletion({
+          course,
+          student,
+          enrollment: updatedEnrollment,
+          reqMeta: {
+            ipAddress: req.ip,
+            userAgent: req.get('user-agent')
+          }
+        });
+
+        issuedCertificate = certificateResult.certificate || null;
+      }
+    }
+
+    await course.save();
+
+    res.status(200).json({
+      success: true,
+      message: attempt.passed ? 'Quiz submitted successfully' : 'Quiz submitted. Try again to improve your score.',
+      data: {
+        lessonId: lesson._id,
+        score: attempt.score,
+        totalPoints: attempt.totalPoints,
+        percentageScore: attempt.percentageScore,
+        passed: attempt.passed,
+        status: attempt.status,
+        attemptNumber: attempt.attemptNumber,
+        completedAt: attempt.completedAt,
+        progress,
+        certificateIssued: enrollment.certificateIssued,
+        certificateUrl: enrollment.certificateUrl,
+        certificate: issuedCertificate,
+        answers: attempt.answers
+      }
+    });
+  } catch (error) {
+    console.error('Submit quiz error:', error);
+    res.status(500).json({ message: error.message || 'Error submitting quiz' });
+  }
+});
+
+router.get('/student/quiz-attempts', protect, authorize('visiteur'), async (req, res) => {
+  try {
+    const courses = await Course.find({
+      'enrolledStudents.student': req.user.id
+    }).populate('formateur', 'fullName');
+
+    const attempts = courses.flatMap((course) => {
+      const enrollment = course.enrolledStudents.find(
+        (item) => item.student.toString() === req.user.id
+      );
+
+      if (!enrollment) {
+        return [];
+      }
+
+      return (enrollment.quizAttempts || []).map((attempt) => {
+        const locatedLesson = course.findLessonById(attempt.lessonId);
+        const lesson = locatedLesson?.lesson;
+        const section = locatedLesson?.section;
+
+        return {
+          id: `${course._id}-${attempt.lessonId}-${attempt.attemptNumber}`,
+          courseId: course._id,
+          courseTitle: course.title,
+          lessonId: attempt.lessonId,
+          lessonTitle: lesson?.title || 'Quiz',
+          sectionTitle: section?.title || '',
+          score: attempt.score,
+          totalPoints: attempt.totalPoints,
+          percentageScore: attempt.percentageScore,
+          passed: attempt.passed,
+          status: attempt.status,
+          completedAt: attempt.completedAt,
+          attemptNumber: attempt.attemptNumber,
+          questionCount: lesson?.quiz?.questions?.length || 0
+        };
+      });
+    }).sort((a, b) => new Date(b.completedAt || 0) - new Date(a.completedAt || 0));
+
+    res.status(200).json({
+      success: true,
+      count: attempts.length,
+      data: attempts
+    });
+  } catch (error) {
+    console.error('Get quiz attempts error:', error);
+    res.status(500).json({ message: 'Error fetching quiz attempts' });
   }
 });
 
@@ -478,7 +685,7 @@ router.post('/:id/reviews',
 );
 
 // Get single course by ID or slug
-router.get('/:id', async (req, res) => {
+router.get('/:id', attachUserIfPresent, async (req, res) => {
   try {
     let course;
     
@@ -501,10 +708,26 @@ router.get('/:id', async (req, res) => {
     if (!course.isPublished && (!req.user || req.user.role !== 'admin')) {
       return res.status(403).json({ message: 'Course not available' });
     }
+
+    const isAdmin = req.user?.role === 'admin';
+    const isOwner = req.user?.role === 'formateur' && course.formateur?._id?.toString() === req.user.id;
+    const enrollment = req.user?.role === 'visiteur'
+      ? course.enrolledStudents.find((item) => item.student.toString() === req.user.id)
+      : null;
+
+    const courseData = (isAdmin || isOwner)
+      ? course.toObject()
+      : buildCourseForLearner(course, enrollment || null);
     
     res.status(200).json({
       success: true,
-      data: course
+      data: {
+        ...courseData,
+        myProgress: enrollment?.progress,
+        enrolledAt: enrollment?.enrolledAt,
+        completedLessons: enrollment?.completedLessons || [],
+        myQuizAttempts: enrollment?.quizAttempts || []
+      }
     });
   } catch (error) {
     console.error('Get course error:', error);

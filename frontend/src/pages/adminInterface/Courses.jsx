@@ -318,9 +318,11 @@ const Courses = () => {
                           )}
                           <button className="action-btn view" title="View" onClick={() => navigate(`/admin/courses/${course._id}`)}>
                             <FaEye />
+                            <span>View</span>
                           </button>
                           <button className="action-btn delete" title="Delete" onClick={() => handleDelete(course._id)}>
                             <FaTrash />
+                            <span>Delete</span>
                           </button>
                         </div>
                       </div>

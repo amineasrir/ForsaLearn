@@ -45,6 +45,14 @@ export const getEnrolledCourses = () => {
   return API.get("courses/student/my-courses");
 };
 
+export const getMyQuizAttempts = () => {
+  return API.get("courses/student/quiz-attempts");
+};
+
+export const submitQuizAttempt = (courseId, lessonId, answers) => {
+  return API.post(`courses/${courseId}/quizzes/${lessonId}/submit`, { answers });
+};
+
 export const getMyCertificates = () => {
   return API.get("certificate/my-certificates");
 };

@@ -5,9 +5,10 @@ import logo_rem from "../../assets/image/home_page/logo_rem.png";
 import loginImage from "../../assets/image/login/image.png";
 import AuthSidebar from '../../components/auth/AuthSidebar';
 import '../../styles/auth.css';
+import { requestPasswordReset } from '../../services/authService';
 
 const ForgotPassword = () => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const navigate = useNavigate();
   const [email, setEmail] = useState('');
   const [loading, setLoading] = useState(false);
@@ -20,14 +21,28 @@ const ForgotPassword = () => {
     setSuccess('');
     
     if (!email) {
-      setError('Please enter your email');
+      setError(t('pleaseEnterEmail'));
       return;
     }
 
-    setSuccess('OTP sent to your email. Check your inbox!');
-    setTimeout(() => {
-      navigate('/otp-verification', { state: { email } });
-    }, 1000);
+    setLoading(true);
+
+    try {
+      const response = await requestPasswordReset({ email, language: i18n.language });
+      const targetEmail = response.data?.email || email;
+
+      setSuccess(response.data?.message || 'OTP sent to your email. Check your inbox!');
+
+      setTimeout(() => {
+        navigate('/otp-verification', { state: { email: targetEmail } });
+      }, 900);
+    } catch (err) {
+      const backendMessage = err.response?.data?.message;
+      const validationMessage = err.response?.data?.errors?.[0]?.msg;
+      setError(backendMessage || validationMessage || t('errorOccurred'));
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (

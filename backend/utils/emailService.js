@@ -363,6 +363,49 @@ const sendPasswordResetEmail = async (user, resetLink, language = 'en') => {
   }
 };
 
+const sendPasswordResetOTPEmail = async (user, otp, language = 'en') => {
+  try {
+    const t = getTranslations(language).passwordReset;
+    const codeLabel = language === 'fr' ? 'Code de verification' : 'Verification Code';
+    const helperText = language === 'fr'
+      ? 'Utilisez le code ci-dessous pour reinitialiser votre mot de passe.'
+      : 'Use the code below to reset your password.';
+    const expiryText = language === 'fr'
+      ? 'Ce code expire dans 10 minutes.'
+      : 'This code expires in 10 minutes.';
+
+    const html = baseTemplate(`
+      <div class="container">
+        <div class="header">
+          <h1>OTP ${t.title}</h1>
+        </div>
+        <div class="content">
+          <p>${t.intro}</p>
+          <p>${helperText}</p>
+          <div style="margin: 30px 0; text-align: center;">
+            <div style="display: inline-block; padding: 18px 28px; border-radius: 12px; background-color: #f7f3ff; border: 1px solid #e4dbff; letter-spacing: 10px; font-size: 32px; font-weight: 700; color: #392C7D;">
+              ${otp}
+            </div>
+          </div>
+          <p style="font-weight: 600;">${codeLabel}</p>
+          <p style="font-size: 12px; color: #888;">${expiryText}</p>
+          <p style="font-size: 12px; color: #888;">${t.ignore}</p>
+        </div>
+      </div>
+    `, language);
+    const delivery = await sendEmail({
+      to: user.email,
+      subject: t.subject,
+      html
+    });
+    console.log(`Password reset OTP email sent to ${user.email}`);
+    return delivery;
+  } catch (error) {
+    console.error('Error sending password reset OTP email:', error);
+    return { success: false, error: error.message };
+  }
+};
+
 module.exports = {
   sendWelcomeEmail,
   sendFormateurApprovalEmail,
@@ -374,5 +417,6 @@ module.exports = {
   sendCourseCompletionEmail,
   sendReminderEmail,
   sendVerificationEmail,
-  sendPasswordResetEmail
+  sendPasswordResetEmail,
+  sendPasswordResetOTPEmail
 };

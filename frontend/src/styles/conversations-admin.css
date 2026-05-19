@@ -24,6 +24,7 @@
     height: 600px;
     overflow: hidden;
     padding: 0 !important;
+    min-width: 0;
   }
   
   /* Conversations Sidebar */
@@ -33,6 +34,7 @@
     display: flex;
     flex-direction: column;
     background: white;
+    min-width: 0;
   }
   
   .conversations-header {
@@ -47,6 +49,19 @@
     border-radius: 8px;
     font-size: 14px;
     margin-bottom: 12px;
+  }
+
+  .search-box {
+    position: relative;
+  }
+
+  .search-icon {
+    position: absolute;
+    left: 14px;
+    top: 38%;
+    transform: translateY(-50%);
+    color: #9ca3af;
+    z-index: 1;
   }
   
   .filter-tabs {
@@ -256,6 +271,7 @@
     display: flex;
     flex-direction: column;
     background: #f9fafb;
+    min-width: 0;
   }
   
   .chat-header {
@@ -265,6 +281,7 @@
     padding: 16px 20px;
     background: white;
     border-bottom: 1px solid #e5e7eb;
+    gap: 12px;
   }
   
   .chat-header-info {
@@ -323,6 +340,8 @@
   .chat-actions {
     display: flex;
     gap: 8px;
+    flex-wrap: wrap;
+    justify-content: flex-end;
   }
   
   .chat-action-btn {
@@ -555,6 +574,10 @@
   
   /* Responsive Design */
   @media (max-width: 1024px) {
+    .messages-container {
+      height: 560px;
+    }
+
     .conversations-sidebar {
       width: 300px;
     }
@@ -566,22 +589,47 @@
   
   @media (max-width: 768px) {
     .messages-container {
-      height: 500px;
+      flex-direction: column;
+      height: auto;
+      min-height: 640px;
     }
   
     .conversations-sidebar {
       width: 100%;
       border-right: none;
-      display: none;
+      border-bottom: 1px solid #e5e7eb;
+      display: flex;
+      max-height: 320px;
     }
   
     .chat-area {
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      z-index: 10;
+      position: static;
+      min-height: 420px;
+    }
+
+    .conversations-list {
+      max-height: 240px;
+    }
+
+    .filter-tabs {
+      justify-content: flex-start;
+      overflow-x: auto;
+      padding-bottom: 4px;
+    }
+
+    .filter-tab {
+      flex: 0 0 auto;
+      min-width: 52px;
+    }
+
+    .chat-header {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+
+    .chat-actions {
+      width: 100%;
+      justify-content: flex-start;
     }
   
     .message {
@@ -592,6 +640,11 @@
   @media (max-width: 480px) {
     .messages-container {
       height: 450px;
+      min-height: 580px;
+    }
+
+    .conversation-item {
+      padding: 10px 12px;
     }
   
     .conversation-avatar {
@@ -605,9 +658,22 @@
       height: 40px;
       font-size: 18px;
     }
+
+    .chat-header {
+      padding: 14px 16px;
+    }
+
+    .messages-area {
+      padding: 14px;
+    }
+
+    .message-input-area {
+      padding: 12px 14px;
+      gap: 8px;
+    }
   
     .message {
-      max-width: 90%;
+      max-width: 100%;
     }
   
     .message-text {

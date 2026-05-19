@@ -5,7 +5,7 @@ import "flag-icons/css/flag-icons.min.css"; // Import CSS des drapeaux
 import logo from "../../assets/image/home_page/logo_rem.png";
 
 const Header = ({title}) => {
-    const { t, i18n } = useTranslation();
+    const { i18n } = useTranslation();
 
     const changeLanguage = () => {
       const lang = i18n && i18n.language === "en" ? "fr" : "en";

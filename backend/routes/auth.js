@@ -4,6 +4,7 @@ const { body, validationResult } = require('express-validator');
 const jwt = require('jsonwebtoken');
 const { Admin, Formateur, Visiteur, User } = require('../models/User');
 const { protect, authorize } = require('../middleware/auth');
+const { sendPasswordResetOTPEmail } = require('../utils/emailService');
 
 // REGISTER ROUTES
 
@@ -398,27 +399,33 @@ router.post('/forgot-password',
 
       const { email } = req.body;
 
-      // Find user by email
       const user = await User.findOne({ email });
       
       if (!user) {
         return res.status(404).json({ message: 'Email not found in our system' });
       }
 
-      // Generate OTP (6 digit code)
       const otp = Math.floor(100000 + Math.random() * 900000).toString();
-      
-      // Save OTP and expiry to user (OTP valid for 10 minutes)
+
       user.resetOTP = otp;
       user.resetOTPExpiry = new Date(Date.now() + 10 * 60 * 1000);
       await user.save();
 
-      // TODO: Send OTP via email using emailService
-      console.log(`OTP for ${email}: ${otp}`); // For testing
+      const emailResult = await sendPasswordResetOTPEmail(
+        user,
+        otp,
+        req.body.language || user.language || 'en'
+      );
+
+      if (!emailResult?.success) {
+        return res.status(503).json({
+          message: 'Email service is unavailable. Please try again later.'
+        });
+      }
 
       res.status(200).json({ 
         message: 'OTP sent to your email',
-        email: email // Return email for OTP verification page
+        email
       });
     } catch (error) {
       console.error('Forgot password error:', error);
@@ -427,6 +434,96 @@ router.post('/forgot-password',
   }
 );
 
-module.exports = router;
+router.post('/verify-reset-otp',
+  [
+    body('email').isEmail().normalizeEmail().withMessage('Please provide a valid email'),
+    body('otp')
+      .trim()
+      .isLength({ min: 6, max: 6 })
+      .withMessage('OTP must be 6 digits')
+      .isNumeric()
+      .withMessage('OTP must contain only numbers')
+  ],
+  async (req, res) => {
+    try {
+      const errors = validationResult(req);
+      if (!errors.isEmpty()) {
+        return res.status(400).json({ errors: errors.array() });
+      }
+
+      const { email, otp } = req.body;
+      const user = await User.findOne({ email });
+
+      if (!user || !user.resetOTP || !user.resetOTPExpiry) {
+        return res.status(400).json({ message: 'No reset request found for this email' });
+      }
+
+      if (user.resetOTPExpiry < new Date()) {
+        return res.status(400).json({ message: 'OTP has expired. Please request a new code.' });
+      }
+
+      if (user.resetOTP !== otp) {
+        return res.status(400).json({ message: 'Invalid OTP code' });
+      }
+
+      res.status(200).json({
+        message: 'OTP verified successfully',
+        email
+      });
+    } catch (error) {
+      console.error('Verify reset OTP error:', error);
+      res.status(500).json({ message: 'Server error during OTP verification' });
+    }
+  }
+);
+
+router.post('/reset-password',
+  [
+    body('email').isEmail().normalizeEmail().withMessage('Please provide a valid email'),
+    body('otp')
+      .trim()
+      .isLength({ min: 6, max: 6 })
+      .withMessage('OTP must be 6 digits')
+      .isNumeric()
+      .withMessage('OTP must contain only numbers'),
+    body('password').isLength({ min: 6 }).withMessage('Password must be at least 6 characters')
+  ],
+  async (req, res) => {
+    try {
+      const errors = validationResult(req);
+      if (!errors.isEmpty()) {
+        return res.status(400).json({ errors: errors.array() });
+      }
+
+      const { email, otp, password } = req.body;
+      const user = await User.findOne({ email }).select('+password');
+
+      if (!user || !user.resetOTP || !user.resetOTPExpiry) {
+        return res.status(400).json({ message: 'No reset request found for this email' });
+      }
+
+      if (user.resetOTPExpiry < new Date()) {
+        return res.status(400).json({ message: 'OTP has expired. Please request a new code.' });
+      }
+
+      if (user.resetOTP !== otp) {
+        return res.status(400).json({ message: 'Invalid OTP code' });
+      }
+
+      user.password = password;
+      user.resetOTP = undefined;
+      user.resetOTPExpiry = undefined;
+      await user.save();
+
+      res.status(200).json({
+        message: 'Password reset successful',
+        email: user.email
+      });
+    } catch (error) {
+      console.error('Reset password error:', error);
+      res.status(500).json({ message: 'Server error during password reset' });
+    }
+  }
+);
 
 module.exports = router;

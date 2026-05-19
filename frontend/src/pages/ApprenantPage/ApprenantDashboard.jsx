@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import './dashboard.css';
+import './apprenant.css';
 import ApprenantLayout from '../../components/apprenant/ApprenantLayout';
 import { FaBook, FaCheckCircle, FaStar, FaFileAlt } from 'react-icons/fa';
 import CardP from '../../components/apprenant/CardP';
@@ -74,7 +74,7 @@ const ApprenantDashboard = () => {
               <h3>{t('apprenant.learningProgress')}</h3>
               <p>{t('apprenant.enrolledIn', { count: courses.length })}</p>
             </div>
-            <button className="apprenant-continue-button">{t('apprenant.keepLearning')}</button>
+            <button className="apprenant-continue-button" to="/apprenant/enrolled">{t('apprenant.keepLearning')}</button>
           </div>
 
           <div className="apprenant-stats-cards">

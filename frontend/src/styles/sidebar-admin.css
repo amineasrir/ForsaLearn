@@ -7,6 +7,12 @@
     margin-top: 20px;
     height: fit-content;
   }
+
+  .sidebar-content {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
   
   .apprenant-menu-title {
     font-size: 0.75rem;
@@ -20,48 +26,126 @@
     flex-direction: column;
     gap: 0.25rem;
   }
+
+  .menu {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+  }
   
-  .apprenant-menu-item {
+  .apprenant-menu-item,
+  .menu-item {
     display: flex;
     align-items: center;
     gap: 0.75rem;
     padding: 0.55rem 0.75rem;
     border-radius: 0.75rem;
     text-decoration: none;
-    color: var(--text);
+    color: var(--text, #1f2937);
     font-weight: 600;
     transition: 0.2s ease;
+    border: none;
+    background: transparent;
+    width: 100%;
+    cursor: pointer;
+    text-align: left;
   }
   
-  .apprenant-menu-item .menu-icon {
+  .apprenant-menu-item .menu-icon,
+  .menu-item .menu-icon {
   
     display: flex;
     align-items: center;
     justify-content: center;
     border-radius: 50%;
-    color: var(--text);
+    color: var(--text, #1f2937);
     flex-shrink: 0;
     font-size: 20px;
   }
   
-  .apprenant-menu-item svg {
+  .apprenant-menu-item svg,
+  .menu-item svg {
     width: 18px;
     height: 18px;
   }
   
-  .apprenant-menu-item .menu-text {
+  .apprenant-menu-item .menu-text,
+  .menu-item .menu-text {
     display: inline-block;
     color: #434242;
     font-size: small;
   }
   
-  .apprenant-menu-item:hover {
+  .apprenant-menu-item:hover,
+  .menu-item:hover {
     background: rgba(124, 58, 237, 0.06);
   }
   
-  .apprenant-menu-item:hover .menu-icon {
+  .apprenant-menu-item:hover .menu-icon,
+  .menu-item:hover .menu-icon {
     background: rgba(124, 58, 237, 0.08);
   }
   
-  
-  
+  .apprenant-menu-item.active {
+    background: rgba(124, 58, 237, 0.12);
+  }
+
+  .apprenant-menu-item.active .menu-icon,
+  .apprenant-menu-item.active .menu-text {
+    color: #6d28d9;
+  }
+
+  @media (max-width: 1024px) {
+    .apprenant-sidebar {
+      position: static;
+      margin-top: 0;
+      padding: 1rem;
+    }
+
+    .sidebar-content {
+      gap: 0.85rem;
+    }
+
+    .apprenant-menu-title {
+      width: 100%;
+      margin: 0;
+    }
+
+    .apprenant-menu,
+    .menu {
+      flex-direction: row;
+      flex-wrap: wrap;
+      gap: 0.65rem;
+    }
+
+    .apprenant-menu-item,
+    .menu-item {
+      flex: 1 1 220px;
+      min-width: 170px;
+    }
+  }
+
+  @media (max-width: 768px) {
+    .apprenant-sidebar {
+      padding: 0.875rem;
+    }
+
+    .apprenant-menu-item,
+    .menu-item {
+      flex: 1 1 calc(50% - 0.65rem);
+      min-width: 0;
+    }
+  }
+
+  @media (max-width: 520px) {
+    .apprenant-menu,
+    .menu {
+      flex-direction: column;
+    }
+
+    .apprenant-menu-item,
+    .menu-item {
+      width: 100%;
+      flex: 1 1 100%;
+    }
+  }

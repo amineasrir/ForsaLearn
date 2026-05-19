@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import ApprenantLayout from '../../components/apprenant/ApprenantLayout';
 import CardP from '../../components/apprenant/CardP';
 import '../../styles/formateur.css';
-import './dashboard.css';
+import './apprenant.css';
 import {
   getApprenantProfile,
   getConversations,

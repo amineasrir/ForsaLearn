@@ -154,7 +154,7 @@ const CourseDetails = () => {
   if (loading) {
     return (
       <ApprenantLayout title="Course Details" breadcrumb={[{ to: '/', label: 'Home' }]}>
-        <div className="cd-loading">Loading...</div>
+        <div className="course-details__loading">Loading...</div>
       </ApprenantLayout>
     );
   }
@@ -198,91 +198,91 @@ const CourseDetails = () => {
       {success && <div className="success-message">{success}</div>}
 
       {/* ── Back button ── */}
-      <button className="cd-back-btn" onClick={() => navigate('/apprenant/courses')}>
+      <button className="course-details__back-btn" onClick={() => navigate('/apprenant/courses')}>
         <FaArrowLeft /> Back to Courses
       </button>
 
 
-<div className="cd-header-card">
-        <div className="cd-header-hero" onClick={handleStartLearning}>
+<div className="course-details__header">
+        <div className="course-details__hero" onClick={handleStartLearning}>
           <img
             src={getMediaUrl(course.thumbnail) || require('../../assets/image/cours/cours.jpg')}
             alt={course.title}
           />
         </div>
 
-        <div className="cd-header-grid">
-          <div className="cd-header-info">
+        <div className="course-details__grid">
+          <div className="course-details__info">
           {/* badges row */}
-          <div className="cd-badges-row">
-            {course.category && <span className="cd-badge-cat">{course.category}</span>}
-            {course.level && <span className="cd-badge-level">{course.level}</span>}
+          <div className="course-details__badges">
+            {course.category && <span className="course-details__badge--category">{course.category}</span>}
+            {course.level && <span className="course-details__badge--level">{course.level}</span>}
           </div>
 
-          <h1 className="cd-title">{course.title}</h1>
-          <p className="cd-desc">{course.description}</p>
+          <h1 className="course-details__title">{course.title}</h1>
+          <p className="course-details__description">{course.description}</p>
 
           {/* Meta stats */}
-          <div className="cd-meta-row">
-            <span className="cd-meta-item">
+          <div className="course-details__meta">
+            <span className="course-details__meta-item">
               <FaBookOpen /> {course.sections?.length || 0}+ Lesson
             </span>
-            <span className="cd-meta-item">
+            <span className="course-details__meta-item">
               <FaClock /> {fmt(course.totalDuration || 0)}
             </span>
-            <span className="cd-meta-item">
+            <span className="course-details__meta-item">
               <FaUsers /> {course.totalEnrollments || 0} students enrolled
             </span>
           </div>
 
           {/* Rating */}
-          <div className="cd-rating-row">
+          <div className="course-details__rating">
             {[1,2,3,4,5].map(s => (
               <FaStar
                 key={s}
-                className={`cd-star ${s <= Math.round(course.averageRating || 0) ? 'filled' : ''}`}
+                className={`course-details__star ${s <= Math.round(course.averageRating || 0) ? 'course-details__star--filled' : ''}`}
               />
             ))}
-            <span className="cd-rating-val">{Number(course.averageRating || 0).toFixed(1)}</span>
-            <span className="cd-rating-count">({course.totalReviews || 0})</span>
+            <span className="course-details__rating-value">{Number(course.averageRating || 0).toFixed(1)}</span>
+            <span className="course-details__rating-count">({course.totalReviews || 0})</span>
           </div>
 
           {/* Instructor */}
-          <div className="cd-instructor-row">
+          <div className="course-details__instructor">
             <img
               src={getMediaUrl(course.formateur?.profileImage) || require('../../assets/image/student/ava.jpg')}
               alt={course.formateur?.fullName}
-              className="cd-inst-avatar"
+              className="course-details__instructor-avatar"
             />
             <div>
-              <span className="cd-inst-name">{course.formateur?.fullName || 'Instructor'}</span>
-              <span className="cd-inst-role">Instructor</span>
+              <span className="course-details__instructor-name">{course.formateur?.fullName || 'Instructor'}</span>
+              <span className="course-details__instructor-role">Instructor</span>
             </div>
           </div>
         </div>
 
         {/* Right sidebar: price card */}
-        <div className="cd-price-card">
-          <div className="cd-price-top">
-            <span className={`cd-price-main ${isFree ? 'free' : ''}`}>{price}</span>
-            {originalPrice && <span className="cd-price-orig">{originalPrice}</span>}
-            {discount && <span className="cd-discount">{discount}% off</span>}
+        <div className="course-details__price-card">
+          <div className="course-details__price-top">
+            <span className={`course-details__price ${isFree ? 'course-details__price--free' : ''}`}>{price}</span>
+            {originalPrice && <span className="course-details__price-original">{originalPrice}</span>}
+            {discount && <span className="course-details__discount">{discount}% off</span>}
           </div>
 
-          <div className="cd-price-actions">
+          <div className="course-details__actions">
             <button
-              className={`cd-wishlist-btn ${inWishlist ? 'active' : ''}`}
+              className={`course-details__wishlist-btn ${inWishlist ? 'course-details__wishlist-btn--active' : ''}`}
               onClick={() => setInWishlist(v => !v)}
             >
               <FaHeart /> {inWishlist ? 'Wishlisted' : 'Add to Wishlist'}
             </button>
-            <button className="cd-share-btn">
+            <button className="course-details__share-btn">
               <FaShareAlt /> Share
             </button>
           </div>
 
           <button
-            className="cd-enroll-btn"
+            className="course-details__enroll-btn"
             onClick={handleEnroll}
             disabled={enrolling}
           >
@@ -290,19 +290,19 @@ const CourseDetails = () => {
           </button>
           <button
             type="button"
-            className="cd-start-learning-btn"
+            className="course-details__learn-btn"
             onClick={handleStartLearning}
           >
             Start Learning
           </button>
 
           {/* Includes */}
-          <div className="cd-includes">
-            <p className="cd-includes-title">Includes</p>
-            <ul className="cd-includes-list">
+          <div className="course-details__includes">
+            <p className="course-details__includes-title">Includes</p>
+            <ul className="course-details__includes-list">
               {includes.map((item, i) => (
-                <li key={i} className="cd-includes-item">
-                  <span className="cd-inc-icon">{item.icon}</span>
+                <li key={i} className="course-details__includes-item">
+                  <span className="course-details__includes-icon">{item.icon}</span>
                   {item.text}
                 </li>
               ))}
@@ -310,13 +310,13 @@ const CourseDetails = () => {
           </div>
 
           {/* Course Features */}
-          <div className="cd-features-block">
-            <p className="cd-includes-title">Course Features</p>
-            <ul className="cd-features-list">
+          <div className="course-details__features">
+            <p className="course-details__includes-title">Course Features</p>
+            <ul className="course-details__features-list">
               {features.map((f, i) => (
-                <li key={i} className="cd-feature-item">
-                  <span className="cd-feat-label">{f.label}</span>
-                  <span className="cd-feat-value">{f.value}</span>
+                <li key={i} className="course-details__feature-item">
+                  <span className="course-details__feature-label">{f.label}</span>
+                  <span className="course-details__feature-value">{f.value}</span>
                 </li>
               ))}
             </ul>
@@ -328,25 +328,25 @@ const CourseDetails = () => {
       {/* ══════════════════════════════════════════
           OVERVIEW SECTION
       ══════════════════════════════════════════ */}
-      <div className="cd-section-card">
-        <h2 className="cd-section-h2">Overview</h2>
+      <div className="course-details__section">
+        <h2 className="course-details__section-title">Overview</h2>
 
         {/* Course Description */}
         {course.description && (
           <>
-            <h3 className="cd-section-h3">Course Description</h3>
-            <p className="cd-section-text">{course.description}</p>
+            <h3 className="course-details__section-subtitle">Course Description</h3>
+            <p className="course-details__text">{course.description}</p>
           </>
         )}
 
         {/* What you'll learn */}
         {course.learningOutcomes && course.learningOutcomes.length > 0 && (
           <>
-            <h3 className="cd-section-h3">What you'll learn</h3>
-            <ul className="cd-learn-list">
+            <h3 className="course-details__section-subtitle">What you'll learn</h3>
+            <ul className="course-details__learn-list">
               {course.learningOutcomes.map((item, i) => (
-                <li key={i} className="cd-learn-item">
-                  <FaCheckCircle className="cd-check" />
+                <li key={i} className="course-details__learn-item">
+                  <FaCheckCircle className="course-details__check-icon" />
                   <span>{item}</span>
                 </li>
               ))}
@@ -357,8 +357,8 @@ const CourseDetails = () => {
         {/* Requirements */}
         {course.requirements && course.requirements.length > 0 && (
           <>
-            <h3 className="cd-section-h3">Requirements</h3>
-            <ul className="cd-req-list">
+            <h3 className="course-details__section-subtitle">Requirements</h3>
+            <ul className="course-details__requirements-list">
               {course.requirements.map((req, i) => (
                 <li key={i}>{req}</li>
               ))}
@@ -371,26 +371,26 @@ const CourseDetails = () => {
           CURRICULUM / COURSE CONTENT
       ══════════════════════════════════════════ */}
       {course.sections && course.sections.length > 0 && (
-        <div className="cd-section-card">
-          <h2 className="cd-section-h2">Course Content</h2>
-          <div className="cd-curriculum">
+        <div className="course-details__section">
+          <h2 className="course-details__section-title">Course Content</h2>
+          <div className="course-details__curriculum">
             {course.sections.map((sec, idx) => (
-              <div key={sec._id || idx} className="cd-sec-item">
+              <div key={sec._id || idx} className="course-details__section-item">
                 <button
-                  className={`cd-sec-header ${openSection === idx ? 'open' : ''}`}
+                  className={`course-details__section-header ${openSection === idx ? 'course-details__section-header--open' : ''}`}
                   onClick={() => setOpenSection(openSection === idx ? null : idx)}
                 >
-                  <span className="cd-sec-title">{sec.title}</span>
-                  <span className="cd-sec-dur">{fmt(sec.duration)}</span>
-                  <span className="cd-sec-arrow">{openSection === idx ? '▲' : '▼'}</span>
+                  <span className="course-details__section-item-title">{sec.title}</span>
+                  <span className="course-details__section-duration">{fmt(sec.duration)}</span>
+                  <span className="course-details__section-arrow">{openSection === idx ? '▲' : '▼'}</span>
                 </button>
                 {openSection === idx && sec.lessons && sec.lessons.length > 0 && (
-                  <div className="cd-lessons">
+                  <div className="course-details__lessons">
                     {sec.lessons.map((lesson, li) => (
-                      <div key={lesson._id || li} className="cd-lesson-item">
-                        <FaCheckCircle className="cd-lesson-icon" />
-                        <span className="cd-lesson-title">{lesson.title}</span>
-                        <span className="cd-lesson-dur">{fmt(lesson.duration)}</span>
+                      <div key={lesson._id || li} className="course-details__lesson">
+                        <FaCheckCircle className="course-details__lesson-icon" />
+                        <span className="course-details__lesson-title">{lesson.title}</span>
+                        <span className="course-details__lesson-duration">{fmt(lesson.duration)}</span>
                       </div>
                     ))}
                   </div>
@@ -405,25 +405,25 @@ const CourseDetails = () => {
           INSTRUCTOR SECTION
       ══════════════════════════════════════════ */}
       {course.formateur && (
-        <div className="cd-section-card">
-          <h2 className="cd-section-h2">About the instructor</h2>
-          <div className="cd-instructor-card">
+        <div className="course-details__section">
+          <h2 className="course-details__section-title">About the instructor</h2>
+          <div className="course-details__instructor-card">
             <img
               src={getMediaUrl(course.formateur.profileImage) || require('../../assets/image/student/ava.jpg')}
               alt={course.formateur.fullName}
-              className="cd-inst-big-avatar"
+              className="course-details__instructor-avatar-lg"
             />
-            <div className="cd-inst-info">
-              <h3 className="cd-inst-big-name">{course.formateur.fullName}</h3>
+            <div className="course-details__instructor-info">
+              <h3 className="course-details__instructor-name-lg">{course.formateur.fullName}</h3>
               {course.formateur.specialty && (
-                <p className="cd-inst-spec">{course.formateur.specialty}</p>
+                <p className="course-details__instructor-specialty">{course.formateur.specialty}</p>
               )}
-              <div className="cd-inst-stats">
-                <span><FaStar className="cd-star filled" /> {Number(course.formateur.rating || 4.5).toFixed(1)}</span>
+              <div className="course-details__instructor-stats">
+                <span><FaStar className="course-details__star course-details__star--filled" /> {Number(course.formateur.rating || 4.5).toFixed(1)}</span>
                 <span><FaUsers /> {course.formateur.totalStudents || 0} students</span>
                 <span><FaBookOpen /> {course.formateur.totalCourses || 0} Courses</span>
               </div>
-              {course.formateur.bio && <p className="cd-inst-bio">{course.formateur.bio}</p>}
+              {course.formateur.bio && <p className="course-details__instructor-bio">{course.formateur.bio}</p>}
             </div>
           </div>
         </div>
@@ -432,18 +432,18 @@ const CourseDetails = () => {
       {/* ══════════════════════════════════════════
           REVIEW SECTION
       ══════════════════════════════════════════ */}
-      <div className="cd-section-card">
-        <h2 className="cd-section-h2">Leave a Review</h2>
+      <div className="course-details__section">
+        <h2 className="course-details__section-title">Leave a Review</h2>
 
-        <form className="cd-comment-form" onSubmit={handleSubmitReview}>
-          <div className="cd-form-group">
+        <form className="course-details__form" onSubmit={handleSubmitReview}>
+          <div className="course-details__form-group">
             <label>Rating</label>
-            <div className="cd-review-stars">
+            <div className="course-details__stars">
               {[1, 2, 3, 4, 5].map(star => (
                 <button
                   key={star}
                   type="button"
-                  className={`cd-review-star${reviewRating >= star ? ' filled' : ''}`}
+                  className={`course-details__star-btn${reviewRating >= star ? ' course-details__star-btn--filled' : ''}`}
                   onClick={() => setReviewRating(star)}
                   aria-label={`${star} star${star > 1 ? 's' : ''}`}
                 >
@@ -452,7 +452,7 @@ const CourseDetails = () => {
               ))}
             </div>
           </div>
-          <div className="cd-form-group">
+          <div className="course-details__form-group">
             <label>Your review</label>
             <textarea
               rows={5}
@@ -462,7 +462,7 @@ const CourseDetails = () => {
               required
             />
           </div>
-          <button type="submit" className="cd-submit-btn" disabled={reviewSubmitting}>
+          <button type="submit" className="course-details__submit-btn" disabled={reviewSubmitting}>
             {reviewSubmitting ? 'Submitting review...' : 'Submit review'}
           </button>
         </form>
@@ -471,12 +471,12 @@ const CourseDetails = () => {
       {/* ══════════════════════════════════════════
           COMMENTS SECTION
       ══════════════════════════════════════════ */}
-      <div className="cd-section-card">
-        <h2 className="cd-section-h2">Post A Comment</h2>
+      <div className="course-details__section">
+        <h2 className="course-details__section-title">Post A Comment</h2>
 
-        <form className="cd-comment-form" onSubmit={handleSubmitComment}>
-          <div className="cd-form-row">
-            <div className="cd-form-group">
+        <form className="course-details__form" onSubmit={handleSubmitComment}>
+          <div className="course-details__form-row">
+            <div className="course-details__form-group">
               <label>Name</label>
               <input
                 type="text" name="name"
@@ -486,7 +486,7 @@ const CourseDetails = () => {
                 required
               />
             </div>
-            <div className="cd-form-group">
+            <div className="course-details__form-group">
               <label>Email</label>
               <input
                 type="email" name="email"
@@ -497,7 +497,7 @@ const CourseDetails = () => {
               />
             </div>
           </div>
-          <div className="cd-form-group">
+          <div className="course-details__form-group">
             <label>Subject</label>
             <input
               type="text" name="subject"
@@ -506,7 +506,7 @@ const CourseDetails = () => {
               placeholder="Subject (optional)"
             />
           </div>
-          <div className="cd-form-group">
+          <div className="course-details__form-group">
             <label>Comments</label>
             <textarea
               name="comment" rows={5}
@@ -516,7 +516,7 @@ const CourseDetails = () => {
               required
             />
           </div>
-          <button type="submit" className="cd-submit-btn" disabled={submitting}>
+          <button type="submit" className="course-details__submit-btn" disabled={submitting}>
             {submitting ? 'Submitting...' : 'Submit'}
           </button>
         </form>
@@ -525,28 +525,28 @@ const CourseDetails = () => {
         {commentsLoading ? (
           <p style={{ color: '#9ca3af', marginTop: '1rem' }}>Loading comments...</p>
         ) : comments.length > 0 ? (
-          <div className="cd-comments-list">
-            <h3 className="cd-section-h3">All Comments ({comments.length})</h3>
+          <div className="course-details__comments">
+            <h3 className="course-details__section-subtitle">All Comments ({comments.length})</h3>
             {comments.map(c => (
-              <div key={c._id || c.id} className="cd-comment-item">
-                <div className="cd-comment-avatar">
+              <div key={c._id || c.id} className="course-details__comment">
+                <div className="course-details__comment-avatar">
                   {(c.name || 'U')[0].toUpperCase()}
                 </div>
-                <div className="cd-comment-body">
-                  <div className="cd-comment-header">
-                    <span className="cd-comment-author">{c.name}</span>
-                    {c.subject && <span className="cd-comment-subject">{c.subject}</span>}
-                    <span className="cd-comment-date">
+                <div className="course-details__comment-body">
+                  <div className="course-details__comment-header">
+                    <span className="course-details__comment-author">{c.name}</span>
+                    {c.subject && <span className="course-details__comment-subject">{c.subject}</span>}
+                    <span className="course-details__comment-date">
                       {new Date(c.createdAt || c.date).toLocaleDateString()}
                     </span>
                   </div>
-                  <p className="cd-comment-text">{c.content || c.comment}</p>
+                  <p className="course-details__comment-text">{c.content || c.comment}</p>
                 </div>
               </div>
             ))}
           </div>
         ) : (
-          <p className="cd-no-comments">No comments yet. Be the first!</p>
+          <p className="course-details__no-comments">No comments yet. Be the first!</p>
         )}
       </div>
     </ApprenantLayout>

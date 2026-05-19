@@ -6,6 +6,98 @@ const slugify = (value = '') => value
   .replace(/[^a-z0-9]+/g, '-')
   .replace(/(^-|-$)/g, '');
 
+const quizQuestionSchema = new mongoose.Schema({
+  prompt: {
+    type: String,
+    required: true,
+    trim: true
+  },
+  type: {
+    type: String,
+    enum: ['multiple-choice', 'true-false', 'short-answer', 'essay'],
+    default: 'multiple-choice'
+  },
+  options: [{
+    text: {
+      type: String,
+      trim: true
+    },
+    isCorrect: {
+      type: Boolean,
+      default: false
+    }
+  }],
+  correctAnswer: {
+    type: String,
+    trim: true
+  },
+  acceptableAnswers: [{
+    type: String,
+    trim: true
+  }],
+  explanation: {
+    type: String,
+    trim: true
+  },
+  points: {
+    type: Number,
+    default: 1,
+    min: 0
+  },
+  order: {
+    type: Number,
+    default: 1
+  }
+}, { _id: true });
+
+const lessonQuizSchema = new mongoose.Schema({
+  instructions: {
+    type: String,
+    trim: true
+  },
+  passingScore: {
+    type: Number,
+    min: 0,
+    max: 100,
+    default: 50
+  },
+  timeLimit: {
+    type: Number,
+    default: 0,
+    min: 0
+  },
+  allowRetry: {
+    type: Boolean,
+    default: true
+  },
+  maxAttempts: {
+    type: Number,
+    default: 0,
+    min: 0
+  },
+  questions: [quizQuestionSchema]
+}, { _id: false });
+
+const quizAnswerSchema = new mongoose.Schema({
+  questionId: {
+    type: mongoose.Schema.Types.ObjectId,
+    required: true
+  },
+  selectedAnswer: {
+    type: String,
+    default: ''
+  },
+  isCorrect: {
+    type: Boolean,
+    default: false
+  },
+  pointsEarned: {
+    type: Number,
+    default: 0,
+    min: 0
+  }
+}, { _id: false });
+
 const courseSchema = new mongoose.Schema({
   title: {
     type: String,
@@ -136,6 +228,10 @@ const courseSchema = new mongoose.Schema({
         type: Number,
         required: true
       },
+      quiz: {
+        type: lessonQuizSchema,
+        default: () => ({})
+      },
       resources: [{
         name: {
           type: String,
@@ -206,6 +302,46 @@ const courseSchema = new mongoose.Schema({
     certificateUrl: {
       type: String
     },
+    quizAttempts: [{
+      lessonId: {
+        type: mongoose.Schema.Types.ObjectId,
+        required: true
+      },
+      answers: [quizAnswerSchema],
+      score: {
+        type: Number,
+        default: 0
+      },
+      totalPoints: {
+        type: Number,
+        default: 0
+      },
+      percentageScore: {
+        type: Number,
+        default: 0
+      },
+      passed: {
+        type: Boolean,
+        default: false
+      },
+      status: {
+        type: String,
+        enum: ['submitted', 'passed', 'failed'],
+        default: 'submitted'
+      },
+      attemptNumber: {
+        type: Number,
+        default: 1
+      },
+      startedAt: {
+        type: Date,
+        default: Date.now
+      },
+      completedAt: {
+        type: Date,
+        default: Date.now
+      }
+    }],
     lastAccessedAt: {
       type: Date,
       default: Date.now
@@ -336,10 +472,7 @@ courseSchema.pre('save', function(next) {
 
   if (this.isModified('sections')) {
     const lessons = (this.sections || []).flatMap((section) => section.lessons || []);
-    this.totalDuration = lessons.reduce((sum, lesson) => {
-      const duration = Number(lesson.duration) || 0;
-      return sum + (isNaN(duration) ? 0 : duration);
-    }, 0);
+    this.totalDuration = lessons.reduce((sum, lesson) => sum + Number(lesson.duration || 0), 0);
   }
 
   next();
@@ -406,6 +539,120 @@ courseSchema.methods.updateProgress = function(studentId, lessonId) {
   }
 
   return enrollment;
+};
+
+courseSchema.methods.findLessonById = function(lessonId) {
+  for (const section of this.sections || []) {
+    const lesson = (section.lessons || []).find(
+      (item) => item._id.toString() === lessonId.toString()
+    );
+
+    if (lesson) {
+      return { section, lesson };
+    }
+  }
+
+  return null;
+};
+
+courseSchema.methods.submitQuizAttempt = function(studentId, lessonId, submittedAnswers = []) {
+  const enrollment = this.enrolledStudents.find(
+    (item) => item.student.toString() === studentId.toString()
+  );
+
+  if (!enrollment) {
+    throw new Error('Student is not enrolled in this course');
+  }
+
+  const locatedLesson = this.findLessonById(lessonId);
+  if (!locatedLesson) {
+    throw new Error('Quiz lesson not found');
+  }
+
+  const { lesson } = locatedLesson;
+  if (lesson.type !== 'quiz') {
+    throw new Error('Selected lesson is not a quiz');
+  }
+
+  const questions = lesson.quiz?.questions || [];
+  if (!questions.length) {
+    throw new Error('This quiz has no questions yet');
+  }
+
+  const previousAttempts = enrollment.quizAttempts.filter(
+    (attempt) => attempt.lessonId.toString() === lessonId.toString()
+  );
+
+  if (lesson.quiz?.allowRetry === false && previousAttempts.length > 0) {
+    throw new Error('This quiz can only be submitted once');
+  }
+
+  if (lesson.quiz?.maxAttempts > 0 && previousAttempts.length >= lesson.quiz.maxAttempts) {
+    throw new Error('You have reached the maximum number of attempts for this quiz');
+  }
+
+  const normalizedAnswerMap = new Map(
+    submittedAnswers.map((answer) => [answer.questionId?.toString(), String(answer.selectedAnswer || '').trim()])
+  );
+
+  const evaluatedAnswers = questions.map((question) => {
+    const selectedAnswer = normalizedAnswerMap.get(question._id.toString()) || '';
+    const normalizedSelected = selectedAnswer.trim().toLowerCase();
+    const normalizedCorrectAnswer = String(question.correctAnswer || '').trim().toLowerCase();
+    const acceptableAnswers = [
+      normalizedCorrectAnswer,
+      ...(question.acceptableAnswers || []).map((answer) => String(answer || '').trim().toLowerCase())
+    ].filter(Boolean);
+
+    let isCorrect = false;
+
+    if (question.type === 'multiple-choice' || question.type === 'true-false') {
+      const correctOption = (question.options || []).find((option) => option.isCorrect);
+      isCorrect = Boolean(
+        correctOption &&
+        normalizedSelected &&
+        normalizedSelected === String(correctOption.text || '').trim().toLowerCase()
+      );
+    } else {
+      isCorrect = Boolean(
+        normalizedSelected &&
+        acceptableAnswers.includes(normalizedSelected)
+      );
+    }
+
+    return {
+      questionId: question._id,
+      selectedAnswer,
+      isCorrect,
+      pointsEarned: isCorrect ? Number(question.points || 0) : 0
+    };
+  });
+
+  const score = evaluatedAnswers.reduce((sum, answer) => sum + Number(answer.pointsEarned || 0), 0);
+  const totalPoints = questions.reduce((sum, question) => sum + Number(question.points || 0), 0);
+  const percentageScore = totalPoints > 0 ? Math.round((score / totalPoints) * 100) : 0;
+  const passed = percentageScore >= Number(lesson.quiz?.passingScore || 50);
+  const attemptNumber = previousAttempts.length + 1;
+
+  enrollment.quizAttempts.push({
+    lessonId,
+    answers: evaluatedAnswers,
+    score,
+    totalPoints,
+    percentageScore,
+    passed,
+    status: passed ? 'passed' : 'failed',
+    attemptNumber,
+    completedAt: new Date()
+  });
+
+  enrollment.lastAccessedAt = new Date();
+
+  return {
+    enrollment,
+    lesson,
+    attempt: enrollment.quizAttempts[enrollment.quizAttempts.length - 1]
+  };
 };
 
 courseSchema.methods.calculateAverageRating = function() {

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import DashboardNavbar from '../../components/common/DashboardNavbar';
 import Sidebar from './Sidebar';
-import '../../pages/ApprenantPage/dashboard.css';
+import '../../pages/ApprenantPage/apprenant.css';
 
 const ApprenantLayout = ({ title, breadcrumb = [], rightContent = null, className = '', children }) => {
   const [sidebarOpen, setSidebarOpen] = useState(false);

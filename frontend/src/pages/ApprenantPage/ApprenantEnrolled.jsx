@@ -6,7 +6,7 @@ import CardP from '../../components/apprenant/CardP';
 import { FaBook, FaClock } from 'react-icons/fa';
 import { getApprenantProfile, getEnrolledCourses } from '../../services/apprenentService';
 import { getMediaUrl } from '../../utils/mediaUrl';
-import './dashboard.css';
+import './apprenant.css';
 
 const getStatusInfo = (progress) => {
   const p = Number(progress || 0);

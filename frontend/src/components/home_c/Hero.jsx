@@ -11,7 +11,7 @@ const Hero = () => {
   };
 
   return (
-    <section className="hero" id="hero">
+    <section className="hero-h">
       <div className="hero-text">
         <button className="btn1" onClick={handleGetStarted}>{t("homePage.hero.leader")}</button>
         <h1>
