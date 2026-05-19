@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import './dashboard.css';
+import './apprenant.css';
 import ApprenantLayout from '../../components/apprenant/ApprenantLayout';
 import { FaBook, FaCheckCircle, FaStar, FaFileAlt } from 'react-icons/fa';
 import CardP from '../../components/apprenant/CardP';

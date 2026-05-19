@@ -156,7 +156,8 @@ const AddCourses = () => {
               duration: lesson.duration || 0,
               isFree: lesson.isFree || false,
               order: lesson.order || 0,
-              resources: lesson.resources || []
+              resources: lesson.resources || [],
+              quiz: lesson.quiz || undefined
             })) || []
           })) || []
         });
@@ -257,13 +258,106 @@ const AddCourses = () => {
     setFormData((prev) => {
       const sections = [...prev.sections];
       const lesson = sections[sectionIndex].lessons[lessonIndex];
-      const updatedLesson = { ...lesson, [field]: value };
+      let updatedLesson = { ...lesson, [field]: value };
 
-      if (field === 'type' && value !== 'video') {
-        updatedLesson.videoFile = null;
+      if (field === 'type') {
+        if (value !== 'video') {
+          updatedLesson.videoFile = null;
+        }
+        if (value === 'quiz') {
+          updatedLesson.quiz = updatedLesson.quiz || {
+            instructions: '',
+            passingScore: 50,
+            allowRetry: true,
+            maxAttempts: 0,
+            questions: []
+          };
+        } else {
+          // remove quiz data when switching away from quiz
+          if (updatedLesson.quiz) {
+            delete updatedLesson.quiz;
+          }
+        }
       }
 
       sections[sectionIndex].lessons[lessonIndex] = updatedLesson;
+      return { ...prev, sections };
+    });
+  };
+
+  // Quiz helpers for the add-course form
+  const addQuizQuestion = (sectionIndex, lessonIndex) => {
+    setFormData((prev) => {
+      const sections = [...prev.sections];
+      const lesson = sections[sectionIndex].lessons[lessonIndex];
+      lesson.quiz = lesson.quiz || { instructions: '', passingScore: 50, allowRetry: true, maxAttempts: 0, questions: [] };
+      lesson.quiz.questions = [
+        ...lesson.quiz.questions,
+        {
+          prompt: '',
+          type: 'multiple-choice',
+          points: 1,
+          correctAnswer: '',
+          explanation: '',
+          options: [
+            { text: '', isCorrect: true },
+            { text: '', isCorrect: false }
+          ]
+        }
+      ];
+      sections[sectionIndex].lessons[lessonIndex] = { ...lesson };
+      return { ...prev, sections };
+    });
+  };
+
+  const removeQuizQuestion = (sectionIndex, lessonIndex, questionIndex) => {
+    setFormData((prev) => {
+      const sections = [...prev.sections];
+      const lesson = sections[sectionIndex].lessons[lessonIndex];
+      if (!lesson.quiz || !Array.isArray(lesson.quiz.questions)) return prev;
+      lesson.quiz.questions = lesson.quiz.questions.filter((_, i) => i !== questionIndex).map((q, i) => ({ ...q }));
+      sections[sectionIndex].lessons[lessonIndex] = { ...lesson };
+      return { ...prev, sections };
+    });
+  };
+
+  const updateQuizQuestionField = (sectionIndex, lessonIndex, questionIndex, field, value) => {
+    setFormData((prev) => {
+      const sections = [...prev.sections];
+      const lesson = sections[sectionIndex].lessons[lessonIndex];
+      if (!lesson.quiz || !Array.isArray(lesson.quiz.questions)) return prev;
+      const questions = [...lesson.quiz.questions];
+      questions[questionIndex] = { ...questions[questionIndex], [field]: value };
+      lesson.quiz.questions = questions;
+      sections[sectionIndex].lessons[lessonIndex] = { ...lesson };
+      return { ...prev, sections };
+    });
+  };
+
+  const addQuizOption = (sectionIndex, lessonIndex, questionIndex) => {
+    setFormData((prev) => {
+      const sections = [...prev.sections];
+      const lesson = sections[sectionIndex].lessons[lessonIndex];
+      if (!lesson.quiz || !Array.isArray(lesson.quiz.questions)) return prev;
+      const questions = [...lesson.quiz.questions];
+      questions[questionIndex] = { ...questions[questionIndex], options: [...(questions[questionIndex].options || []), { text: '', isCorrect: false }] };
+      lesson.quiz.questions = questions;
+      sections[sectionIndex].lessons[lessonIndex] = { ...lesson };
+      return { ...prev, sections };
+    });
+  };
+
+  const updateQuizOption = (sectionIndex, lessonIndex, questionIndex, optionIndex, field, value) => {
+    setFormData((prev) => {
+      const sections = [...prev.sections];
+      const lesson = sections[sectionIndex].lessons[lessonIndex];
+      if (!lesson.quiz || !Array.isArray(lesson.quiz.questions)) return prev;
+      const questions = [...lesson.quiz.questions];
+      const opts = [...(questions[questionIndex].options || [])];
+      opts[optionIndex] = { ...opts[optionIndex], [field]: value };
+      questions[questionIndex] = { ...questions[questionIndex], options: opts };
+      lesson.quiz.questions = questions;
+      sections[sectionIndex].lessons[lessonIndex] = { ...lesson };
       return { ...prev, sections };
     });
   };
@@ -372,11 +466,11 @@ const AddCourses = () => {
                 order: lesson.order,
                 resources: lesson.resources || [],
                 quiz: lesson.type === 'quiz' ? {
-                  instructions: content,
-                  passingScore: 50,
-                  allowRetry: true,
-                  maxAttempts: 0,
-                  questions: []
+                  instructions: (lesson.quiz && lesson.quiz.instructions) || content,
+                  passingScore: (lesson.quiz && lesson.quiz.passingScore) || 50,
+                  allowRetry: (lesson.quiz && typeof lesson.quiz.allowRetry !== 'undefined') ? lesson.quiz.allowRetry : true,
+                  maxAttempts: (lesson.quiz && lesson.quiz.maxAttempts) || 0,
+                  questions: (lesson.quiz && Array.isArray(lesson.quiz.questions)) ? lesson.quiz.questions : []
                 } : undefined
               };
             })
@@ -821,6 +915,7 @@ const AddCourses = () => {
                                 {lesson.type === 'assignment' && ' (Assignment description)'}
                                 {lesson.type === 'file' && ' (File URL)'}
                               </label>
+
                               {lesson.type === 'article' ? (
                                 <textarea
                                   className="form-textarea"
@@ -849,6 +944,112 @@ const AddCourses = () => {
                                     </div>
                                   )}
                                 </>
+                              ) : lesson.type === 'quiz' ? (
+                                <div className="quiz-editor">
+                                  <div className="form-group">
+                                    <label>Quiz Instructions</label>
+                                    <textarea
+                                      className="form-textarea"
+                                      rows="3"
+                                      value={(lesson.quiz && lesson.quiz.instructions) || ''}
+                                      onChange={(e) => {
+                                        const val = e.target.value;
+                                        setFormData((prev) => {
+                                          const sections = [...prev.sections];
+                                          const l = sections[sectionIndex].lessons[lessonIndex];
+                                          l.quiz = l.quiz || { instructions: '', passingScore: 50, allowRetry: true, maxAttempts: 0, questions: [] };
+                                          l.quiz.instructions = val;
+                                          sections[sectionIndex].lessons[lessonIndex] = { ...l };
+                                          return { ...prev, sections };
+                                        });
+                                      }}
+                                      placeholder="Optional quiz instructions"
+                                    />
+                                  </div>
+
+                                  <div className="form-group">
+                                    <label>Questions</label>
+                                    {(lesson.quiz && lesson.quiz.questions && lesson.quiz.questions.length > 0) ? (
+                                      lesson.quiz.questions.map((q, qi) => (
+                                        <div key={qi} className="quiz-question-row">
+                                          <input
+                                            type="text"
+                                            className="form-input"
+                                            value={q.prompt}
+                                            placeholder={`Question ${qi + 1}`}
+                                            onChange={(e) => updateQuizQuestionField(sectionIndex, lessonIndex, qi, 'prompt', e.target.value)}
+                                          />
+                                          <div style={{ marginTop: '0.4rem' }}>
+                                            <select
+                                              className="form-input"
+                                              value={q.type}
+                                              onChange={(e) => updateQuizQuestionField(sectionIndex, lessonIndex, qi, 'type', e.target.value)}
+                                            >
+                                              <option value="multiple-choice">Multiple Choice</option>
+                                              <option value="true-false">True / False</option>
+                                              <option value="short-answer">Short Answer</option>
+                                              <option value="essay">Essay</option>
+                                            </select>
+                                          </div>
+
+                                          {(q.type === 'multiple-choice' || q.type === 'true-false') && (
+                                            <div className="form-group" style={{ marginTop: '0.5rem' }}>
+                                              <label>Options</label>
+                                              { (q.options || []).map((opt, oi) => (
+                                                <div key={oi} style={{ display: 'flex', gap: '0.5rem', alignItems: 'center', marginBottom: '0.25rem' }}>
+                                                  <input
+                                                    type="text"
+                                                    className="form-input"
+                                                    value={opt.text}
+                                                    placeholder={`Option ${oi + 1}`}
+                                                    onChange={(e) => updateQuizOption(sectionIndex, lessonIndex, qi, oi, 'text', e.target.value)}
+                                                  />
+                                                  <label className="checkbox-label">
+                                                    <input
+                                                      type="checkbox"
+                                                      checked={!!opt.isCorrect}
+                                                      onChange={(e) => updateQuizOption(sectionIndex, lessonIndex, qi, oi, 'isCorrect', e.target.checked)}
+                                                    />
+                                                    Correct
+                                                  </label>
+                                                </div>
+                                              ))}
+                                              <button type="button" className="btn-add-option" onClick={() => addQuizOption(sectionIndex, lessonIndex, qi)}>+ Add Option</button>
+                                            </div>
+                                          )}
+
+                                          <div style={{ marginTop: '0.5rem' }}>
+                                            <input
+                                              type="text"
+                                              className="form-input"
+                                              value={q.correctAnswer}
+                                              placeholder="Correct Answer"
+                                              onChange={(e) => updateQuizQuestionField(sectionIndex, lessonIndex, qi, 'correctAnswer', e.target.value)}
+                                            />
+                                          </div>
+
+                                          <div style={{ marginTop: '0.5rem' }}>
+                                            <textarea
+                                              className="form-textarea"
+                                              rows="2"
+                                              value={q.explanation}
+                                              placeholder="Explanation (optional)"
+                                              onChange={(e) => updateQuizQuestionField(sectionIndex, lessonIndex, qi, 'explanation', e.target.value)}
+                                            />
+                                          </div>
+
+                                          <div style={{ marginTop: '0.5rem', display: 'flex', gap: '0.5rem' }}>
+                                            <button type="button" className="btn-text remove-lesson-btn" onClick={() => removeQuizQuestion(sectionIndex, lessonIndex, qi)}>Remove Question</button>
+                                          </div>
+                                        </div>
+                                      ))
+                                    ) : (
+                                      <p className="no-questions">No questions yet.</p>
+                                    )}
+
+                                    <button type="button" className="btn-secondary" onClick={() => addQuizQuestion(sectionIndex, lessonIndex)}>Add Question</button>
+                                  </div>
+                                </div>
                               ) : (
                                 <input
                                   type="text"

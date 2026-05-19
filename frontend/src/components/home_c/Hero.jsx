@@ -3,7 +3,7 @@ import { useTranslation } from "react-i18next";
 const Hero = () => {
   const { t } = useTranslation();
   return (
-    <section className="hero">
+    <section className="hero-h">
       <div className="hero-text">
         <button className="btn1">{t("homePage.hero.leader")}</button>
         <h1>

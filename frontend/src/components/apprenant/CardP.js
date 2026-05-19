@@ -1,7 +1,7 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import ava from '../../assets/image/student/ava.jpg';
-import "../../pages/ApprenantPage/dashboard.css";
+import "../../pages/ApprenantPage/apprenant.css";
 
 const CardP = ({ user }) => {
   const { t } = useTranslation();

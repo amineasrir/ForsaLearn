@@ -7,7 +7,6 @@ import Mentor from "../components/home_c/Mentor";
 import Navbar from "../components/home_c/Navbar";
 import Hero from "../components/home_c/Hero";
 import Blog from "../components/home_c/Blog";
-import Testimonials from "../components/home_c/Testimonials";
 import Footer from "../components/home_c/Footer";
 
 const Home = () => {
@@ -20,7 +19,6 @@ const Home = () => {
       <div id="courses"><Courses /></div>
       <div id="blog"><Blog /></div>
       <Mentor />
-      <Testimonials />
       <div id="footer"><Footer /></div>
      
       

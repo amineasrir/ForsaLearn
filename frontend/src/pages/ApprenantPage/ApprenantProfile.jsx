@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import ApprenantLayout from '../../components/apprenant/ApprenantLayout';
 import CardP from '../../components/apprenant/CardP';
-import './dashboard.css';
+import './apprenant.css';
 import { getApprenantProfile } from '../../services/apprenentService';
 
 const ApprenantProfile = () => {

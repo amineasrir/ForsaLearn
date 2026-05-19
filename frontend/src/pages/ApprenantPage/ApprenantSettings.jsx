@@ -4,7 +4,7 @@ import { FaUser, FaLock, FaShareAlt, FaLink, FaBell, FaMapMarkerAlt, FaTrash, Fa
 import ApprenantLayout from '../../components/apprenant/ApprenantLayout';
 import CardP from '../../components/apprenant/CardP';
 import { getApprenantProfile, updateApprenantProfile } from '../../services/apprenentService';
-import './dashboard.css';
+import './apprenant.css';
 
 // Dynamic tab configuration
 const TAB_CONFIG = {

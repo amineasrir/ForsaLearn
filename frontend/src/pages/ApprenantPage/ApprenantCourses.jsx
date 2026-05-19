@@ -7,7 +7,7 @@ import CardP from '../../components/apprenant/CardP';
 import { useWishlist } from '../../context/WishlistContext';
 import { getApprenantProfile, getPublishedCourses } from '../../services/apprenentService';
 import { getMediaUrl } from '../../utils/mediaUrl';
-import './dashboard.css';
+import './apprenant.css';
 
 const CATEGORIES = [
   { id: 'backend',     label: 'Backend',              count: 3 },

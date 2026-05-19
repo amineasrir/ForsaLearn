@@ -1,0 +1,38 @@
+# SERVER
+NODE_ENV=development
+PORT=5000
+
+# DATABASE
+MONGO_URI=mongodb+srv://forsalearn_admin:forsalearnDB@cluster0.un0j5qd.mongodb.net/forsalearn?retryWrites=true&w=majority
+
+# JWT
+JWT_SECRET=your_super_secret_jwt_key_min_32_characters_change_this
+JWT_EXPIRE=7d
+
+# EMAIL ( Example)
+EMAIL_SERVICE=gmail
+EMAIL_HOST=smtp.gmail.com
+EMAIL_PORT=587
+EMAIL_USER=mohamedamineasrir@gmail.com
+EMAIL_PASSWORD=ruxu hsxh dtxd bhpd
+
+EMAIL_FROM=noreply@forsalearn.com
+EMAIL_FROM_NAME=ForsaLearn
+
+# STRIPE (Test Mode)
+STRIPE_SECRET_KEY=sk_test_your_key
+STRIPE_PUBLISHABLE_KEY=pk_test_your_key
+
+# PAYPAL (Sandbox)
+PAYPAL_MODE=sandbox
+PAYPAL_CLIENT_ID=your_client_id
+PAYPAL_CLIENT_SECRET=your_secret
+
+# FRONTEND
+    CLIENT_URL=http://localhost:3000
+
+# ADMIN CREDENTIALS
+ADMIN_EMAIL=admin@forsalearn.com
+ADMIN_PASSWORD=Admin@123!
+ADMIN_FIRST_NAME=Admin
+ADMIN_LAST_NAME=ForsaLearn
