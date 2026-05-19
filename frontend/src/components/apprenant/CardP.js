@@ -1,12 +1,12 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import ava from '../../assets/image/student/ava.jpg';
 import "../../pages/ApprenantPage/apprenant.css";
+import { getUserAvatar } from '../../utils/userAvatar';
 
 const CardP = ({ user }) => {
   const { t } = useTranslation();
   const name = user?.fullName || t('student');
-  const avatar = user?.profilePicture || ava;
+  const avatar = getUserAvatar(user);
   const roleLabel = user?.role === 'visiteur' ? t('student') : (user?.role || t('student'));
 
   return (

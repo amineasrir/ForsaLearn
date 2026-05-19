@@ -1611,6 +1611,7 @@ body {
 .chat-message,
 .message {
   display: flex;
+  width: 100%;
   margin-bottom: 0;
 }
 
@@ -1621,12 +1622,23 @@ body {
 
 .chat-bubble,
 .message-content {
-  max-width: 65%;
+  width: fit-content;
+  max-width: min(70%, 34rem);
+  min-width: 0;
   padding: 0.75rem 1rem;
   border-radius: 18px;
-  word-wrap: break-word;
   font-size: 0.875rem;
   line-height: 1.4;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
+.chat-bubble > div,
+.message-content p {
+  margin: 0;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  word-break: break-word;
 }
 
 .chat-message.sent .chat-bubble,

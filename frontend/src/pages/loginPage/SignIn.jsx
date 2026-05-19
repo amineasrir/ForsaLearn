@@ -5,19 +5,20 @@ import logo_rem from "../../assets/image/home_page/logo_rem.png";
 import loginImage from "../../assets/image/login/image.png";
 import AuthSidebar from '../../components/auth/AuthSidebar';
 import '../../styles/auth.css';
-import { loginApprenant } from '../../services/apprenentService';
-import { loginFormateur } from '../../services/formateurService';
+import { loginUser } from '../../services/authService';
+import { adminLogin } from '../../services/adminService';
 import { setAuthSession } from '../../utils/authStorage';
 
 const SignIn = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const [userType, setUserType] = useState('apprenant'); // 'apprenant' or 'formateur'
+  const [userType, setUserType] = useState('apprenant');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [rememberMe, setRememberMe] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const signUpPath = userType === 'formateur' ? '/formateur/signup' : '/signup';
 
   
   const handleSubmit = async (e) => {
@@ -33,12 +34,17 @@ const SignIn = () => {
 
     try {
       const payload = { email, password };
-      const response = userType === 'formateur'
-        ? await loginFormateur(payload)
-        : await loginApprenant(payload);
+      const response = userType === 'admin'
+        ? await adminLogin(payload)
+        : await loginUser(payload);
 
       const { token, user } = response.data;
       setAuthSession({ token, user });
+
+      if (user.role === 'admin') {
+        navigate('/admin/dashboard');
+        return;
+      }
 
       if (user.role === 'formateur') {
         if (user.isApproved) {
@@ -48,7 +54,6 @@ const SignIn = () => {
         }
         return;
       }
-      console.log("LOGIN USER:", user);
 
       navigate('/apprenant/dashboard');
     } catch (err) {
@@ -73,8 +78,29 @@ const SignIn = () => {
           <div className="auth-form-container">
             <h2 style={{ textAlign: 'center' }}>{t('signInTitle') || 'Sign into Your Account'}</h2>
 
-            {/* User Type Selection */}
-           
+            <div className="user-type-selector">
+              <button
+                type="button"
+                className={`user-type-btn ${userType === 'apprenant' ? 'active' : ''}`}
+                onClick={() => setUserType('apprenant')}
+              >
+                Learner
+              </button>
+              <button
+                type="button"
+                className={`user-type-btn ${userType === 'formateur' ? 'active' : ''}`}
+                onClick={() => setUserType('formateur')}
+              >
+                Teacher
+              </button>
+              <button
+                type="button"
+                className={`user-type-btn ${userType === 'admin' ? 'active' : ''}`}
+                onClick={() => setUserType('admin')}
+              >
+                Admin
+              </button>
+            </div>
 
             {error && <div className="error-message">{error}</div>}
 
@@ -119,7 +145,11 @@ const SignIn = () => {
             </form>
 
             <div className="auth-footer">
-              <p>{t('noAccount') || "Don't you have an account?"} <Link to="/signup">{t('signUp') || 'Sign up'}</Link></p>
+              {userType === 'admin' ? (
+                <p>Administrator accounts are created by an existing admin.</p>
+              ) : (
+                <p>{t('noAccount') || "Don't you have an account?"} <Link to={signUpPath}>{t('signUp') || 'Sign up'}</Link></p>
+              )}
             </div>
           </div>
         </div>

@@ -1,10 +1,12 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import '../../styles/dashboard.css';
 import '../../styles/myprofile-admin.css';
 import Header from '../../components/admin/Header';
 import Sidebar from '../../components/admin/Sidebar';
 import { FaCamera, FaEdit } from 'react-icons/fa';
-import { getAdminProfile } from '../../services/adminService';
+import { getAdminProfile, uploadAdminProfilePicture } from '../../services/adminService';
+import { AUTH_KEYS } from '../../utils/authStorage';
+import { getUserAvatar } from '../../utils/userAvatar';
 
 const splitFullName = (fullName = '') => {
   const parts = fullName.trim().split(/\s+/).filter(Boolean);
@@ -25,9 +27,12 @@ const MyProfile = () => {
     role: 'Administrateur',
     joinDate: ''
   });
-  const [profilePicture, setProfilePicture] = useState('https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100&h=100&fit=crop');
+  const [profilePicture, setProfilePicture] = useState('');
   const [isEditing, setIsEditing] = useState(false);
   const [error, setError] = useState('');
+  const [success, setSuccess] = useState('');
+  const [uploadingImage, setUploadingImage] = useState(false);
+  const fileInputRef = useRef(null);
 
   useEffect(() => {
     const loadProfile = async () => {
@@ -48,7 +53,7 @@ const MyProfile = () => {
             ? new Date(user.createdAt).toLocaleDateString('en-US', { month: 'long', year: 'numeric' })
             : ''
         });
-        setProfilePicture(user?.profilePicture || 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100&h=100&fit=crop');
+        setProfilePicture(user?.profilePicture || '');
       } catch (err) {
         setError(err.response?.data?.message || 'Failed to load admin profile.');
       }
@@ -70,6 +75,52 @@ const MyProfile = () => {
     setIsEditing(false);
   };
 
+  const updateStoredAdminUser = (nextProfilePicture) => {
+    const rawUser = localStorage.getItem(AUTH_KEYS.adminUser);
+    if (!rawUser) {
+      return;
+    }
+
+    try {
+      const parsedUser = JSON.parse(rawUser);
+      parsedUser.profilePicture = nextProfilePicture;
+      localStorage.setItem(AUTH_KEYS.adminUser, JSON.stringify(parsedUser));
+    } catch (storageError) {
+      // Ignore malformed cached user objects.
+    }
+  };
+
+  const handleAvatarButtonClick = () => {
+    fileInputRef.current?.click();
+  };
+
+  const handleAvatarChange = async (event) => {
+    const file = event.target.files?.[0];
+    if (!file) {
+      return;
+    }
+
+    try {
+      setUploadingImage(true);
+      setError('');
+      setSuccess('');
+
+      const response = await uploadAdminProfilePicture(file);
+      const nextProfilePicture = response.data?.data?.url || '';
+
+      setProfilePicture(nextProfilePicture);
+      updateStoredAdminUser(nextProfilePicture);
+      setSuccess('Profile picture updated successfully.');
+    } catch (uploadError) {
+      setError(uploadError.response?.data?.message || 'Failed to upload profile picture.');
+    } finally {
+      setUploadingImage(false);
+      if (fileInputRef.current) {
+        fileInputRef.current.value = '';
+      }
+    }
+  };
+
   const fullName = useMemo(() => (
     [formData.firstName, formData.lastName].filter(Boolean).join(' ').trim() || 'Administrator'
   ), [formData.firstName, formData.lastName]);
@@ -85,24 +136,41 @@ const MyProfile = () => {
 
           <main className="main">
             {error && <div className="error-message">{error}</div>}
+            {success && <div className="success-message">{success}</div>}
 
             <div className="profile-card">
               <div className="profile-content">
                 <div className="profile-avatar-wrapper">
                   <img
-                    src={profilePicture}
+                    src={getUserAvatar(profilePicture)}
                     alt={fullName}
                     className="profile-avatar"
                   />
                   <span className="profile-status"></span>
-                  <button className="avatar-edit-btn">
+                  <button
+                    className="avatar-edit-btn"
+                    type="button"
+                    onClick={handleAvatarButtonClick}
+                    disabled={uploadingImage}
+                    title={uploadingImage ? 'Uploading...' : 'Upload profile picture'}
+                  >
                     <FaCamera />
                   </button>
+                  <input
+                    ref={fileInputRef}
+                    type="file"
+                    accept="image/png,image/jpeg,image/jpg,image/webp"
+                    style={{ display: 'none' }}
+                    onChange={handleAvatarChange}
+                  />
                 </div>
                 <div className="profile-info">
                   <h2 className="profile-name">{fullName}</h2>
                   <p className="profile-role">{formData.role}</p>
                   <p className="profile-member-since">Member since {formData.joinDate || 'Recently'}</p>
+                  {uploadingImage && (
+                    <p className="profile-member-since">Uploading profile picture...</p>
+                  )}
                 </div>
                 <button
                   className="edit-profile-btn"

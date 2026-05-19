@@ -4,7 +4,7 @@ import "./index.css";
 import "./i18n";
 import App from "./App";
 import reportWebVitals from "./reportWebVitals";
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 import AppAdmin from "./AppAdmin";
 import AppFormateur from "./AppFormateur";
 import SignIn from "./pages/loginPage/SignIn";
@@ -12,7 +12,6 @@ import ForgotPassword from "./pages/loginPage/ForgotPassword";
 import OTPVerification from "./pages/loginPage/OTPVerification";
 import SetPassword from "./pages/loginPage/SetPassword";
 import WelcomeBack from "./pages/loginPage/WelcomeBack";
-import AdminLogin from "./pages/loginPage/AdminLogin";
 import AdminProtectedRoute from "./protectRoutes/AdminProtectedRoute";
 import FormatterSignUp from "./pages/loginPage/FormatterSignUp";
 import FormateurProtectedRoute from "./protectRoutes/FormateutProtectedRoute";
@@ -23,7 +22,7 @@ root.render(
     <Router>
       <Routes>
         <Route path="/*" element={<App />} />
-        <Route path="/admin/login" element={<AdminLogin />} />
+        <Route path="/admin/login" element={<Navigate to="/signin" replace />} />
         <Route path="/admin/*" element={<AdminProtectedRoute >
           <AppAdmin />
         </AdminProtectedRoute>} />

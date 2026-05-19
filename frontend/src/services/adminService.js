@@ -8,6 +8,17 @@ export const getAdminProfile = () => {
   return API.get("auth/me");
 };
 
+export const uploadAdminProfilePicture = (file) => {
+  const formData = new FormData();
+  formData.append("profilePicture", file);
+
+  return API.post("upload/profile/picture", formData, {
+    headers: {
+      "Content-Type": "multipart/form-data",
+    },
+  });
+};
+
 export const getAdminDashboardStats = () => {
   return API.get("admin/dashboard/stats");
 };

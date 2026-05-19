@@ -13,6 +13,7 @@ import {
   getFormateurProfile
 } from '../../services/formateurService';
 import { getMediaUrl } from '../../utils/mediaUrl';
+import { getUserAvatar } from '../../utils/userAvatar';
 
 const formatCurrency = (value) => {
   return new Intl.NumberFormat('en-US', {
@@ -118,7 +119,7 @@ const FormateurDashboard = () => {
         <main className="formateur-main">
           <ProfilSection
             formateur={{
-              avatar: profile?.profilePicture || 'https://via.placeholder.com/60',
+              avatar: getUserAvatar(profile),
               name: profile?.fullName || 'Instructor'
             }}
           />

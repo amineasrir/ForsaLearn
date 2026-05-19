@@ -2643,6 +2643,7 @@ body {
 
 .chat-message {
   display: flex;
+  width: 100%;
   justify-content: flex-start;
 }
 
@@ -2651,11 +2652,21 @@ body {
 }
 
 .chat-bubble {
-  max-width: 70%;
+  width: fit-content;
+  max-width: min(70%, 34rem);
+  min-width: 0;
   padding: 0.75rem 1rem;
   border-radius: 18px;
   position: relative;
-  word-wrap: break-word;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
+.chat-bubble > div {
+  margin: 0;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  word-break: break-word;
 }
 
 .chat-message.sent .chat-bubble {

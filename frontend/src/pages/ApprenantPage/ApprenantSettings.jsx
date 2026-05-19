@@ -4,6 +4,7 @@ import { FaUser, FaLock, FaShareAlt, FaLink, FaBell, FaMapMarkerAlt, FaTrash, Fa
 import ApprenantLayout from '../../components/apprenant/ApprenantLayout';
 import CardP from '../../components/apprenant/CardP';
 import { getApprenantProfile, updateApprenantProfile } from '../../services/apprenentService';
+import { getUserAvatar } from '../../utils/userAvatar';
 import './apprenant.css';
 
 // Dynamic tab configuration
@@ -368,7 +369,7 @@ const ApprenantSettings = () => {
               {currentTabConfig.hasPhoto && (
                 <div className="sett-photo-row">
                   <img
-                    src={user?.profileImage || require('../../assets/image/student/ava.jpg')}
+                    src={getUserAvatar(user)}
                     alt="Profile"
                     className="sett-avatar"
                   />

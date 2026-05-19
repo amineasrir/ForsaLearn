@@ -551,7 +551,8 @@
    USER TYPE SELECTOR
 ===================== */
 .user-type-selector {
-    display: flex;
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
     gap: 15px;
     margin-bottom: 30px;
     justify-content: center;
@@ -596,6 +597,10 @@
 
     .auth-right {
         padding: 40px;
+    }
+
+    .user-type-selector {
+        grid-template-columns: 1fr;
     }
 }
 

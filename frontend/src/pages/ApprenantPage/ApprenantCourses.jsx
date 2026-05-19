@@ -7,6 +7,7 @@ import CardP from '../../components/apprenant/CardP';
 import { useWishlist } from '../../context/WishlistContext';
 import { getApprenantProfile, getPublishedCourses } from '../../services/apprenentService';
 import { getMediaUrl } from '../../utils/mediaUrl';
+import { getUserAvatar } from '../../utils/userAvatar';
 import './apprenant.css';
 
 const CATEGORIES = [
@@ -232,7 +233,7 @@ const ApprenantCourses = () => {
                   {/* Instructor row */}
                   <div className="cg-card-instructor-row">
                     <img
-                      src={getMediaUrl(course.formateur?.profileImage) || require('../../assets/image/student/ava.jpg')}
+                      src={getUserAvatar(course.formateur)}
                       alt={course.instructor}
                       className="cg-card-avatar"
                     />

@@ -30,6 +30,7 @@ import {
   unmuteAdminConversation,
   unpinAdminConversation
 } from '../../services/adminService';
+import { getUserAvatar } from '../../utils/userAvatar';
 
 const formatTime = (value) => {
   if (!value) return '';
@@ -85,7 +86,7 @@ const getConversationAvatar = (conversation, currentUserId) => {
     (participant) => participant._id !== currentUserId
   );
 
-  return otherParticipant?.profilePicture || 'https://via.placeholder.com/50x50?text=U';
+  return getUserAvatar(otherParticipant);
 };
 
 const getLastMessagePreview = (conversation) => {
@@ -602,7 +603,7 @@ const Conversations = () => {
                           <div key={message._id} className={`message ${isOwn ? 'own' : ''}`}>
                             {!isOwn && (
                               <img
-                                src={message.sender?.profilePicture || 'https://via.placeholder.com/32x32?text=U'}
+                                src={getUserAvatar(message.sender)}
                                 alt={message.sender?.fullName || 'User'}
                                 className="message-avatar"
                               />

@@ -14,6 +14,7 @@ import {
   getCourseComments, postCourseComment, postCourseReview
 } from '../../services/apprenentService';
 import { getMediaUrl } from '../../utils/mediaUrl';
+import { getUserAvatar } from '../../utils/userAvatar';
 import './CourseDetails.css';
 
 const CourseDetails = () => {
@@ -250,7 +251,7 @@ const CourseDetails = () => {
           {/* Instructor */}
           <div className="course-details__instructor">
             <img
-              src={getMediaUrl(course.formateur?.profileImage) || require('../../assets/image/student/ava.jpg')}
+              src={getUserAvatar(course.formateur)}
               alt={course.formateur?.fullName}
               className="course-details__instructor-avatar"
             />
@@ -409,7 +410,7 @@ const CourseDetails = () => {
           <h2 className="course-details__section-title">About the instructor</h2>
           <div className="course-details__instructor-card">
             <img
-              src={getMediaUrl(course.formateur.profileImage) || require('../../assets/image/student/ava.jpg')}
+              src={getUserAvatar(course.formateur)}
               alt={course.formateur.fullName}
               className="course-details__instructor-avatar-lg"
             />
