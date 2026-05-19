@@ -222,6 +222,16 @@ const Formateur = User.discriminator('formateur', new mongoose.Schema({
 
 // VISITEUR (STUDENT/LEARNER) MODEL
 const Visiteur = User.discriminator('visiteur', new mongoose.Schema({
+  gender: {
+    type: String,
+    enum: ['male', 'female', 'other', 'prefer-not-to-say'],
+    default: 'prefer-not-to-say'
+  },
+  bio: {
+    type: String,
+    maxlength: [500, 'Bio cannot exceed 500 characters'],
+    default: ''
+  },
   skillsNeeded: [{
     type: String,
     trim: true

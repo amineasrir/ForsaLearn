@@ -1,5 +1,6 @@
 const Message = require('../models/Message');
 const Conversation = require('../models/Conversation');
+const { Admin } = require('../models/User');
 const { emitToConversation, emitToUser } = require('../config/socket');
 const asyncHandler = require('express-async-handler');
 
@@ -68,19 +69,32 @@ const getConversation = asyncHandler(async (req, res) => {
 // @route   POST /api/messages/conversations
 // @access  Private
 const createConversation = asyncHandler(async (req, res) => {
-  const { type, participantIds, name, courseId } = req.body;
+  const {
+    type,
+    participantIds = [],
+    name,
+    courseId,
+    subject,
+    category,
+    priority,
+    initialMessage
+  } = req.body;
 
   // Validate input
-  if (!type || !participantIds || participantIds.length === 0) {
+  if (!type) {
     res.status(400);
-    throw new Error('Type and participants are required');
+    throw new Error('Conversation type is required');
   }
 
-  // Add current user to participants if not included
-  const participants = [...new Set([...participantIds, req.user._id.toString()])];
+  let participants = [...new Set([...(participantIds || []), req.user._id.toString()])];
 
   // For direct conversations, check if already exists
   if (type === 'direct') {
+    if (participants.length === 1) {
+      res.status(400);
+      throw new Error('A recipient is required for direct conversations');
+    }
+
     if (participants.length !== 2) {
       res.status(400);
       throw new Error('Direct conversation must have exactly 2 participants');
@@ -97,6 +111,27 @@ const createConversation = asyncHandler(async (req, res) => {
     });
   }
 
+  if (type === 'support') {
+    if (!subject || !initialMessage || !String(initialMessage).trim()) {
+      res.status(400);
+      throw new Error('Support ticket subject and initial message are required');
+    }
+
+    const assignedAdmin = await Admin.findOne({ isActive: true }).select('_id');
+
+    if (!assignedAdmin) {
+      res.status(503);
+      throw new Error('No active support admin is available right now');
+    }
+
+    participants = [...new Set([req.user._id.toString(), assignedAdmin._id.toString()])];
+  }
+
+  if ((type === 'group') && participants.length < 2) {
+    res.status(400);
+    throw new Error('Group conversations require participants');
+  }
+
   // Create group or support conversation
   const conversationData = {
     type,
@@ -109,10 +144,42 @@ const createConversation = asyncHandler(async (req, res) => {
     conversationData.groupAdmin = req.user._id;
   }
 
+  if (type === 'support') {
+    const assignedAdminId = participants.find(
+      (participantId) => participantId !== req.user._id.toString()
+    );
+
+    conversationData.name = subject;
+    conversationData.supportTicket = {
+      subject: String(subject).trim(),
+      category: category || 'other',
+      priority: priority || 'medium',
+      status: 'open',
+      createdBy: req.user._id,
+      assignedAdmin: assignedAdminId || null
+    };
+  }
+
   const conversation = await Conversation.create(conversationData);
+
+  if (type === 'support' && initialMessage && String(initialMessage).trim()) {
+    const firstMessage = await Message.create({
+      conversation: conversation._id,
+      sender: req.user._id,
+      content: String(initialMessage).trim(),
+      type: 'text'
+    });
+
+    conversation.lastMessage = firstMessage._id;
+    conversation.lastMessageAt = new Date();
+    await conversation.save();
+  }
 
   const populatedConversation = await Conversation.findById(conversation._id)
     .populate('participants', 'fullName email role profilePicture')
+    .populate('lastMessage')
+    .populate('supportTicket.createdBy', 'fullName email role')
+    .populate('supportTicket.assignedAdmin', 'fullName email role')
     .populate('course', 'title thumbnail');
 
   // Notify all participants
@@ -127,6 +194,70 @@ const createConversation = asyncHandler(async (req, res) => {
   res.status(201).json({
     success: true,
     data: populatedConversation
+  });
+});
+
+// @desc    Update support ticket status
+// @route   PATCH /api/messages/support-tickets/:conversationId/status
+// @access  Private
+const updateSupportTicketStatus = asyncHandler(async (req, res) => {
+  const { status } = req.body;
+  const allowedStatuses = ['open', 'pending', 'resolved', 'closed'];
+
+  if (!allowedStatuses.includes(status)) {
+    res.status(400);
+    throw new Error('Invalid support ticket status');
+  }
+
+  const conversation = await Conversation.findById(req.params.conversationId)
+    .populate('participants', 'fullName email role profilePicture')
+    .populate('supportTicket.createdBy', 'fullName email role')
+    .populate('supportTicket.assignedAdmin', 'fullName email role');
+
+  if (!conversation || conversation.type !== 'support') {
+    res.status(404);
+    throw new Error('Support ticket not found');
+  }
+
+  const isAdmin = req.user.role === 'admin';
+  const isTicketOwner = conversation.supportTicket?.createdBy &&
+    conversation.supportTicket.createdBy._id.toString() === req.user._id.toString();
+
+  if (!isAdmin && !(isTicketOwner && status === 'closed')) {
+    res.status(403);
+    throw new Error('Not authorized to update this support ticket');
+  }
+
+  conversation.supportTicket.status = status;
+
+  if (status === 'resolved') {
+    conversation.supportTicket.resolvedAt = new Date();
+    conversation.supportTicket.closedAt = null;
+  } else if (status === 'closed') {
+    conversation.supportTicket.closedAt = new Date();
+  } else {
+    conversation.supportTicket.closedAt = null;
+    if (status !== 'resolved') {
+      conversation.supportTicket.resolvedAt = null;
+    }
+  }
+
+  await conversation.save();
+
+  const refreshedConversation = await Conversation.findById(conversation._id)
+    .populate('participants', 'fullName email role profilePicture')
+    .populate('lastMessage')
+    .populate('supportTicket.createdBy', 'fullName email role')
+    .populate('supportTicket.assignedAdmin', 'fullName email role')
+    .populate('course', 'title thumbnail');
+
+  emitToConversation(conversation._id.toString(), 'support-ticket-updated', {
+    conversation: refreshedConversation
+  });
+
+  res.json({
+    success: true,
+    data: refreshedConversation
   });
 });
 
@@ -700,5 +831,6 @@ module.exports = {
   archiveConversation,
   unarchiveConversation,
   searchMessages,
-  getUnreadCount
+  getUnreadCount,
+  updateSupportTicketStatus
 };

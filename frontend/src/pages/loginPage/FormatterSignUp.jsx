@@ -19,6 +19,7 @@ const FormatterSignUp = () => {
     phone: "",
     password: "",
     confirmPassword: "",
+    profilePicture: null,
   });
   const [professionalInfo, setProfessionalInfo] = useState({
     field: "",
@@ -30,6 +31,7 @@ const FormatterSignUp = () => {
   const [agreeTOS, setAgreeTOS] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [profilePreview, setProfilePreview] = useState("");
 
   // Redirect to SignUp if apprenant is selected
   useEffect(() => {
@@ -37,6 +39,20 @@ const FormatterSignUp = () => {
       navigate("/signup");
     }
   }, [userType, navigate]);
+
+  useEffect(() => {
+    if (!basicInfo.profilePicture) {
+      setProfilePreview("");
+      return undefined;
+    }
+
+    const objectUrl = URL.createObjectURL(basicInfo.profilePicture);
+    setProfilePreview(objectUrl);
+
+    return () => {
+      URL.revokeObjectURL(objectUrl);
+    };
+  }, [basicInfo.profilePicture]);
 
   const handleBasicChange = (e) => {
     const { name, value } = e.target;
@@ -59,6 +75,14 @@ const FormatterSignUp = () => {
     setProfessionalInfo((prev) => ({
       ...prev,
       certification: file,
+    }));
+  };
+
+  const handleProfilePictureChange = (e) => {
+    const file = e.target.files[0] || null;
+    setBasicInfo((prev) => ({
+      ...prev,
+      profilePicture: file,
     }));
   };
 
@@ -101,33 +125,37 @@ const FormatterSignUp = () => {
         .map((skill) => skill.trim())
         .filter((skill) => skill !== "");
 
-      const body = {
-        fullName: basicInfo.fullName,
-        email: basicInfo.email,
-        phoneNumber: basicInfo.phone,
-        password: basicInfo.password,
-        field: professionalInfo.field,
-        skills: skillsArray,
-        projects: professionalInfo.projectLink
-          ? [
-              {
-                title: "Project Link",
-                type: "link",
-                value: professionalInfo.projectLink,
-              },
-            ]
-          : [],
-        certificates: professionalInfo.certification
-          ? [
-              { 
-                name: professionalInfo.certification.name,
-                type: "file",
-                value: professionalInfo.certification.name }]
-          : [],
-        bio: professionalInfo.bio,
-      };
+      const formData = new FormData();
+      formData.append("fullName", basicInfo.fullName);
+      formData.append("email", basicInfo.email);
+      formData.append("phoneNumber", basicInfo.phone);
+      formData.append("password", basicInfo.password);
+      formData.append("field", professionalInfo.field);
+      formData.append("skills", JSON.stringify(skillsArray));
+      formData.append("bio", professionalInfo.bio);
 
-      const response = await registerFormateur(body);
+      if (professionalInfo.projectLink) {
+        formData.append(
+          "projects",
+          JSON.stringify([
+            {
+              title: "Project Link",
+              type: "link",
+              value: professionalInfo.projectLink,
+            },
+          ])
+        );
+      }
+
+      if (basicInfo.profilePicture) {
+        formData.append("profilePicture", basicInfo.profilePicture);
+      }
+
+      if (professionalInfo.certification) {
+        formData.append("certification", professionalInfo.certification);
+      }
+
+      const response = await registerFormateur(formData);
       const data = response.data;
 
       setAuthSession({ token: data.token, user: data.user });
@@ -237,6 +265,35 @@ const FormatterSignUp = () => {
                     onChange={handleBasicChange}
                     required
                   />
+                </div>
+
+                <div className="form-group">
+                  <label htmlFor="profilePicture">
+                    {t("profilePicture") || "Profile Picture"}
+                  </label>
+                  <input
+                    type="file"
+                    id="profilePicture"
+                    name="profilePicture"
+                    onChange={handleProfilePictureChange}
+                    accept="image/png,image/jpeg,image/jpg,image/webp"
+                  />
+                  <small className="auth-upload-hint">
+                    {t("profilePictureHint") ||
+                      "Optional. Add a professional photo to help admins review your account faster."}
+                  </small>
+                  {profilePreview && (
+                    <div className="auth-image-preview-row">
+                      <img
+                        src={profilePreview}
+                        alt="Profile preview"
+                        className="auth-image-preview"
+                      />
+                      <span className="auth-image-name">
+                        {basicInfo.profilePicture?.name}
+                      </span>
+                    </div>
+                  )}
                 </div>
 
                 <div className="form-group">

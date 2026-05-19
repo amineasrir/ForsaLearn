@@ -159,10 +159,50 @@
     resize: vertical;
 }
 
+.form-group input[type="file"] {
+    height: auto;
+    padding: 10px 12px;
+    background: #fff;
+}
+
 .form-group input:focus {
     outline: none;
     border-color: var(--primary);
     box-shadow: 0 0 0 3px rgba(255, 107, 107, 0.15);
+}
+
+.auth-upload-hint {
+    display: block;
+    margin-top: 8px;
+    color: var(--text-muted);
+    font-size: 12px;
+    line-height: 1.5;
+}
+
+.auth-image-preview-row {
+    margin-top: 12px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 12px;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    background: linear-gradient(135deg, #fff7f8 0%, #fff 100%);
+}
+
+.auth-image-preview {
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid #ffd8e0;
+    flex-shrink: 0;
+}
+
+.auth-image-name {
+    font-size: 13px;
+    color: var(--text-dark);
+    word-break: break-word;
 }
 
 /* =====================

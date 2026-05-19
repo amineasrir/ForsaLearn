@@ -91,6 +91,20 @@ export const getConversationMessages = (conversationId, params = {}) => {
   return API.get(`messages/conversations/${conversationId}/messages${query ? `?${query}` : ""}`);
 };
 
+export const createSupportTicket = (payload) => {
+  return API.post('messages/conversations', {
+    type: 'support',
+    subject: payload.subject,
+    category: payload.category,
+    priority: payload.priority,
+    initialMessage: payload.message
+  });
+};
+
+export const updateSupportTicketStatus = (conversationId, status) => {
+  return API.patch(`messages/support-tickets/${conversationId}/status`, { status });
+};
+
 export const sendConversationMessage = (conversationId, payload) => {
   return API.post(`messages/conversations/${conversationId}/messages`, payload);
 };

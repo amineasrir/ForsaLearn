@@ -58,6 +58,10 @@ export const getPendingFormateurs = () => {
   return API.get("admin/formateurs/pending");
 };
 
+export const getAdminUserDetails = (userId) => {
+  return API.get(`admin/users/${userId}`);
+};
+
 export const approveFormateur = (id) => {
   return API.patch(`admin/formateurs/${id}/approve`);
 };
@@ -113,4 +117,8 @@ export const unmuteAdminConversation = (conversationId) => {
 
 export const archiveAdminConversation = (conversationId) => {
   return API.patch(`messages/conversations/${conversationId}/archive`);
+};
+
+export const updateAdminSupportTicketStatus = (conversationId, status) => {
+  return API.patch(`messages/support-tickets/${conversationId}/status`, { status });
 };

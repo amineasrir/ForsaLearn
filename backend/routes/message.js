@@ -13,6 +13,7 @@ router.get('/conversations', messageController.getConversations);
 router.get('/conversations/:conversationId', messageController.getConversation);
 router.post('/conversations', messageController.createConversation);
 router.delete('/conversations/:conversationId', messageController.deleteConversation);
+router.patch('/support-tickets/:conversationId/status', messageController.updateSupportTicketStatus);
 
 // Conversation management
 router.patch('/conversations/:conversationId/mute', messageController.muteConversation);

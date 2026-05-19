@@ -1,10 +1,94 @@
 const express = require('express');
 const router = express.Router();
+const path = require('path');
 const { body, validationResult } = require('express-validator');
 const jwt = require('jsonwebtoken');
 const { Admin, Formateur, Visiteur, User } = require('../models/User');
 const { protect, authorize } = require('../middleware/auth');
 const { sendPasswordResetOTPEmail } = require('../utils/emailService');
+const {
+  uploadFormateurSignupAssets,
+  handleUploadError,
+  deleteFile
+} = require('../middleware/upload');
+
+const cleanupUploadedFiles = (files = {}) => {
+  Object.values(files)
+    .flat()
+    .filter(Boolean)
+    .forEach((file) => deleteFile(file.path));
+};
+
+const normalizeStringArray = (value) => {
+  if (Array.isArray(value)) {
+    return value.map((item) => String(item).trim()).filter(Boolean);
+  }
+
+  if (typeof value !== 'string') {
+    return [];
+  }
+
+  const trimmedValue = value.trim();
+
+  if (!trimmedValue) {
+    return [];
+  }
+
+  try {
+    const parsed = JSON.parse(trimmedValue);
+    if (Array.isArray(parsed)) {
+      return parsed.map((item) => String(item).trim()).filter(Boolean);
+    }
+  } catch (error) {
+    // Fall back to comma-separated values.
+  }
+
+  return trimmedValue
+    .split(',')
+    .map((item) => item.trim())
+    .filter(Boolean);
+};
+
+const normalizeObjectArray = (value, requiredKeys = []) => {
+  if (!value) {
+    return [];
+  }
+
+  let parsedValue = value;
+
+  if (typeof value === 'string') {
+    const trimmedValue = value.trim();
+
+    if (!trimmedValue) {
+      return [];
+    }
+
+    try {
+      parsedValue = JSON.parse(trimmedValue);
+    } catch (error) {
+      return [];
+    }
+  }
+
+  if (!Array.isArray(parsedValue)) {
+    return [];
+  }
+
+  return parsedValue.filter((item) => {
+    if (!item || typeof item !== 'object') {
+      return false;
+    }
+
+    return requiredKeys.every((key) => Boolean(item[key]));
+  });
+};
+
+const normalizeFormateurRegistrationPayload = (req, res, next) => {
+  req.body.skills = normalizeStringArray(req.body.skills);
+  req.body.projects = normalizeObjectArray(req.body.projects, ['title', 'type', 'value']);
+  req.body.certificates = normalizeObjectArray(req.body.certificates, ['name', 'type', 'value']);
+  next();
+};
 
 // REGISTER ROUTES
 
@@ -73,28 +157,67 @@ router.post('/register/admin',
 
 // Register Formateur (Instructor)
 router.post('/register/formateur',
+  (req, res, next) => {
+    uploadFormateurSignupAssets(req, res, (err) => {
+      if (err) {
+        return handleUploadError(err, req, res, next);
+      }
+      next();
+    });
+  },
+  normalizeFormateurRegistrationPayload,
   [
     body('fullName').trim().isLength({ min: 2 }).withMessage('Full name must be at least 2 characters'),
     body('email').isEmail().normalizeEmail().withMessage('Please provide a valid email'),
     body('phoneNumber').matches(/^[0-9]{10,15}$/).withMessage('Please provide a valid phone number'),
     body('password').isLength({ min: 6 }).withMessage('Password must be at least 6 characters'),
     body('field').trim().notEmpty().withMessage('Field of expertise is required'),
-    body('skills').isArray({ min: 1 }).withMessage('At least one skill is required'),
+    body('skills').custom((value) => {
+      if (!Array.isArray(value) || value.length === 0) {
+        throw new Error('At least one skill is required');
+      }
+      return true;
+    }),
   ],
   async (req, res) => {
     try {
       const errors = validationResult(req);
       if (!errors.isEmpty()) {
+        cleanupUploadedFiles(req.files);
         console.log('Validation errors:', errors.array());
         return res.status(400).json({ errors: errors.array() });
       }
 
-      const { fullName, email, phoneNumber, password, field,  skills, certificates, projects, bio } = req.body;
+      const {
+        fullName,
+        email,
+        phoneNumber,
+        password,
+        field,
+        skills,
+        certificates,
+        projects,
+        bio
+      } = req.body;
+
+      const uploadedProfilePicture = req.files?.profilePicture?.[0];
+      const uploadedCertification = req.files?.certification?.[0];
 
       // Check if email already exists
       const existingUser = await User.findOne({ email });
       if (existingUser) {
+        cleanupUploadedFiles(req.files);
         return res.status(400).json({ message: 'Email already registered' });
+      }
+
+      const normalizedCertificates = [...(certificates || [])];
+
+      if (uploadedCertification) {
+        normalizedCertificates.push({
+          name: path.parse(uploadedCertification.originalname).name || uploadedCertification.originalname,
+          type: 'file',
+          value: `/uploads/certificates/${uploadedCertification.filename}`
+        });
       }
 
       // Create new formateur (instructor)
@@ -106,9 +229,12 @@ router.post('/register/formateur',
         role: 'formateur',
         field,
         skills,
-        certificates: certificates || [],
+        certificates: normalizedCertificates,
         projects: projects || [],
         bio: bio || '',
+        profilePicture: uploadedProfilePicture
+          ? `/uploads/profiles/${uploadedProfilePicture.filename}`
+          : undefined,
         isApproved: false // Requires admin approval
       });
 
@@ -129,10 +255,12 @@ router.post('/register/formateur',
           fullName : formateur.fullName,
           email: formateur.email,
           role: formateur.role,
+          profilePicture: formateur.profilePicture,
           isApproved: formateur.isApproved
         }
       });
     } catch (error) {
+      cleanupUploadedFiles(req.files);
       console.error('Formateur registration error:', error);
       res.status(500).json({ message: 'Server error during registration' });
     }
@@ -329,7 +457,8 @@ router.post('/login',
         fullName: user.fullName,
         email: user.email,
         phoneNumber: user.phoneNumber,
-        role: user.role
+        role: user.role,
+        profilePicture: user.profilePicture
       };
 
       // Add role-specific data

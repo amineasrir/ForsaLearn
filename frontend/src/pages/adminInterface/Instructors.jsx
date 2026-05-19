@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import '../../styles/dashboard.css';
 import '../../styles/instructors-admin.css';
 import {
@@ -51,6 +52,7 @@ const statusOptions = [
 ];
 
 const Instructors = () => {
+  const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState('');
   const [filterStatus, setFilterStatus] = useState('all');
   const [filterField, setFilterField] = useState('all');
@@ -349,7 +351,10 @@ const Instructors = () => {
                     </div>
 
                     <div className="instructor-footer">
-                      <button className="instructor-btn view">
+                      <button
+                        className="instructor-btn view"
+                        onClick={() => navigate(`/admin/instructors/${instructor._id}`)}
+                      >
                         <FaEye /> View Profile
                       </button>
                       {!instructor.isApproved && (

@@ -1,5 +1,11 @@
 const mongoose = require('mongoose');
 
+const generateTicketId = () => {
+  const randomPart = Math.random().toString(36).slice(2, 6).toUpperCase();
+  const timePart = Date.now().toString().slice(-6);
+  return `SUP-${timePart}-${randomPart}`;
+};
+
 const conversationSchema = new mongoose.Schema({
   participants: [{
     type: mongoose.Schema.Types.ObjectId,
@@ -51,6 +57,52 @@ const conversationSchema = new mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Course',
     default: null
+  },
+  supportTicket: {
+    ticketId: {
+      type: String,
+      default: null,
+      trim: true
+    },
+    subject: {
+      type: String,
+      default: '',
+      trim: true,
+      maxlength: 160
+    },
+    category: {
+      type: String,
+      enum: ['technical', 'billing', 'certificate', 'account', 'course', 'other'],
+      default: 'other'
+    },
+    priority: {
+      type: String,
+      enum: ['low', 'medium', 'high'],
+      default: 'medium'
+    },
+    status: {
+      type: String,
+      enum: ['open', 'pending', 'resolved', 'closed'],
+      default: 'open'
+    },
+    createdBy: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User',
+      default: null
+    },
+    assignedAdmin: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User',
+      default: null
+    },
+    resolvedAt: {
+      type: Date,
+      default: null
+    },
+    closedAt: {
+      type: Date,
+      default: null
+    }
   }
 }, {
   timestamps: true
@@ -60,6 +112,8 @@ const conversationSchema = new mongoose.Schema({
 conversationSchema.index({ participants: 1, lastMessageAt: -1 });
 conversationSchema.index({ type: 1, isActive: 1 });
 conversationSchema.index({ course: 1 });
+conversationSchema.index({ 'supportTicket.ticketId': 1 }, { sparse: true });
+conversationSchema.index({ 'supportTicket.status': 1 }, { sparse: true });
 
 // Virtual for participant count
 conversationSchema.virtual('participantCount').get(function() {
@@ -139,6 +193,17 @@ conversationSchema.pre('save', function(next) {
   if (this.type === 'direct' && this.participants.length !== 2) {
     return next(new Error('Direct conversation must have exactly 2 participants'));
   }
+
+  if (this.type === 'support') {
+    if (!this.supportTicket) {
+      this.supportTicket = {};
+    }
+
+    if (!this.supportTicket.ticketId) {
+      this.supportTicket.ticketId = generateTicketId();
+    }
+  }
+
   next();
 });
 

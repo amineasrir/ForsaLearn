@@ -3,6 +3,7 @@ const router = express.Router();
 const { body, validationResult } = require('express-validator');
 const { User, Admin, Formateur, Visiteur } = require('../models/User');
 const Course = require('../models/Course');
+const Certificate = require('../models/Certificate');
 const { protect, authorize } = require('../middleware/auth');
 const {
   sendFormateurApprovalEmail,
@@ -191,7 +192,9 @@ router.get('/users', async (req, res) => {
 // Get single user details
 router.get('/users/:id', async (req, res) => {
   try {
-    const user = await User.findById(req.params.id).select('-password');
+    const user = await User.findById(req.params.id)
+      .select('-password')
+      .populate('approvedBy', 'fullName email');
     
     if (!user) {
       return res.status(404).json({ message: 'User not found' });
@@ -201,18 +204,94 @@ router.get('/users/:id', async (req, res) => {
     let additionalData = {};
     if (user.role === 'formateur') {
       const courses = await Course.find({ formateur: user._id })
-        .select('title status totalEnrollments totalRevenue');
+        .select('title status totalEnrollments totalRevenue averageRating totalReviews category level thumbnail createdAt')
+        .sort({ createdAt: -1 });
+
+      const totalIssuedCertificates = await Certificate.countDocuments({
+        instructor: user._id,
+        status: 'active'
+      });
+
+      const issuedCertificates = await Certificate.find({
+        instructor: user._id,
+        status: 'active'
+      })
+        .select('certificateId studentName courseName completionDate pdfUrl createdAt')
+        .sort({ completionDate: -1 })
+        .limit(5);
+
       additionalData.courses = courses;
+      additionalData.issuedCertificates = issuedCertificates;
+      additionalData.stats = {
+        totalCourses: courses.length,
+        publishedCourses: courses.filter((course) => course.status === 'published').length,
+        pendingCourses: courses.filter((course) => course.status === 'pending').length,
+        totalEnrollments: courses.reduce((sum, course) => sum + Number(course.totalEnrollments || 0), 0),
+        totalRevenue: courses.reduce((sum, course) => sum + Number(course.totalRevenue || 0), 0),
+        issuedCertificates: totalIssuedCertificates
+      };
     }
     
     // If visiteur, get enrolled courses
     if (user.role === 'visiteur') {
-      const enrolledCourses = await Course.find({ 
-        'enrolledStudents.student': user._id 
-      })
-      .select('title')
-      .populate('formateur', 'fullName');
+      const enrolledCourseIds = (user.enrolledCourses || [])
+        .map((enrollment) => enrollment.course)
+        .filter(Boolean);
+      const wishlistCourseIds = user.wishlist || [];
+
+      const [enrolledCoursesRaw, wishlistCourses, certificates] = await Promise.all([
+        Course.find({ _id: { $in: enrolledCourseIds } })
+          .select('title category level thumbnail totalDuration averageRating totalReviews price priceType status')
+          .populate('formateur', 'fullName profilePicture'),
+        Course.find({ _id: { $in: wishlistCourseIds } })
+          .select('title category level thumbnail averageRating totalReviews price priceType status')
+          .populate('formateur', 'fullName'),
+        Certificate.find({ student: user._id, status: 'active' })
+          .select('certificateId courseName instructorName completionDate pdfUrl createdAt')
+          .sort({ completionDate: -1 })
+      ]);
+
+      const enrollmentMap = new Map(
+        (user.enrolledCourses || []).map((enrollment) => [
+          enrollment.course?.toString(),
+          enrollment
+        ])
+      );
+
+      const enrolledCourses = enrolledCoursesRaw
+        .map((course) => {
+          const enrollment = enrollmentMap.get(course._id.toString());
+          return {
+            ...course.toObject(),
+            enrolledAt: enrollment?.enrolledAt,
+            progress: enrollment?.progress || 0,
+            completed: enrollment?.completed || false,
+            completedAt: enrollment?.completedAt,
+            certificateIssued: enrollment?.certificateIssued || false,
+            certificateUrl: enrollment?.certificateUrl || '',
+            lastAccessedAt: enrollment?.lastAccessedAt,
+            completedLessons: enrollment?.completedLessons?.length || 0
+          };
+        })
+        .sort((a, b) => new Date(b.enrolledAt || 0) - new Date(a.enrolledAt || 0));
+
+      const totalProgress = enrolledCourses.reduce(
+        (sum, course) => sum + Number(course.progress || 0),
+        0
+      );
+
       additionalData.enrolledCourses = enrolledCourses;
+      additionalData.wishlistCourses = wishlistCourses;
+      additionalData.certificates = certificates;
+      additionalData.stats = {
+        totalEnrolledCourses: enrolledCourses.length,
+        completedCourses: enrolledCourses.filter((course) => course.completed || Number(course.progress) >= 100).length,
+        certificatesIssued: certificates.length,
+        wishlistCount: wishlistCourses.length,
+        averageProgress: enrolledCourses.length
+          ? Math.round(totalProgress / enrolledCourses.length)
+          : 0
+      };
     }
     
     res.status(200).json({

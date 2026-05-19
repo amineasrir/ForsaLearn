@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import '../../styles/dashboard.css';
 import '../../styles/students-admin.css';
 import {
@@ -39,6 +40,7 @@ const progressOptions = [
 ];
 
 const Students = () => {
+  const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState('');
   const [filterStatus, setFilterStatus] = useState('all');
   const [filterProgress, setFilterProgress] = useState('all');
@@ -366,10 +368,16 @@ const Students = () => {
                       </div>
 
                       <div className="student-footer">
-                        <button className="student-btn view">
+                        <button
+                          className="student-btn view"
+                          onClick={() => navigate(`/admin/students/${student._id}`)}
+                        >
                           <FaEye /> View Details
                         </button>
-                        <button className="student-btn progress">
+                        <button
+                          className="student-btn progress"
+                          onClick={() => navigate(`/admin/students/${student._id}`)}
+                        >
                           <FaChartLine /> Track Progress
                         </button>
                       </div>
