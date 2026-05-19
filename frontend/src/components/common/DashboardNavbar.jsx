@@ -1,7 +1,7 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import logo_rem from '../../assets/image/home_page/logo_rem.png';
-import '../../pages/ApprenantPage/dashboard.css';
+import '../../pages/ApprenantPage/apprenant.css';
 import 'flag-icons/css/flag-icons.min.css';
 
 const DashboardNavbar = () => {

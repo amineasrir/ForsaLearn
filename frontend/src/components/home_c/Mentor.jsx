@@ -1,4 +1,5 @@
 import React from "react";
+import { useNavigate } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCheckCircle, faChalkboardTeacher, faCertificate, faCompass } from "@fortawesome/free-solid-svg-icons";
 
@@ -8,6 +9,12 @@ import { useTranslation } from 'react-i18next';
 
 const Mentor = () => {
   const { t } = useTranslation();
+  const navigate = useNavigate();
+
+  const handleReadMore = () => {
+    navigate("/courses");
+  };
+
   return (
     <section className="mentor-section">
       <div className="mentor-hero">
@@ -53,7 +60,7 @@ const Mentor = () => {
               ))}
             </ul>
 
-            <button className="btn-primary">{t('homePage.mentor.read_more')}</button>
+            <button className="btn-primary" onClick={handleReadMore}>{t('homePage.mentor.read_more')}</button>
           </div>
         </div>
       </div>

@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { FaHeadset, FaPaperPlane, FaPlus, FaSearch } from 'react-icons/fa';
 import ApprenantLayout from '../../components/apprenant/ApprenantLayout';
 import '../../styles/formateur.css';
-import './dashboard.css';
+import './apprenant.css';
 import {
   createSupportTicket,
   getApprenantProfile,

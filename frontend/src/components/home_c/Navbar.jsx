@@ -53,7 +53,7 @@ const Navbar = () => {
 
 
       <div className="nav-actions">
-        <button className="lang-btn" onClick={changeLanguage} style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
+        <button className="lang-btn-h" onClick={changeLanguage} style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
           <span className={getFlagClass(currentLang)} style={{ fontSize: '18px' }}></span>
           <span>{currentLang.toUpperCase()}</span>
         </button>

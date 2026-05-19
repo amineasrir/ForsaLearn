@@ -1,68 +1,121 @@
-import React, { useEffect, useState } from 'react';
-import { useTranslation } from 'react-i18next';
-import ApprenantLayout from '../../components/apprenant/ApprenantLayout';
-import './dashboard.css';
-import { getApprenantProfile, updateApprenantProfile } from '../../services/apprenentService';
+import React, { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
+import ApprenantLayout from "../../components/apprenant/ApprenantLayout";
+import {
+  getApprenantProfile,
+  updateApprenantProfile,
+} from "../../services/apprenentService";
+import "./apprenant.css";
+
+const defaultFormData = {
+  fullName: "",
+  phoneNumber: "",
+  gender: "prefer-not-to-say",
+  bio: "",
+  interests: "",
+  skillsNeeded: "",
+};
+
+const toCommaSeparated = (value) =>
+  Array.isArray(value) ? value.join(", ") : "";
+
+const toArray = (value) =>
+  String(value || "")
+    .split(",")
+    .map((item) => item.trim())
+    .filter(Boolean);
+
+const createFormDataFromUser = (user) => ({
+  fullName: user?.fullName || "",
+  phoneNumber: user?.phoneNumber || "",
+  gender: user?.gender || "prefer-not-to-say",
+  bio: user?.bio || "",
+  interests: toCommaSeparated(user?.interests),
+  skillsNeeded: toCommaSeparated(user?.skillsNeeded),
+});
+
+const formatGender = (value, t) => {
+  const labels = {
+    male: t("apprenant.genderMale", "Male"),
+    female: t("apprenant.genderFemale", "Female"),
+    other: t("apprenant.genderOther", "Other"),
+    "prefer-not-to-say": t("apprenant.genderPreferNotToSay", "Prefer not to say"),
+  };
+
+  return labels[value] || t("apprenant.notSpecified", "Not specified");
+};
 
 const ApprenantProfile = () => {
   const { t } = useTranslation();
   const [user, setUser] = useState(null);
+  const [formData, setFormData] = useState(defaultFormData);
+  const [loading, setLoading] = useState(true);
   const [editMode, setEditMode] = useState(false);
-  const [error, setError] = useState('');
-  const [success, setSuccess] = useState('');
   const [saving, setSaving] = useState(false);
-  const [formData, setFormData] = useState({
-    fullName: '',
-    phoneNumber: '',
-    gender: 'prefer-not-to-say',
-    bio: '',
-    interests: '',
-    skillsNeeded: ''
-  });
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
 
   useEffect(() => {
+    let isMounted = true;
+
     const loadProfile = async () => {
       try {
+        setLoading(true);
+        setError("");
         const response = await getApprenantProfile();
         const loadedUser = response.data?.user || null;
 
+        if (!isMounted) {
+          return;
+        }
+
         setUser(loadedUser);
-        setFormData({
-          fullName: loadedUser?.fullName || '',
-          phoneNumber: loadedUser?.phoneNumber || '',
-          gender: loadedUser?.gender || 'prefer-not-to-say',
-          bio: loadedUser?.bio || '',
-          interests: (loadedUser?.interests || []).join(', '),
-          skillsNeeded: (loadedUser?.skillsNeeded || []).join(', ')
-        });
-      } catch (err) {
-        setError(err.response?.data?.message || 'Failed to load profile.');
+        setFormData(createFormDataFromUser(loadedUser));
+      } catch (requestError) {
+        if (isMounted) {
+          setError(
+            requestError.response?.data?.message ||
+              t("apprenant.profileLoadError", "Failed to load profile.")
+          );
+        }
+      } finally {
+        if (isMounted) {
+          setLoading(false);
+        }
       }
     };
 
     loadProfile();
-  }, []);
+
+    return () => {
+      isMounted = false;
+    };
+  }, [t]);
 
   const handleChange = (event) => {
     const { name, value } = event.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
   };
 
-  const resetFormFromUser = (sourceUser) => {
-    setFormData({
-      fullName: sourceUser?.fullName || '',
-      phoneNumber: sourceUser?.phoneNumber || '',
-      gender: sourceUser?.gender || 'prefer-not-to-say',
-      bio: sourceUser?.bio || '',
-      interests: (sourceUser?.interests || []).join(', '),
-      skillsNeeded: (sourceUser?.skillsNeeded || []).join(', ')
-    });
+  const handleEditToggle = () => {
+    setSuccess("");
+    setError("");
+
+    if (editMode) {
+      setFormData(createFormDataFromUser(user));
+    }
+
+    setEditMode((prev) => !prev);
   };
 
   const handleCancel = () => {
-    resetFormFromUser(user);
+    setFormData(createFormDataFromUser(user));
     setEditMode(false);
-    setSuccess('');
+    setError("");
+    setSuccess("");
   };
 
   const handleSubmit = async (event) => {
@@ -70,42 +123,65 @@ const ApprenantProfile = () => {
 
     try {
       setSaving(true);
-      setError('');
-      setSuccess('');
+      setError("");
+      setSuccess("");
 
       const payload = {
         fullName: formData.fullName.trim(),
         phoneNumber: formData.phoneNumber.trim(),
         gender: formData.gender,
         bio: formData.bio.trim(),
-        interests: formData.interests.split(',').map((item) => item.trim()).filter(Boolean),
-        skillsNeeded: formData.skillsNeeded.split(',').map((item) => item.trim()).filter(Boolean)
+        interests: toArray(formData.interests),
+        skillsNeeded: toArray(formData.skillsNeeded),
       };
 
       const response = await updateApprenantProfile(payload);
       const updatedUser = response.data?.user || null;
 
       setUser(updatedUser);
-      resetFormFromUser(updatedUser);
+      setFormData(createFormDataFromUser(updatedUser));
       setEditMode(false);
-      setSuccess('Profile updated successfully.');
-    } catch (err) {
-      setError(err.response?.data?.message || 'Failed to update profile.');
+      setSuccess(
+        t("apprenant.profileSaved", "Profile updated successfully.")
+      );
+    } catch (requestError) {
+      setError(
+        requestError.response?.data?.message ||
+          t("apprenant.profileSaveError", "Failed to update profile.")
+      );
     } finally {
       setSaving(false);
     }
   };
 
   const profileData = {
-    fullName: user?.fullName || 'Student',
-    phone: user?.phoneNumber || 'N/A',
-    gender: user?.gender ? user.gender.replace(/-/g, ' ') : 'Not specified',
-    bio: user?.bio || 'No bio available.',
-    registrationDate: user?.createdAt ? new Date(user.createdAt).toLocaleString() : 'N/A',
-    email: user?.email || 'N/A',
-    interests: (user?.interests || []).join(', ') || 'N/A',
-    skillsNeeded: (user?.skillsNeeded || []).join(', ') || 'N/A'
+    fullName: user?.fullName || t("apprenant.student", "Student"),
+    registrationDate: user?.createdAt
+      ? new Date(user.createdAt).toLocaleString()
+      : t("apprenant.na", "N/A"),
+    phone: user?.phoneNumber || t("apprenant.na", "N/A"),
+    email: user?.email || t("apprenant.na", "N/A"),
+    gender: formatGender(user?.gender, t),
+    interests:
+      toCommaSeparated(user?.interests) || t("apprenant.na", "N/A"),
+    skillsNeeded:
+      toCommaSeparated(user?.skillsNeeded) || t("apprenant.na", "N/A"),
+    bio: user?.bio || t("apprenant.noBio", "No bio available."),
   };
+
+  if (loading) {
+    return (
+      <ApprenantLayout>
+        <div className="profile-page-content">
+          <div className="profile-details">
+            <p className="value">
+              {t("apprenant.loadingProfile", "Loading profile...")}
+            </p>
+          </div>
+        </div>
+      </ApprenantLayout>
+    );
+  }
 
   return (
     <ApprenantLayout>
@@ -114,30 +190,34 @@ const ApprenantProfile = () => {
 
       <div className="profile-page-content">
         <h2 className="profile-title">
-          {t('apprenant.myProfile')}
+          {t("apprenant.myProfile")}
           <button
             className="title-edit-btn"
-            onClick={() => {
-              setSuccess('');
-              setEditMode((value) => !value);
-            }}
-            title={editMode ? t('apprenant.close') : t('apprenant.settings')}
+            onClick={handleEditToggle}
+            title={
+              editMode
+                ? t("apprenant.close", "Close")
+                : t("apprenant.editProfile", "Edit profile")
+            }
             type="button"
           >
-            Edit
+            {editMode
+              ? t("apprenant.close", "Close")
+              : t("apprenant.edit", "Edit")}
           </button>
         </h2>
 
         <form onSubmit={handleSubmit}>
           <div className="profile-details">
             <div>
-              <label>{t('apprenant.fullName')}</label>
+              <label>{t("apprenant.fullName")}</label>
               {editMode ? (
                 <input
                   type="text"
                   name="fullName"
                   value={formData.fullName}
                   onChange={handleChange}
+                  required
                 />
               ) : (
                 <p className="value">{profileData.fullName}</p>
@@ -145,12 +225,12 @@ const ApprenantProfile = () => {
             </div>
 
             <div>
-              <label>{t('apprenant.registrationDate')}</label>
+              <label>{t("apprenant.registrationDate")}</label>
               <p className="value">{profileData.registrationDate}</p>
             </div>
 
             <div>
-              <label>{t('apprenant.phoneNumber')}</label>
+              <label>{t("apprenant.phoneNumber")}</label>
               {editMode ? (
                 <input
                   type="text"
@@ -164,22 +244,26 @@ const ApprenantProfile = () => {
             </div>
 
             <div>
-              <label>{t('email')}</label>
+              <label>{t("email", "Email")}</label>
               <p className="value">{profileData.email}</p>
             </div>
 
             <div>
-              <label>{t('apprenant.gender')}</label>
+              <label>{t("apprenant.gender")}</label>
               {editMode ? (
                 <select
                   name="gender"
                   value={formData.gender}
                   onChange={handleChange}
                 >
-                  <option value="prefer-not-to-say">Prefer not to say</option>
-                  <option value="male">Male</option>
-                  <option value="female">Female</option>
-                  <option value="other">Other</option>
+                  <option value="prefer-not-to-say">
+                    {t("apprenant.genderPreferNotToSay", "Prefer not to say")}
+                  </option>
+                  <option value="male">{t("apprenant.genderMale", "Male")}</option>
+                  <option value="female">
+                    {t("apprenant.genderFemale", "Female")}
+                  </option>
+                  <option value="other">{t("apprenant.genderOther", "Other")}</option>
                 </select>
               ) : (
                 <p className="value">{profileData.gender}</p>
@@ -187,14 +271,17 @@ const ApprenantProfile = () => {
             </div>
 
             <div>
-              <label>Interests</label>
+              <label>{t("apprenant.interests", "Interests")}</label>
               {editMode ? (
                 <input
                   type="text"
                   name="interests"
                   value={formData.interests}
                   onChange={handleChange}
-                  placeholder="UI/UX, AI, Design"
+                  placeholder={t(
+                    "apprenant.interestsPlaceholder",
+                    "UI/UX, AI, Design"
+                  )}
                 />
               ) : (
                 <p className="value">{profileData.interests}</p>
@@ -202,14 +289,17 @@ const ApprenantProfile = () => {
             </div>
 
             <div>
-              <label>Learning Goals</label>
+              <label>{t("apprenant.learningGoals", "Learning Goals")}</label>
               {editMode ? (
                 <input
                   type="text"
                   name="skillsNeeded"
                   value={formData.skillsNeeded}
                   onChange={handleChange}
-                  placeholder="React, Node.js, English"
+                  placeholder={t(
+                    "apprenant.skillsNeededPlaceholder",
+                    "React, Node.js, English"
+                  )}
                 />
               ) : (
                 <p className="value">{profileData.skillsNeeded}</p>
@@ -217,7 +307,7 @@ const ApprenantProfile = () => {
             </div>
 
             <div>
-              <label>{t('apprenant.bio')}</label>
+              <label>{t("apprenant.bio")}</label>
               {editMode ? (
                 <textarea
                   name="bio"
@@ -233,11 +323,17 @@ const ApprenantProfile = () => {
 
           {editMode && (
             <div className="profile-actions">
-              <button type="button" className="cancel-btn" onClick={handleCancel}>
-                {t('apprenant.close')}
+              <button
+                type="button"
+                className="cancel-btn"
+                onClick={handleCancel}
+              >
+                {t("apprenant.cancel", "Cancel")}
               </button>
               <button type="submit" className="save-btn" disabled={saving}>
-                {saving ? 'Saving...' : t('apprenant.saveChanges')}
+                {saving
+                  ? t("apprenant.saving", "Saving...")
+                  : t("apprenant.saveChanges", "Save Changes")}
               </button>
             </div>
           )}

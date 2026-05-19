@@ -3,6 +3,7 @@ import '../../styles/formateur.css';
 import logo_rem from '../../assets/image/home_page/logo_rem.png';
 import i18nInstance from '../../i18n';
 import { useTranslation } from 'react-i18next';
+import { FaBookOpen, FaUsers, FaDollarSign } from 'react-icons/fa';
 import 'flag-icons/css/flag-icons.min.css';
 import EarningsChart from '../../components/charts/EarningsChart';
 import SidebarF from '../../components/formateur/sidebarF';
@@ -75,19 +76,19 @@ const FormateurDashboard = () => {
 
   const cards = useMemo(() => ([
     {
-      icon: '📚',
+      icon: <FaBookOpen />,
       label: t('dashboard.totalCourses'),
       value: overview.totalCourses || 0,
       color: '#FF6B9D'
     },
     {
-      icon: '👥',
+      icon: <FaUsers />,
       label: t('dashboard.studentsEnrolled'),
       value: overview.totalEnrollments || 0,
       color: '#4F46E5'
     },
     {
-      icon: '💰',
+      icon: <FaDollarSign />,
       label: t('dashboard.totalRevenue'),
       value: formatCurrency(overview.totalRevenue),
       color: '#10B981'

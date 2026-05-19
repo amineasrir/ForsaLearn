@@ -150,27 +150,22 @@ body {
 
 /* ================= LAYOUT ================= */
 .formateur-container {
-  width: 100%;
-  display: flex;
-  flex: 1;
+   max-width: 1200px;
+  display: grid;
+  grid-template-columns: 270px 1fr;
 }
 
 /* ================= SIDEBAR ================= */
 .formateur-sidebar {
   background: #ffffff;
   padding: 2rem 1.5rem;
-  overflow-y: auto;
-  height: calc(100vh - 55px);
+  overflow: visible;
+  height: auto;
   position: sticky;
   top: 55px;
   z-index: 50;
   width: 270px;
-  min-width: 270px;
-  flex-shrink: 0;
   border-right: 1px solid var(--border);
-  flex-direction: column;
-  gap: 0;
-  align-self: flex-start;
 }
 
 .sidebar-header {
@@ -278,21 +273,40 @@ body {
 .menu-item:hover .menu-icon {
   background: rgba(124, 58, 237, 0.08);
 }
-
 .menu-item.active {
-  background: rgba(255, 59, 99, 0.08);
-  border-left: 3px solid var(--primary);
-  padding-left: calc(0.75rem - 3px);
+  background: rgba(124, 58, 237, 0.06);
   color: var(--primary);
-  border-radius: 0;
 }
 
 .menu-item.active .menu-icon {
   color: var(--primary);
-  background: rgba(255, 59, 99, 0.1);
+  background: rgba(124, 58, 237, 0.08);
 }
 
 .menu-item.active .menu-label {
+  color: var(--primary);
+}
+
+/* Scoped overrides to ensure formateur sidebar styles take precedence */
+.formateur-sidebar .menu-item:hover {
+  background: rgba(124, 58, 237, 0.06);
+}
+
+.formateur-sidebar .menu-item:hover .menu-icon {
+  background: rgba(124, 58, 237, 0.08);
+}
+
+.formateur-sidebar .menu-item.active {
+  background: rgba(124, 58, 237, 0.06);
+  color: var(--primary);
+}
+
+.formateur-sidebar .menu-item.active .menu-icon {
+  color: var(--primary);
+  background: rgba(124, 58, 237, 0.08);
+}
+
+.formateur-sidebar .menu-item.active .menu-label {
   color: var(--primary);
 }
 
@@ -2435,7 +2449,6 @@ body {
     background: var(--card);
     display: none;
     transition: transform 0.3s ease;
-    position: fixed;
     min-width: unset;
     border-right: none;
   }

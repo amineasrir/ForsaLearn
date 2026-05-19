@@ -5,7 +5,7 @@ import { FaArrowRight } from 'react-icons/fa';
 import ApprenantLayout from '../../components/apprenant/ApprenantLayout';
 import CardP from '../../components/apprenant/CardP';
 import { getMyQuizAttempts } from '../../services/apprenentService';
-import './dashboard.css';
+import './apprenant.css';
 
 const ApprenantQuizzes = () => {
   const { t } = useTranslation();

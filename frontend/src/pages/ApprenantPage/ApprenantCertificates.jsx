@@ -8,7 +8,7 @@ import {
   getCertificateDownloadUrl,
   getMyCertificates
 } from '../../services/apprenentService';
-import './dashboard.css';
+  import './apprenant.css';
 
 const ApprenantCertificates = () => {
   const { t } = useTranslation();
