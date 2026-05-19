@@ -1,9 +1,9 @@
-import React, { useEffect, useState, useCallback } from 'react';
+import React, { useEffect, useState, useCallback, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { FaUser, FaLock, FaShareAlt, FaLink, FaBell, FaMapMarkerAlt, FaTrash, FaUpload, FaSave, FaCheck } from 'react-icons/fa';
 import ApprenantLayout from '../../components/apprenant/ApprenantLayout';
 import CardP from '../../components/apprenant/CardP';
-import { getApprenantProfile, updateApprenantProfile } from '../../services/apprenentService';
+import { getApprenantProfile, updateApprenantProfile, uploadProfilePicture } from '../../services/apprenentService';
 import { getUserAvatar } from '../../utils/userAvatar';
 import './apprenant.css';
 
@@ -101,6 +101,26 @@ const ApprenantSettings = () => {
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
   const [errors, setErrors] = useState({});
+  const fileInputRef = useRef(null);
+
+  const handlePhotoUpload = async (event) => {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    try {
+      setLoading(true);
+      await uploadProfilePicture(file);
+      const res = await getApprenantProfile();
+      setUser(res.data?.user);
+      setSaved(true);
+      setTimeout(() => setSaved(false), 3000);
+    } catch (err) {
+      console.error('Photo upload failed', err);
+      setErrors({ general: t('apprenant.photoUploadFailed') || 'Photo upload failed' });
+    } finally {
+      setLoading(false);
+    }
+  };
 
   // Dynamic form state
   const [formData, setFormData] = useState({});
@@ -377,7 +397,14 @@ const ApprenantSettings = () => {
                     <p className="sett-photo-title">{t('apprenant.profilePhoto')}</p>
                     <p className="sett-photo-hint">{t('apprenant.profilePhotoHint')}</p>
                     <div className="sett-photo-btns">
-                      <button className="sett-btn-upload">
+                      <input 
+                        type="file" 
+                        ref={fileInputRef} 
+                        style={{ display: 'none' }} 
+                        accept="image/*" 
+                        onChange={handlePhotoUpload} 
+                      />
+                      <button className="sett-btn-upload" onClick={() => fileInputRef.current?.click()}>
                         <FaUpload /> {t('apprenant.upload')}
                       </button>
                       <button className="sett-btn-del-photo">{t('apprenant.delete')}</button>

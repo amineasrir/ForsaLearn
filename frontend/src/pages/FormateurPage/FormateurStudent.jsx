@@ -5,6 +5,7 @@ import logo_rem from '../../assets/image/home_page/logo_rem.png';
 import i18nInstance from '../../i18n';
 import { useTranslation } from 'react-i18next';
 import 'flag-icons/css/flag-icons.min.css';
+import { getMediaUrl } from '../../utils/mediaUrl';
 import {
   getFormateurProfile,
   getFormateurStudents
@@ -116,8 +117,9 @@ const FormateurStudent = () => {
             ) : filteredStudents.map((entry) => (
               <div key={entry.student?._id} className="student-card">
                 <img
-                  src={entry.student?.profilePicture || 'https://via.placeholder.com/120'}
+                  src={getMediaUrl(entry.student?.profilePicture) || 'https://via.placeholder.com/120'}
                   alt={entry.student?.fullName || 'Student'}
+                  
                 />
                 <div className="student-role">{t('formateur.students.activeStudent')}</div>
                 <h3>{entry.student?.fullName || t('formateur.students.unknownStudent')}</h3>

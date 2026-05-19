@@ -12,15 +12,13 @@ import { setAuthSession } from '../../utils/authStorage';
 const SignIn = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const [userType, setUserType] = useState('apprenant');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [rememberMe, setRememberMe] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-  const signUpPath = userType === 'formateur' ? '/formateur/signup' : '/signup';
 
-  
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
@@ -34,9 +32,22 @@ const SignIn = () => {
 
     try {
       const payload = { email, password };
-      const response = userType === 'admin'
-        ? await adminLogin(payload)
-        : await loginUser(payload);
+      let response;
+      let loginError;
+
+      try {
+        response = await loginUser(payload);
+      } catch (err) {
+        loginError = err;
+      }
+
+      if (!response) {
+        try {
+          response = await adminLogin(payload);
+        } catch (adminErr) {
+          throw loginError || adminErr; // throw the original error if both fail
+        }
+      }
 
       const { token, user } = response.data;
       setAuthSession({ token, user });
@@ -63,7 +74,7 @@ const SignIn = () => {
       setLoading(false);
     }
   };
-  
+
   return (
     <div className="auth-container">
       <div className="auth-content">
@@ -77,30 +88,6 @@ const SignIn = () => {
 
           <div className="auth-form-container">
             <h2 style={{ textAlign: 'center' }}>{t('signInTitle') || 'Sign into Your Account'}</h2>
-
-            <div className="user-type-selector">
-              <button
-                type="button"
-                className={`user-type-btn ${userType === 'apprenant' ? 'active' : ''}`}
-                onClick={() => setUserType('apprenant')}
-              >
-                Learner
-              </button>
-              <button
-                type="button"
-                className={`user-type-btn ${userType === 'formateur' ? 'active' : ''}`}
-                onClick={() => setUserType('formateur')}
-              >
-                Teacher
-              </button>
-              <button
-                type="button"
-                className={`user-type-btn ${userType === 'admin' ? 'active' : ''}`}
-                onClick={() => setUserType('admin')}
-              >
-                Admin
-              </button>
-            </div>
 
             {error && <div className="error-message">{error}</div>}
 
@@ -127,7 +114,7 @@ const SignIn = () => {
                 />
               </div>
 
-              <div className="form-options" style={{marginTop:"10px", marginLeft:"3px"}}>
+              <div className="form-options" style={{ marginTop: "10px", marginLeft: "3px" }}>
                 <label className="remember-me">
                   <input
                     type="checkbox"
@@ -145,11 +132,11 @@ const SignIn = () => {
             </form>
 
             <div className="auth-footer">
-              {userType === 'admin' ? (
-                <p>Administrator accounts are created by an existing admin.</p>
-              ) : (
-                <p>{t('noAccount') || "Don't you have an account?"} <Link to={signUpPath}>{t('signUp') || 'Sign up'}</Link></p>
-              )}
+              <p>
+                {t('noAccount') || "Don't you have an account?"} <Link to="/signup">{t('signUp') || 'Sign up'}</Link>
+                <br />
+
+              </p>
             </div>
           </div>
         </div>

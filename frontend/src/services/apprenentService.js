@@ -132,3 +132,14 @@ export const postCourseReview = (courseId, data) => {
 export const deleteCourseComment = (courseId, commentId) => {
   return API.delete(`courses/${courseId}/comments/${commentId}`);
 };
+
+export const uploadProfilePicture = (file) => {
+  const formData = new FormData();
+  formData.append("profilePicture", file);
+
+  return API.post("upload/profile/picture", formData, {
+    headers: {
+      "Content-Type": "multipart/form-data",
+    },
+  });
+};

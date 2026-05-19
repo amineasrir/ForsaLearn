@@ -5,6 +5,7 @@ import {
   getApprenantProfile,
   updateApprenantProfile,
 } from "../../services/apprenentService";
+import { getUserAvatar } from "../../utils/userAvatar";
 import "./apprenant.css";
 
 const defaultFormData = {
@@ -75,7 +76,7 @@ const ApprenantProfile = () => {
         if (isMounted) {
           setError(
             requestError.response?.data?.message ||
-              t("apprenant.profileLoadError", "Failed to load profile.")
+            t("apprenant.profileLoadError", "Failed to load profile.")
           );
         }
       } finally {
@@ -147,7 +148,7 @@ const ApprenantProfile = () => {
     } catch (requestError) {
       setError(
         requestError.response?.data?.message ||
-          t("apprenant.profileSaveError", "Failed to update profile.")
+        t("apprenant.profileSaveError", "Failed to update profile.")
       );
     } finally {
       setSaving(false);
@@ -191,21 +192,20 @@ const ApprenantProfile = () => {
       <div className="profile-page-content">
         <h2 className="profile-title">
           {t("apprenant.myProfile")}
-          <button
-            className="title-edit-btn"
-            onClick={handleEditToggle}
-            title={
-              editMode
-                ? t("apprenant.close", "Close")
-                : t("apprenant.editProfile", "Edit profile")
-            }
-            type="button"
-          >
-            {editMode
-              ? t("apprenant.close", "Close")
-              : t("apprenant.edit", "Edit")}
-          </button>
+
         </h2>
+
+        <div className="profile-header-info" style={{ display: 'flex', alignItems: 'center', gap: '1.5rem', marginBottom: '2rem' }}>
+          <img 
+            src={getUserAvatar(user)} 
+            alt="Profile Avatar" 
+            style={{ width: '100px', height: '100px', borderRadius: '50%', objectFit: 'cover', border: '3px solid var(--primary)', backgroundColor: 'var(--bg-secondary)' }} 
+          />
+          <div>
+            <h3 style={{ margin: 0, fontSize: '1.5rem' }}>{profileData.fullName}</h3>
+            <p style={{ margin: '0.25rem 0 0', color: 'var(--muted)' }}>{profileData.email}</p>
+          </div>
+        </div>
 
         <form onSubmit={handleSubmit}>
           <div className="profile-details">

@@ -181,9 +181,8 @@ const FormatterSignUp = () => {
         <div className="auth-right">
           <div className="auth-header">
             <img src={logo_rem} alt="ForsaLearn" className="auth-logo" />
-            <Link to="/" className="back-link">
-              {t("backToHome")}
-            </Link>
+            <Link to="/" className="back-link"><span className="back-link-icon">←</span></Link>
+
           </div>
 
           <div className="auth-form-container">
@@ -197,9 +196,8 @@ const FormatterSignUp = () => {
             {step === 1 && (
               <div className="role-selector">
                 <label
-                  className={`role-option ${
-                    userType === "apprenant" ? "active" : ""
-                  }`}
+                  className={`role-option ${userType === "apprenant" ? "active" : ""
+                    }`}
                 >
                   <input
                     type="radio"
@@ -211,9 +209,8 @@ const FormatterSignUp = () => {
                   <span>{t("student") || "Student"}</span>
                 </label>
                 <label
-                  className={`role-option ${
-                    userType === "formateur" ? "active" : ""
-                  }`}
+                  className={`role-option ${userType === "formateur" ? "active" : ""
+                    }`}
                 >
                   <input
                     type="radio"

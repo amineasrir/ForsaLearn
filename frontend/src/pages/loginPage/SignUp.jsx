@@ -5,7 +5,7 @@ import logo_rem from "../../assets/image/home_page/logo_rem.png";
 import signupImage from "../../assets/image/login/image.png";
 import AuthSidebar from '../../components/auth/AuthSidebar';
 import '../../styles/auth.css';
-import { registerApprenant } from '../../services/apprenentService';
+import { registerApprenant, uploadProfilePicture } from '../../services/apprenentService';
 import { setAuthSession } from '../../utils/authStorage';
 
 const SignUp = () => {
@@ -22,6 +22,7 @@ const SignUp = () => {
     interests: '',
   });
   const [agreeTOS, setAgreeTOS] = useState(false);
+  const [profilePicture, setProfilePicture] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
@@ -85,6 +86,15 @@ const SignUp = () => {
       const data = response.data;
 
       setAuthSession({ token: data.token, user: data.user });
+
+      if (profilePicture) {
+        try {
+          await uploadProfilePicture(profilePicture);
+        } catch (uploadErr) {
+          console.error("Profile picture upload failed", uploadErr);
+        }
+      }
+
       navigate('/apprenant/dashboard');
 
     } catch (err) {
@@ -103,7 +113,7 @@ const SignUp = () => {
         <div className="auth-right">
           <div className="auth-header">
             <img src={logo_rem} alt="ForsaLearn" className="auth-logo" />
-            <Link to="/" className="back-link">{t('backToHome')}</Link>
+            <Link to="/" className="back-link"><span className="back-link-icon">←</span></Link>
           </div>
 
           <div className="auth-form-container">
@@ -136,6 +146,17 @@ const SignUp = () => {
             {error && <div className="error-message">{error}</div>}
 
             <form onSubmit={handleSubmit}>
+              <div className="form-group">
+                <label htmlFor="profilePicture">{t('apprenant.profilePhoto') || 'Profile Photo (Optional)'}</label>
+                <input
+                  type="file"
+                  id="profilePicture"
+                  accept="image/*"
+                  onChange={(e) => setProfilePicture(e.target.files[0])}
+                  style={{ padding: '0.4rem', border: '1px solid var(--border)', borderRadius: '4px' }}
+                />
+              </div>
+
               <div className="form-group">
                 <label htmlFor="fullName">{t('fullName')}</label>
                 <input
@@ -171,8 +192,8 @@ const SignUp = () => {
                   required
                 />
               </div>
-              
-               <div className="form-group">
+
+              <div className="form-group">
                 <label htmlFor="weak_subjects">{t('weak_subjects') || 'Weak subjects'}</label>
                 <input
                   type="text"
@@ -183,8 +204,17 @@ const SignUp = () => {
                   required
                 />
               </div>
-
-                <div className="form-group">
+ <div className="form-group">
+                <label htmlFor="profilePicture">{t('apprenant.profilePhoto') || 'Profile Photo (Optional)'}</label>
+                <input
+                  type="file"
+                  id="profilePicture"
+                  accept="image/*"
+                  onChange={(e) => setProfilePicture(e.target.files[0])}
+                  style={{ padding: '0.4rem', border: '1px solid var(--border)', borderRadius: '4px' }}
+                />
+              </div>
+              <div className="form-group">
                 <label htmlFor="interests">{t('interests') || 'Interests'}</label>
                 <input
                   type="text"

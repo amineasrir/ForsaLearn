@@ -396,7 +396,7 @@ router.get('/courses/:id/students', async (req, res) => {
 router.get('/students', async (req, res) => {
   try {
     const courses = await Course.find({ formateur: req.user.id })
-      .populate('enrolledStudents.student', 'fullName email');
+      .populate('enrolledStudents.student', 'fullName email profilePicture');
     
     // Collect unique students
     const studentsMap = new Map();
