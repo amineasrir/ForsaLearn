@@ -146,16 +146,7 @@ const SignUp = () => {
             {error && <div className="error-message">{error}</div>}
 
             <form onSubmit={handleSubmit}>
-              <div className="form-group">
-                <label htmlFor="profilePicture">{t('apprenant.profilePhoto') || 'Profile Photo (Optional)'}</label>
-                <input
-                  type="file"
-                  id="profilePicture"
-                  accept="image/*"
-                  onChange={(e) => setProfilePicture(e.target.files[0])}
-                  style={{ padding: '0.4rem', border: '1px solid var(--border)', borderRadius: '4px' }}
-                />
-              </div>
+              
 
               <div className="form-group">
                 <label htmlFor="fullName">{t('fullName')}</label>
