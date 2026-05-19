@@ -42,6 +42,11 @@ const Feature = ({ title, semi_title, bullets, image, reverse, icon, colorClass 
 const Blog = () => {
     const { t } = useTranslation();
     const features = t('homePage.blog.features', { returnObjects: true });
+    const featureImages = [
+        [imgA, imgB],
+        [imgC, imgD],
+        [imgE, imgF],
+    ];
 
     return (
         <main className="blog-page">
@@ -53,7 +58,7 @@ const Blog = () => {
                         title={f.title}
                         semi_title={f.semi_title}
                         bullets={f.bullets}
-                        image={[imgA, imgB]} // images remain static
+                        image={featureImages[idx % featureImages.length]}
                         reverse={idx % 2 === 1}
                         icon={idx === 0 ? faTrophy : idx === 1 ? faClock : faCertificate}
                         colorClass={colorClass}

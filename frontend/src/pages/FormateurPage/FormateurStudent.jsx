@@ -117,7 +117,7 @@ const FormateurStudent = () => {
             ) : filteredStudents.map((entry) => (
               <div key={entry.student?._id} className="student-card">
                 <img
-                  src={getMediaUrl(entry.student?.profilePicture) || 'https://via.placeholder.com/120'}
+                  src={entry.student?.profilePicture ? getMediaUrl(entry.student.profilePicture) : 'https://via.placeholder.com/120'}
                   alt={entry.student?.fullName || 'Student'}
                   
                 />
