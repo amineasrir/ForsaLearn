@@ -66,7 +66,7 @@ const ApprenantQuizzes = () => {
                   </p>
                 </div>
                 <div className="quiz-action">
-                  <Link to={`/apprenant/course/${quiz.courseId}`} className="quiz-start-btn">
+                  <Link to={`/apprenant/course/${quiz.courseId}/learn`} className="quiz-start-btn">
                     <FaArrowRight />
                   </Link>
                 </div>

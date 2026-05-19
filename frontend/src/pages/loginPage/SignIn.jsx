@@ -72,7 +72,7 @@ const SignIn = () => {
         <div className="auth-right">
           <div className="auth-header">
             <img src={logo_rem} alt="ForsaLearn" className="auth-logo" />
-            <Link to="/" className="back-link">{t('backToHome')}</Link>
+            <Link to="/" className="back-link"><span className="back-link-icon">←</span></Link>
           </div>
 
           <div className="auth-form-container">
@@ -127,7 +127,7 @@ const SignIn = () => {
                 />
               </div>
 
-              <div className="form-options">
+              <div className="form-options" style={{marginTop:"10px", marginLeft:"3px"}}>
                 <label className="remember-me">
                   <input
                     type="checkbox"
