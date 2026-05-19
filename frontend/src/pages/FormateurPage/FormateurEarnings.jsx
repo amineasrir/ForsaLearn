@@ -4,6 +4,7 @@ import logo_rem from '../../assets/image/home_page/logo_rem.png';
 import SidebarF from '../../components/formateur/sidebarF';
 import { FaDollarSign, FaStar, FaUsers } from 'react-icons/fa';
 import { useTranslation } from 'react-i18next';
+import i18nInstance from '../../i18n';
 import {
   getFormateurDashboardStats,
   getFormateurEarnings,
@@ -22,7 +23,28 @@ const FormateurEarnings = () => {
   const [payments, setPayments] = useState([]);
   const [dashboardStats, setDashboardStats] = useState(null);
   const [error, setError] = useState('');
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+
+  const changeLanguage = () => {
+    const lang = (i18n && i18n.language === 'en') ? 'fr' : 'en';
+    const instance = (i18n && typeof i18n.changeLanguage === 'function') ? i18n : i18nInstance;
+    if (instance && typeof instance.changeLanguage === 'function') {
+      instance.changeLanguage(lang);
+    }
+  };
+
+  const getFlagClass = (lang) => {
+    switch (lang) {
+      case 'en':
+        return 'fi fi-gb';
+      case 'fr':
+        return 'fi fi-fr';
+      default:
+        return 'fi fi-gl';
+    }
+  };
+
+  const currentLang = (i18n && i18n.language) ? i18n.language : 'en';
 
   useEffect(() => {
     const loadEarnings = async () => {
@@ -76,14 +98,17 @@ const FormateurEarnings = () => {
           <div className="navbar-dashboard-left">
             <img src={logo_rem} alt="ForsaLearn" className="navbar-dashboard-logo" />
           </div>
-          <div className="navbar-dashboard-right" />
-        </div>
+          <div className="navbar-dashboard-right">
+            <button className="lang-btn-dashboard" onClick={changeLanguage}>
+              <span className={getFlagClass(currentLang)} style={{ fontSize: '20px' }}></span>
+              <span>{currentLang.toUpperCase()}</span>
+            </button>
+          </div>        </div>
       </nav>
 
       <div className="formateur-container">
         <SidebarF />
         <main className="formateur-main">
-          {error && <div className="alert alert-error">{error}</div>}
 
           <div className="earnings-section">
             <div style={{ marginBottom: '1rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>

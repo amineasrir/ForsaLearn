@@ -4,6 +4,7 @@ import SidebarF from "../../components/formateur/sidebarF";
 import logo_rem from "../../assets/image/home_page/logo_rem.png";
 import { FaDownload, FaEye } from "react-icons/fa";
 import { useTranslation } from "react-i18next";
+import i18nInstance from "../../i18n";
 import {
   getFormateurCourse,
   getFormateurCourses,
@@ -57,8 +58,29 @@ const countQuizAttempts = (course, quizId) => {
 };
 
 const FormateurQuizResult = () => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [courses, setCourses] = useState([]);
+
+  const changeLanguage = () => {
+    const lang = (i18n && i18n.language === 'en') ? 'fr' : 'en';
+    const instance = (i18n && typeof i18n.changeLanguage === 'function') ? i18n : i18nInstance;
+    if (instance && typeof instance.changeLanguage === 'function') {
+      instance.changeLanguage(lang);
+    }
+  };
+
+  const getFlagClass = (lang) => {
+    switch (lang) {
+      case 'en':
+        return 'fi fi-gb';
+      case 'fr':
+        return 'fi fi-fr';
+      default:
+        return 'fi fi-gl';
+    }
+  };
+
+  const currentLang = (i18n && i18n.language) ? i18n.language : 'en';
   const [course, setCourse] = useState(null);
   const [selectedCourse, setSelectedCourse] = useState("");
   const [selectedQuiz, setSelectedQuiz] = useState("");
@@ -323,8 +345,12 @@ const FormateurQuizResult = () => {
             <img src={logo_rem} alt="ForsaLearn" className="navbar-dashboard-logo" />
           </div>
 
-          <div className="navbar-dashboard-right" />
-        </div>
+          <div className="navbar-dashboard-right">
+            <button className="lang-btn-dashboard" onClick={changeLanguage}>
+              <span className={getFlagClass(currentLang)} style={{ fontSize: '20px' }}></span>
+              <span>{currentLang.toUpperCase()}</span>
+            </button>
+          </div>        </div>
       </nav>
 
       <div className="dashboard-container">

@@ -3,6 +3,8 @@ import '../../styles/formateur.css';
 import SidebarF from '../../components/formateur/sidebarF';
 import logo_rem from '../../assets/image/home_page/logo_rem.png';
 import { FaHeadset, FaPaperPlane, FaPlus, FaSearch } from 'react-icons/fa';
+import { useTranslation } from 'react-i18next';
+import i18nInstance from '../../i18n';
 import {
   createFormateurSupportTicket,
   getFormateurConversationMessages,
@@ -42,11 +44,33 @@ const getTicketPreview = (conversation) => {
 const getStatusClass = (status = 'open') => status.toLowerCase().replace(/\s+/g, '-');
 
 const FormateurSupport = () => {
+  const { t, i18n } = useTranslation();
   const [profile, setProfile] = useState(null);
   const [conversations, setConversations] = useState([]);
   const [activeConversationId, setActiveConversationId] = useState(null);
   const [messages, setMessages] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
+
+  const changeLanguage = () => {
+    const lang = (i18n && i18n.language === 'en') ? 'fr' : 'en';
+    const instance = (i18n && typeof i18n.changeLanguage === 'function') ? i18n : i18nInstance;
+    if (instance && typeof instance.changeLanguage === 'function') {
+      instance.changeLanguage(lang);
+    }
+  };
+
+  const getFlagClass = (lang) => {
+    switch (lang) {
+      case 'en':
+        return 'fi fi-gb';
+      case 'fr':
+        return 'fi fi-fr';
+      default:
+        return 'fi fi-gl';
+    }
+  };
+
+  const currentLang = (i18n && i18n.language) ? i18n.language : 'en';
   const [newMessage, setNewMessage] = useState('');
   const [loading, setLoading] = useState(true);
   const [loadingMessages, setLoadingMessages] = useState(false);
@@ -220,8 +244,12 @@ const FormateurSupport = () => {
             <img src={logo_rem} alt="ForsaLearn" className="navbar-dashboard-logo" />
           </div>
 
-          <div className="navbar-dashboard-right" />
-        </div>
+          <div className="navbar-dashboard-right">
+            <button className="lang-btn-dashboard" onClick={changeLanguage}>
+              <span className={getFlagClass(currentLang)} style={{ fontSize: '20px' }}></span>
+              <span>{currentLang.toUpperCase()}</span>
+            </button>
+          </div>        </div>
       </nav>
 
       <div className="dashboard-container">
