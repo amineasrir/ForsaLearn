@@ -32,8 +32,15 @@ app.use(express.urlencoded({ extended: true }));
 app.use('/uploads', express.static('uploads'));
 
 // CORS - Allow frontend to communicate with backend
+const allowedClient = process.env.CLIENT_URL || 'http://localhost:3000';
+const devFrontend = 'http://localhost:3001';
 app.use(cors({
-  origin: process.env.CLIENT_URL || 'http://localhost:3000',
+  origin: (origin, callback) => {
+    // Allow requests from configured client or local dev frontend
+    if (!origin) return callback(null, true); // allow non-browser tools (curl, server-to-server)
+    if (origin === allowedClient || origin === devFrontend) return callback(null, true);
+    return callback(new Error('CORS policy: This origin is not allowed'), false);
+  },
   credentials: true
 }));
 

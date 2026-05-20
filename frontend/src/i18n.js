@@ -189,6 +189,11 @@ i18n.use(initReactI18next).init({
           numberOfQuestions: "Number of Questions : {{count}}",
           wishlist: "Wishlist",
           wishlistEmpty: "Your wishlist is empty.",
+          addToWishlist: "Add to Wishlist",
+          share: "Share",
+          aboutInstructor: "About the Instructor",
+          contactInstructor: "Contact Instructor",
+          email: "Email",
           instructor: "Instructor",
           priceFree: "Free",
           myQuizAttempts: "My Quiz Attempts",
@@ -281,6 +286,34 @@ i18n.use(initReactI18next).init({
           startLearning: "Start Learning",
           lessonCount: "{{done}}/{{total}} lessons",
           durationHours: "{{duration}}h"
+          ,
+          overview: "Overview",
+          courseDescription: "Course Description",
+          leaveReview: "Leave a Review",
+          rating: "Rating",
+          yourReview: "Your Review",
+          reviewPlaceholder: "Write your review...",
+          submitReview: "Submit Review",
+          postComment: "Post Comment",
+          name: "Name",
+          yourName: "Your Name",
+          yourEmail: "Your Email",
+          subjectOptional: "Subject (optional)",
+          comments: "Comments",
+          commentPlaceholder: "Write your comment...",
+          submit: "Submit",
+          noCommentsYet: "No comments yet",
+          back: "Back",
+          hide: "Hide",
+          previous: "Previous",
+          markComplete: "Mark Complete",
+          next: "Next",
+          introduction: "Introduction",
+          video: "Video",
+          sectionIntro: "In this section, students will discover what Python is, why it is one of the most popular programming languages, and how to set up the development environment. This section also introduces the basic syntax and structure of Python programs.",
+          complete: "Complete",
+          of: "of",
+          lessons: "lessons"
         },
         homePage: {
           hero: {
@@ -836,6 +869,11 @@ i18n.use(initReactI18next).init({
           numberOfQuestions: "Nombre de questions : {{count}}",
           wishlist: "Liste de souhaits",
           wishlistEmpty: "Votre liste de souhaits est vide.",
+          addToWishlist: "Ajouter à la liste de souhaits",
+          share: "Partager",
+          aboutInstructor: "À propos de l'instructeur",
+          contactInstructor: "Contacter l'instructeur",
+          email: "E-mail",
           instructor: "Instructeur",
           priceFree: "Gratuit",
           myQuizAttempts: "Mes tentatives de quiz",
@@ -890,6 +928,34 @@ i18n.use(initReactI18next).init({
           pending: "En attente",
           failed: "Échec",
           all: "Tous"
+          ,
+          overview: "Aperçu",
+          courseDescription: "Description du cours",
+          leaveReview: "Laisser un avis",
+          rating: "Note",
+          yourReview: "Votre avis",
+          reviewPlaceholder: "Écrivez votre avis...",
+          submitReview: "Soumettre l'avis",
+          postComment: "Publier le commentaire",
+          name: "Nom",
+          yourName: "Votre nom",
+          yourEmail: "Votre e-mail",
+          subjectOptional: "Sujet (facultatif)",
+          comments: "Commentaires",
+          commentPlaceholder: "Écrivez votre commentaire...",
+          submit: "Soumettre",
+          noCommentsYet: "Aucun commentaire pour le moment",
+          back: "Retour",
+          hide: "Masquer",
+          previous: "Précédent",
+          markComplete: "Marquer comme terminé",
+          next: "Suivant",
+          introduction: "Introduction",
+          video: "Vidéo",
+          sectionIntro: "Dans cette section, les étudiants découvriront ce qu'est Python, pourquoi c'est l'un des langages de programmation les plus populaires, et comment configurer l'environnement de développement. Cette section présente également la syntaxe et la structure de base des programmes Python.",
+          complete: "Terminé",
+          of: "de",
+          lessons: "leçons"
         },
         homePage: {
           hero: {
@@ -1284,9 +1350,20 @@ i18n.use(initReactI18next).init({
       }
     }
   },
-
+  // Default language
+  lng: 'en',
   fallbackLng: "en",
   interpolation: { escapeValue: false }
 });
+
+// Expose i18n for debugging in browser console
+if (typeof window !== 'undefined') {
+  try {
+    window.i18n = i18n;
+    console.info('i18n initialized, current language:', i18n.language || 'unknown');
+  } catch (e) {
+    // ignore in non-browser environments
+  }
+}
 
 export default i18n;
